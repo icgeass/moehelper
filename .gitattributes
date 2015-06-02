@@ -1,0 +1,24 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# *.java should be recognized as text file, eol=crlf means use crlf when new line
+*.java	text	eol=crlf
+
+# resources files or etc files
+# binary is a macro for -text -diff after git 1.6
+*.png	-text	-diff
+*.jpg	-text	-diff
+*.xml	text	eol=crlf
+*.vsd	-text	-diff
+*.ucls	-text	-diff
+
+
+# git files
+LICENSE	text	eol=crlf
+README.md	text	eol=crlf
+.gitattributes	text	eol=crlf
+.gitignore	text	eol=crlf
+
+
+
+
