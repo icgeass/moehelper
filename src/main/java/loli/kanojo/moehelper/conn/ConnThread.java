@@ -1,6 +1,7 @@
 package loli.kanojo.moehelper.conn;
 
 import loli.kanojo.moehelper.config.Configuration;
+import loli.kanojo.moehelper.linkstart.App;
 import loli.kanojo.moehelper.utils.Logger;
 
 import org.apache.http.HttpHost;
@@ -23,7 +24,7 @@ import org.jsoup.nodes.Document;
  * @url https://github.com/icgeass/moehelper
  */
 public class ConnThread implements Runnable {
-
+    
     // 每个CloseableHttpClient默认只允许两个连接, 需要设置cm
     private static PoolingHttpClientConnectionManager cm = null;
     private static CloseableHttpClient httpClient = null;
@@ -81,7 +82,7 @@ public class ConnThread implements Runnable {
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else if (resp.getStatusLine().getStatusCode() == 200) {
                 Document doc = Jsoup.parse(resp.getEntity().getContent(), "utf-8", connectUrl);
-                new Thread(Configuration.getFetcher(pageId, doc)).start();
+                App.getExecutorservice().execute(Configuration.getFetcher(pageId, doc));
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else {
                 throw new RuntimeException("lyh, I miss you now. though this exception can't be thrown, it compiled");

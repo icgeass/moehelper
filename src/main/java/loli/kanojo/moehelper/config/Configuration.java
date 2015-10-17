@@ -142,7 +142,7 @@ public class Configuration {
             System.exit(-1);
         }
         if (!procUserInput(args)) {
-            System.out.println("usage：\r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
+            System.out.println("usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
             System.exit(-1);
         }
         userInputParams = args;

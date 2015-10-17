@@ -1,14 +1,12 @@
 package loli.kanojo.moehelper.test;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
-import loli.kanojo.moehelper.linkstart.App;
 import loli.kanojo.moehelper.utils.Kit;
 
 import org.apache.commons.io.FileUtils;
@@ -19,9 +17,15 @@ import org.junit.Test;
 public class AppTest {
 
     @Test
-    public void test() {
+    public void testApp() {
         String[] args = new String[] { "1", "10" };
         //App.main(args);
+    }
+    
+    @Test
+    public void test(){
+        Properties props = System.getProperties();
+        props.list(System.out);
     }
 
     @Test

@@ -1,5 +1,8 @@
 package loli.kanojo.moehelper.linkstart;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import loli.kanojo.moehelper.config.Configuration;
 import loli.kanojo.moehelper.conn.ConnManager;
 import loli.kanojo.moehelper.conn.ConnThread;
@@ -15,9 +18,12 @@ import loli.kanojo.moehelper.utils.Logger;
  * @url https://github.com/icgeass/moehelper
  */
 public class App {
+    
+    private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
         try {
+            System.setProperty("line.separator", "\r\n");
             Configuration.init(args);
             linkStart();// ヽ(✿ﾟ▽ﾟ)ノ
             Configuration.getWriter().writeToFile();
@@ -31,7 +37,7 @@ public class App {
         lab: while (true) {
             int pageId = ConnManager.getInstance().getPageId();
             if (pageId != ConnManager.FIND_PAGE_ID_ALL_COMPLETED && pageId != ConnManager.FIND_PAGE_ID_LOCKED) {
-                new Thread(new ConnThread(pageId)).start();
+                executorService.execute(new ConnThread(pageId));
             } else if (pageId == ConnManager.FIND_PAGE_ID_ALL_COMPLETED) {
                 // 对应下载完成但是本地是否解析完成的判断
                 int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
@@ -52,5 +58,13 @@ public class App {
             // 每隔0.02秒获取pageId
             Thread.sleep(20);
         }
+        // 关闭线程池
+        executorService.shutdown();
     }
+
+    
+    public static ExecutorService getExecutorservice() {
+        return executorService;
+    }
+    
 }
