@@ -112,13 +112,11 @@ public class PoolUpdatedValidator {
                     lastTimeZipAllNum++;
                     // 01
                     mapLastTimePageId2ZipLinkNumInfo.put(pageId, mapLastTimePageId2ZipLinkNumInfo.get(pageId) + 1);
-                } else if (url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_PNG)) {
+                } else{
                     lastTimeZipOriginalNum++;
                     lastTimeZipAllNum++;
                     // 10
                     mapLastTimePageId2ZipLinkNumInfo.put(pageId, mapLastTimePageId2ZipLinkNumInfo.get(pageId) + 2);
-                } else {
-                    Logger.fatal("illgal suffix in zip package url");
                 }
                 if (mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b01 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b10 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b11) {
                     Logger.fatal("Find a error zip pack number info, the page id is " + pageId);

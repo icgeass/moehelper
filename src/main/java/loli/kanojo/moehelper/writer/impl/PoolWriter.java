@@ -304,11 +304,9 @@ public class PoolWriter implements Writer {
                 if (url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
                     jpegZipsNow++;
                     allZipNow++;
-                } else if (url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_PNG)) {
+                } else {
                     originalZipsNow++;
                     allZipNow++;
-                } else {
-                    Logger.fatal("Unreachable code");
                 }
             }
         }
@@ -342,14 +340,15 @@ public class PoolWriter implements Writer {
      * @return String
      */
     private String getFormatedZipUrl(String url) {
-        if (!url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG) && !url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_PNG)) {
+        if(!Constants.pattern_zip_link.matcher(url).matches()){
             Logger.fatal("Unrecognized url");
         }
-        int index = Kit.getInnerStrIndex(url, "/", 6);
+        return url;
+        /*int index = Kit.getInnerStrIndex(url, "/", 6);
         String prefix = url.substring(0, index + 1);
         String suffix = url.substring(index + 1);
         String pid = url.split("/", 7)[5].trim();
         String formattedId = ("[" + ("0000" + pid).substring(pid.length()) + "]").trim();
-        return Kit.formatUrlLink(prefix + formattedId + suffix.replace("/", "_")).replace(".zip_jpeg%3D1", Constants.LINK_POOL_ZIP_SUFFIX_JPG);
+        return Kit.formatUrlLink(prefix + formattedId + suffix.replace("/", "_")).replace(".zip_jpeg%3D1", Constants.LINK_POOL_ZIP_SUFFIX_JPG);*/
     }
 }

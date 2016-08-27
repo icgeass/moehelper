@@ -1,5 +1,7 @@
 package loli.kanojo.moehelper.config;
 
+import java.util.regex.Pattern;
+
 /**
  * 常量
  * 
@@ -21,10 +23,16 @@ public class Constants {
     public final static String HOST_KONA = "konachan.com";
 
     // Pool-JPG包链接后缀
-    public final static String LINK_POOL_ZIP_SUFFIX_JPG = ".zip?jpeg=1";
+    public final static String LINK_POOL_ZIP_SUFFIX_JPG = "?jpeg=1";
     // Pool-PNG包链接后缀
-    public final static String LINK_POOL_ZIP_SUFFIX_PNG = ".zip";
+    // public final static String LINK_POOL_ZIP_SUFFIX_PNG = "https://yande.re/pool/zip/4161";
 
+
+    public static Pattern pattern_zip_link = Pattern.compile("^(.*?)(/pool/zip/[1-9][0-9]{0,})(([?]jpeg=1)?)(.*?)$");
+
+    /**
+     * pool页面状态
+     */
     // 该页面404或不存在（被重定向到https://yande.re/pool, 表现为没有找到Json数据）
     public final static String POOL_STATUS_NULL = "null";
 
@@ -43,6 +51,10 @@ public class Constants {
     // 正常Pool, 上次抓取时没有该Pool, 新添加的Pool
     public final static String POOL_STATUS_NEW = "new";
 
+
+    /**
+     * post页面状态
+     */
     // 页面404
     public final static String POST_STATUS_404 = "404";
     // 程序异常

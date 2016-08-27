@@ -2,6 +2,7 @@ package loli.kanojo.moehelper.bean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 对应Post和Pool页面的数据对象
@@ -16,8 +17,8 @@ public class Page implements Comparable<Page> {
     private List<Post> posts;
     private List<Pool> pools;
     private List<Pool_post> pool_posts;
-    private Tags tags;
-    private Votes votes;
+    private Map<String, Object> tags;
+    private Map<String, Object> votes;
 
     public void initPage() {
         posts = new ArrayList<Post>();
@@ -49,19 +50,19 @@ public class Page implements Comparable<Page> {
         this.pool_posts = pool_posts;
     }
 
-    public Tags getTags() {
+    public Map<String, Object> getTags() {
         return tags;
     }
 
-    public void setTags(Tags tags) {
+    public void setTags(Map<String, Object> tags) {
         this.tags = tags;
     }
 
-    public Votes getVotes() {
+    public Map<String, Object> getVotes() {
         return votes;
     }
 
-    public void setVotes(Votes votes) {
+    public void setVotes(Map<String, Object> votes) {
         this.votes = votes;
     }
 

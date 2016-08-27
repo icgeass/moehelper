@@ -31,7 +31,6 @@ import com.alibaba.fastjson.JSON;
  */
 public class PoolFetcher implements Fetcher {
 
-    private static Pattern pattern_zip_link = Pattern.compile("^(.*?)(/pool/zip/.*?)([.]zip)(([?]jpeg=1)?)(.*?)$");
     private int pageId = -1;
 
     private Document doc = null;
@@ -133,16 +132,14 @@ public class PoolFetcher implements Fetcher {
         if (!pageStatus.equals(Constants.POOL_STATUS_NULL) && !pageStatus.equals(Constants.POOL_STATUS_EMPTY) && !pageStatus.equals(Constants.POOL_STATUS_ALL_DELETED)) {
             Elements eles = this.doc.getElementsByTag("a");
             for (Element element : eles) {
-                if (pattern_zip_link.matcher(element.absUrl("href")).matches()) {
+                if (Constants.pattern_zip_link.matcher(element.absUrl("href")).matches()) {
                     String zipUrl = element.absUrl("href").trim();
                     re.add(zipUrl);
                     log.setAllPackages(log.getAllPackages() + 1);
                     if (zipUrl.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
                         log.setJpegPackages(log.getJpegPackages() + 1);
-                    } else if (zipUrl.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_PNG)) {
+                    } else{
                         log.setOriginalPackages(log.getOriginalPackages() + 1);
-                    } else {
-                        Logger.fatal("Unreachable code");
                     }
                 }
             }
