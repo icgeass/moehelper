@@ -17,4 +17,12 @@ yande.re/
 konachan.com/
 tmp/
 
+*.class
+
+# idea相关
+.idea/
+target/
+*.iml
+
+
 
