@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import loli.kanojo.moehelper.config.Constants;
 import loli.kanojo.moehelper.utils.Kit;
 
 import org.apache.commons.io.FileUtils;
@@ -124,6 +125,33 @@ public class AppTest {
         }
         FileUtils.writeLines(new File(pathToWrite), "utf-8", liResult, false);
 
+    }
+
+    @Test
+    public void processZipUrl() throws Exception{
+        String srcPath = "D://yande.re_-_pool_160827173353_1_4169_packages_url.lst";
+        if(!srcPath.endsWith(".lst")){
+            throw new RuntimeException("不支持的文件格式");
+        }
+        String desPath = srcPath.replace(".lst", "." + System.currentTimeMillis() + ".lst");
+        List<String> li = FileUtils.readLines(new File(srcPath), "utf-8");
+        List<String> result = new ArrayList<String>();
+        for(int i =0; i<li.size() ; i++){
+            String url = li.get(i);
+            String[] splitStrArr = url.split("/");
+            if(null == splitStrArr || splitStrArr.length != 6){
+                throw new RuntimeException("Error Pool url format: " + url);
+            }
+            String pageIdString = splitStrArr[splitStrArr.length - 1];
+            Integer pageId = Integer.valueOf(pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?")));
+            if(url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)){
+                url = url + "&poolId=" +  pageId;
+            }else{
+                url = url + "?poolId=" + pageId;
+            }
+            result.add(url);
+        }
+        FileUtils.writeLines(new File(desPath), "utf-8", result, false);
     }
 
 }
