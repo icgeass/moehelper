@@ -312,6 +312,9 @@ public class PoolWriter implements Writer {
         }
         Logger.warn("all url this time:");
         Logger.warn("all: " + allZipNow + ", jpeg: " + jpegZipsNow + ", original: " + originalZipsNow);
+        if(allZipNow != allZipPre + affectedZipNumJpgSum + affectedZipNumPngSum || jpegZipsNow != jpegZipsPre + affectedZipNumJpgSum || originalZipsNow != originalZipsPre + affectedZipNumPngSum){
+            throw new RuntimeException("zips url number info predicted not match actual!");
+        }
     }
 
     private Integer getLastTimePageId2ZipLinkNumInfoById(Integer pageId) {

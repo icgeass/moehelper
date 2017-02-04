@@ -92,12 +92,17 @@ public class PoolUpdatedValidator {
                 return;
             }
             // https://yande.re/pool/zip/3387/Dengeki%20Moeoh%202014-04%20(JPG).zip?jpeg=1
+            // 20170204, now the url like https://yande.re/pool/zip/6?jpeg=1 ,  https://yande.re/pool/zip/6
             int lastTimeZipJpegNum = 0;
             int lastTimeZipOriginalNum = 0;
             int lastTimeZipAllNum = 0;
             for (String url : liLastTimeAllPackageUrl) {
-                String[] splitStrArr = url.split("/", 7);
-                Integer pageId = Integer.valueOf(splitStrArr[splitStrArr.length - 2]);
+                String[] splitStrArr = url.split("/");
+                if(null == splitStrArr || splitStrArr.length != 6){
+                    throw new RuntimeException("Error Pool url format: " + url);
+                }
+                String pageIdString = splitStrArr[splitStrArr.length - 1];
+                Integer pageId = Integer.valueOf(pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?")));
                 if (pageId > lastTimePageTo) {
                     lastTimePageTo = pageId;
                 }
@@ -118,6 +123,7 @@ public class PoolUpdatedValidator {
                     // 10
                     mapLastTimePageId2ZipLinkNumInfo.put(pageId, mapLastTimePageId2ZipLinkNumInfo.get(pageId) + 2);
                 }
+                // 最终只会有0b10或0b11，判断0b01, 0b10是因为第一次处理链接时原图和jpeg图链接顺序不确定，而0b11是第二次有原图情况下的计数
                 if (mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b01 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b10 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b11) {
                     Logger.fatal("Find a error zip pack number info, the page id is " + pageId);
                 }
