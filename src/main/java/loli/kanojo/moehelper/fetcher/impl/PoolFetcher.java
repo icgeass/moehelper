@@ -136,7 +136,7 @@ public class PoolFetcher implements Fetcher {
                     String zipUrl = element.absUrl("href").trim();
                     re.add(zipUrl);
                     log.setAllPackages(log.getAllPackages() + 1);
-                    if (zipUrl.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
+                    if (zipUrl.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
                         log.setJpegPackages(log.getJpegPackages() + 1);
                     } else{
                         log.setOriginalPackages(log.getOriginalPackages() + 1);

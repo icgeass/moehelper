@@ -16,6 +16,7 @@ import loli.kanojo.moehelper.utils.Logger;
 import loli.kanojo.moehelper.writer.Writer;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Pool数据写入, 先从Runtime和PoolLog中获取数据存在实例字段中后进行写入
@@ -301,7 +302,7 @@ public class PoolWriter implements Writer {
         // 也可以通过PoolLog判断
         for (Integer key : PoolLog.getMapPageId2ZipLinkPoolAll().keySet()) {
             for (String url : PoolLog.getMapPageId2ZipLinkPoolAll().get(key)) {
-                if (url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
+                if (url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
                     jpegZipsNow++;
                     allZipNow++;
                 } else {
@@ -337,14 +338,31 @@ public class PoolWriter implements Writer {
     }
 
     /**
-     * https://yande.re/pool/zip/3387/Dengeki%20Moeoh%202014-04%20(JPG).zip?jpeg=1
-     * 
+     * // https://yande.re/pool/zip/3387/Dengeki%20Moeoh%202014-04%20(JPG).zip?jpeg=1
+     * https://yande.re/pool/zip/6?jpeg=1 ,  https://yande.re/pool/zip/6
+     * 转为
+     * https://yande.re/pool/zip/6?jpeg=1&myPoolId=0006 ,  https://yande.re/pool/zip/6?myPoolId=0006
      * @param url
      * @return String
      */
     private String getFormatedZipUrl(String url) {
         if(!Constants.pattern_zip_link.matcher(url).matches()){
             Logger.fatal("Unrecognized url");
+        }
+        String[] splitStrArr = url.split("/", 6);
+        if(null == splitStrArr || splitStrArr.length != 6){
+            throw new RuntimeException("Error Pool url format: " + url);
+        }
+        String pageIdString = splitStrArr[splitStrArr.length - 1];
+        pageIdString = pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?"));
+        pageIdString = StringUtils.leftPad(pageIdString, 4, "0");
+        if(!StringUtils.isNumeric(pageIdString)){
+            throw new RuntimeException("pageId获取失败, " + pageIdString);
+        }
+        if(url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)){
+            url = url + "&myPoolId=" +  pageIdString;
+        }else{
+            url = url + "?myPoolId=" + pageIdString;
         }
         return url;
         /*int index = Kit.getInnerStrIndex(url, "/", 6);

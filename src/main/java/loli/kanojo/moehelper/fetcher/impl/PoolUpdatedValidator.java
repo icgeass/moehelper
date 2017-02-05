@@ -97,7 +97,7 @@ public class PoolUpdatedValidator {
             int lastTimeZipOriginalNum = 0;
             int lastTimeZipAllNum = 0;
             for (String url : liLastTimeAllPackageUrl) {
-                String[] splitStrArr = url.split("/");
+                String[] splitStrArr = url.split("/", 6);
                 if(null == splitStrArr || splitStrArr.length != 6){
                     throw new RuntimeException("Error Pool url format: " + url);
                 }
@@ -112,7 +112,7 @@ public class PoolUpdatedValidator {
                 if (!mapLastTimePageId2ZipLinkNumInfo.keySet().contains(pageId)) {
                     mapLastTimePageId2ZipLinkNumInfo.put(pageId, new Integer(0));
                 }
-                if (url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
+                if (url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
                     lastTimeZipJpegNum++;
                     lastTimeZipAllNum++;
                     // 01

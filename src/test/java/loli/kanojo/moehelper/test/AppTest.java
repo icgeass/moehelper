@@ -11,6 +11,7 @@ import loli.kanojo.moehelper.config.Constants;
 import loli.kanojo.moehelper.utils.Kit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -129,7 +130,7 @@ public class AppTest {
 
     @Test
     public void processZipUrl() throws Exception{
-        String srcPath = "D://yande.re_-_pool_160827173353_1_4169_packages_url.lst";
+        String srcPath = "D://yande.re_-_pool_170204103710_1_4431_packages_updated_url.lst";
         if(!srcPath.endsWith(".lst")){
             throw new RuntimeException("不支持的文件格式");
         }
@@ -138,16 +139,20 @@ public class AppTest {
         List<String> result = new ArrayList<String>();
         for(int i =0; i<li.size() ; i++){
             String url = li.get(i);
-            String[] splitStrArr = url.split("/");
+            String[] splitStrArr = url.split("/", 6);
             if(null == splitStrArr || splitStrArr.length != 6){
                 throw new RuntimeException("Error Pool url format: " + url);
             }
             String pageIdString = splitStrArr[splitStrArr.length - 1];
-            Integer pageId = Integer.valueOf(pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?")));
-            if(url.endsWith(Constants.LINK_POOL_ZIP_SUFFIX_JPG)){
-                url = url + "&poolId=" +  pageId;
+            pageIdString = pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?"));
+            pageIdString = StringUtils.leftPad(pageIdString, 4, "0");
+            if(!StringUtils.isNumeric(pageIdString)){
+                throw new RuntimeException("pageId获取失败, " + pageIdString);
+            }
+            if(url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)){
+                url = url + "&myPoolId=" +  pageIdString;
             }else{
-                url = url + "?poolId=" + pageId;
+                url = url + "?myPoolId=" + pageIdString;
             }
             result.add(url);
         }
