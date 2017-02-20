@@ -119,7 +119,12 @@ public class PostFetcher implements Fetcher {
                     Logger.fatal("Post #" + this.pageId + " match error. Reason: post was not in pool in document");
                 }
                 // ---校验json数据中post文件链接是否为原图/image/
-                if (!(page.getPosts().get(0).getFile_url().startsWith("http") && page.getPosts().get(0).getFile_url().contains("/image/"))) {
+                String fileUrl = page.getPosts().get(0).getFile_url();
+                if(fileUrl.startsWith("//")){
+                    fileUrl = Configuration.getConnParam("protocol") + ":" + fileUrl;
+                    page.getPosts().get(0).setFile_url(fileUrl);
+                }
+                if (!(fileUrl.startsWith("http") && fileUrl.contains("/image/"))) {
                     Logger.fatal("Post #" + this.pageId + " match error. Reason: post url was not correct in json");
                 }
                 boolean isPostUrlMatched = false;

@@ -154,19 +154,13 @@ public class PostWriter implements Writer {
     }
 
     private void writeDeletedPostJson() throws IOException {
-        File f = new File(Constants.W_WRITE_DIR + "/" + Configuration.getConnParam("host") + ".deleted_post.json");
-        if (f.exists()) {
-            FileUtils.copyFile(f, new File(Constants.W_WRITE_DIR + "/" + Configuration.getConnParam("host") + ".deleted_post.bk.json"), true);
-        }
+        File f = new File(Constants.W_FULL_PATH_PREFIX + ".deleted_post.json");
         FileUtils.writeLines(f, "utf-8", liJsonDeletedPost, true);
 
     }
 
     private void writeOkJson() throws IOException {
-        File f = new File(Constants.W_WRITE_DIR + "/" + Configuration.getConnParam("host") + ".json");
-        if (f.exists()) {
-            FileUtils.copyFile(f, new File(Constants.W_WRITE_DIR + "/" + Configuration.getConnParam("host") + ".bk.json"), true);
-        }
+        File f = new File(Constants.W_FULL_PATH_PREFIX + ".json");
         FileUtils.writeLines(f, "utf-8", liJsonOkPost, true);
     }
 
