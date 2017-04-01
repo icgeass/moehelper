@@ -2,12 +2,15 @@ package loli.kanojo.moehelper.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.regex.Pattern;
 
+import com.alibaba.fastjson.JSON;
+import loli.kanojo.moehelper.bean.Page;
+import loli.kanojo.moehelper.bean.Post;
 import loli.kanojo.moehelper.config.Constants;
+import loli.kanojo.moehelper.rt.Runtime;
 import loli.kanojo.moehelper.utils.Kit;
 
 import org.apache.commons.io.FileUtils;
@@ -20,21 +23,221 @@ public class AppTest {
 
     @Test
     public void testApp() {
-        String[] args = new String[] { "1", "10" };
+        String[] args = new String[]{"1", "10"};
         //App.main(args);
     }
-    
+
+
     @Test
-    public void test(){
+    public void genDeletedPostJson() throws Exception {
+        String basePath = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\Post";
+        File dir = new File(basePath);
+        Map<String, Page> postId2Page = new HashMap<String, Page>();
+        Map<String, String> postId2JsonOk = new HashMap<String, String>();
+        Pattern pattern = Pattern.compile("^[0-9a-f]{32}$");
+
+        for (File file : dir.listFiles()) {
+            if (file.getName().endsWith("post_all.lst")) {
+                List<String> list = FileUtils.readLines(file, "utf-8");
+                for (String link : list) {
+                    String decode = URLDecoder.decode(link, "utf-8");
+                    Integer productId = Integer.valueOf(decode.split(" ", 3)[1]);
+                    Page page = new Page();
+                    page.initPage();
+                    Post post = new Post();
+                    page.getPosts().add(post);
+                    postId2Page.put(productId + "", page);
+                    //
+                    post.setCreated_at(-10086);
+                    post.setId(productId);
+                    post.setFile_url(link);
+                    post.setMd5(link.substring(link.indexOf("/image/") + "/image/".length(), link.lastIndexOf("/yande.re")));
+                    if (!pattern.matcher(post.getMd5()).matches()) {
+                        throw new RuntimeException("非法md5格式");
+                    }
+                    post.setTags(URLDecoder.decode(link.substring(link.indexOf(post.getMd5()) + post.getMd5().length() + 1), "utf-8").split(" ", 3)[2]);
+                    post.setTags(post.getTags().substring(0, post.getTags().lastIndexOf(".")));
+                }
+            }else if(file.getName().replace(".deleted_post.json", "").endsWith(".json")){
+                List<String> list = FileUtils.readLines(file, "utf-8");
+                for(String string : list){
+                    Page page = JSON.parseObject(string, Page.class);
+                    postId2JsonOk.put(page.getPosts().get(0).getId()+ "", true+"");
+                }
+            }
+        }
+
+        Map<String, String> list = genHashMap(dir, "_post.log");
+        int all =  0;
+        for (String key : list.keySet()) {
+            int index = Integer.valueOf(key);
+            int from = (index - 1) * 10000 + 1;
+            int to = index * 10000;
+            List<String> stringList = new ArrayList<String>();
+            for (int i = from; i <= to; i++) {
+                Page page = postId2Page.get(i + "");
+                if (null == page) {
+                    continue;
+                }
+                if(null == postId2JsonOk.get(i + "")){
+                    stringList.add(JSON.toJSONString(page));
+                }
+            }
+            if (!stringList.isEmpty()) {
+                String newName = list.get(key).replace("_post.log", "") + ".deleted_post.json";
+                FileUtils.writeLines(new File("E:\\new111" + File.separator + newName), "utf-8", stringList, false);
+                System.out.println(key + "--->" + stringList.size());
+                all += stringList.size();
+            }
+        }
+
+        System.out.println(all);
+
+    }
+
+
+    @Test
+    public void testMerge() throws Exception {
+        String basePath = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\Post";
+        String type = "lst";
+        String baseSuffix = "post_no_pool." + type;
+        // base
+        Map<String, String> baseId2FileName = genHashMap(new File(basePath), baseSuffix);
+
+
+        String targetPath = "E:";
+        String targetSuffix = "post_in_pool." + type;
+        // to change
+        Map<String, String> targetId2FileName = genHashMap(new File(targetPath), targetSuffix);
+
+
+        for (String id : targetId2FileName.keySet()) {
+            File baseFile = new File(basePath + File.separator + baseId2FileName.get(id));
+            File targetFile = new File(targetPath + File.separator + targetId2FileName.get(id));
+            List<String> list = FileUtils.readLines(baseFile, "utf-8");
+            list.addAll(FileUtils.readLines(targetFile, "utf-8"));
+            Map<String, String> postId2String = new HashMap<String, String>();
+            for (String string : list) {
+                String decode = URLDecoder.decode(string, "utf-8");
+                Integer productId = null;
+                if (string.toLowerCase().startsWith("http")) {
+                    productId = Integer.valueOf(decode.split(" ", 3)[1]);
+                } else if (string.contains(" *yande.re")) {
+                    productId = Integer.valueOf(decode.split(" ", 4)[2]);
+                }
+                postId2String.put(productId + "", string);
+                // System.out.println(productId + "------------" + string);
+            }
+            int index = Integer.valueOf(id);
+            int from = (index - 1) * 10000 + 1;
+            int to = index * 10000;
+            List<String> stringList = new ArrayList<String>();
+            for (int i = from; i <= to; i++) {
+                String value = postId2String.get(i + "");
+                if (StringUtils.isBlank(value)) {
+                    continue;
+                }
+                stringList.add(value);
+            }
+            if (!stringList.isEmpty()) {
+                String newName = baseId2FileName.get(id).replace("no_pool", "all");
+                FileUtils.writeLines(new File("E:\\new" + File.separator + newName), "utf-8", stringList, false);
+                System.out.println(id + "--->" + stringList.size());
+            }
+
+        }
+    }
+
+
+    @Test
+    public void testRename() throws Exception {
+        // yande.re_-_post_130908133938_1_10000_post_no_pool
+        // yande.re_-_post_140528210534_1_10000_post_in_pool
+        // yande.re_-_post_170126111234_370001_380000_post_all
+
+        String basePath = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\Post";
+        String baseSuffix = "post_no_pool.lst";
+        // base
+        Map<String, String> baseId2FileName = genHashMap(new File(basePath), baseSuffix);
+
+
+        String targetPath = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\tmp";
+        String targetSuffix = "post_in_pool.lst";
+        // to change
+        Map<String, String> targetId2FileName = genHashMap(new File(targetPath), targetSuffix);
+
+
+        for (String id : targetId2FileName.keySet()) {
+            String newName = baseId2FileName.get(id).replace(baseSuffix, targetSuffix);
+            File f = new File(targetPath + File.separator + targetId2FileName.get(id));
+            f.renameTo(new File("E://" + newName));
+        }
+
+
+    }
+
+
+    public static Map<String, String> genHashMap(File dir, String suffix) throws Exception {
+        Map<String, String> re = new HashMap<String, String>();
+        for (File f : dir.listFiles()) {
+            if (f.getName().endsWith(suffix)) {
+                // konachan.com_-_post_140510201904_1_10000_post
+                Integer n = Integer.valueOf(f.getName().split("_", 7)[5]) / 10000;
+                re.put("" + n, f.getName());
+            }
+        }
+        return re;
+    }
+
+    @Test
+    public void testGenJsonFile() throws Exception {
+        String path = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\Post";
+        String jsonFileName = "yande.re.json";
+        File dir = new File(path);
+        Map<String, String> id2Path = genHashMap(dir, ".log");
+        Map<Integer, String> id2String = new HashMap<Integer, String>();
+        List<String> jsonStringList = FileUtils.readLines(new File(path + File.separator + jsonFileName), "utf-8");
+        for (String s : jsonStringList) {
+            Page page = JSON.parseObject(s, Page.class);
+            Integer postId = page.getPosts().get(0).getId();
+            id2String.put(postId, s);
+        }
+
+        int size = 0;
+        for (String string : id2Path.keySet()) {
+            String logName = id2Path.get(string).replace("_post.log", "");
+            String newName = logName + "." + jsonFileName.replace("konachan.com.", "").replace("yande.re.", "");
+            List<String> stringList = new ArrayList<String>();
+            int index = Integer.valueOf(string);
+            int from = (index - 1) * 10000 + 1;
+            int to = index * 10000;
+            for (int i = from; i <= to; i++) {
+                String value = id2String.get(i);
+                if (StringUtils.isBlank(value)) {
+                    continue;
+                }
+                stringList.add(value);
+            }
+            if (!stringList.isEmpty()) {
+                FileUtils.writeLines(new File("E:\\" + newName), "utf-8", stringList, false);
+                size += stringList.size();
+                System.out.println(newName);
+            }
+        }
+        System.out.println(size);
+        System.out.println();
+    }
+
+    @Test
+    public void test() {
         Properties props = System.getProperties();
         props.list(System.out);
     }
 
     @Test
-    @Ignore
     public void countPostNumInfoAll() throws IOException {
-        int to = 20000;
-        String logFilesDir = "D:\\moe\\Konachan.com\\Post";
+        int to = 380000;
+        String logFilesDir = "E:\\sh\\图\\WORK!!!\\!work\\yande.re\\Post";
         String pathToWrite = "./tmp/kona_all_post_info.txt";
         File dir = new File(logFilesDir);
         List<String> liLines = new ArrayList<String>();
