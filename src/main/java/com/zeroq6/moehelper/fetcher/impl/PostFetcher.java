@@ -26,8 +26,6 @@ import com.alibaba.fastjson.JSON;
  * 
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
- * @version moehelper - v1.0.7
- * @url https://github.com/icgeass/moehelper
  */
 public class PostFetcher implements Fetcher {
 
@@ -174,12 +172,9 @@ public class PostFetcher implements Fetcher {
                             // 设置page属性
                             // 被标记删除的图片但是在html中找到链接的page对象含有Post: id, url, md5, tags, created_at; Pool: id, name
                             page = new Page();
-                            page.initPage();
-                            page.getPosts().add(new Post(pageId));
-                            page.getPosts().get(0).setFile_url(file_url);
-                            page.getPosts().get(0).setMd5(md5);
-                            page.getPosts().get(0).setTags(tags);
-                            page.getPosts().get(0).setCreated_at(Configuration.DELETED_POST_CREATED_AT);
+                            Post post = new Post();
+                            post.setId(pageId).setFile_url(file_url).setMd5(md5).setTags(tags).setCreated_at(Configuration.DELETED_POST_CREATED_AT);
+                            page.getPosts().add(post);
                             PostLog.logPageNumByType(Constants.POST_STATUS_READ_BY_DOCUMENT);
                             // 设置是否在pool中属性
                             if (isInPoolByDoc) {

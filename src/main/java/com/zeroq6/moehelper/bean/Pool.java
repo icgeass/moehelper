@@ -1,12 +1,12 @@
 package com.zeroq6.moehelper.bean;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * Pool
  * 
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
- * @version moehelper - v1.0.7
- * @url https://github.com/icgeass/moehelper
  */
 public class Pool {
 
@@ -23,69 +23,76 @@ public class Pool {
         return id;
     }
 
-    public void setId(int id) {
+    public Pool setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Pool setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(String created_at) {
+    public Pool setCreated_at(String created_at) {
         this.created_at = created_at;
+        return this;
     }
 
     public String getUpdated_at() {
         return updated_at;
     }
 
-    public void setUpdated_at(String updated_at) {
+    public Pool setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
+        return this;
     }
 
     public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(int user_id) {
+    public Pool setUser_id(int user_id) {
         this.user_id = user_id;
+        return this;
     }
 
     public boolean isIs_public() {
         return is_public;
     }
 
-    public void setIs_public(boolean is_public) {
+    public Pool setIs_public(boolean is_public) {
         this.is_public = is_public;
+        return this;
     }
 
     public int getPost_count() {
         return post_count;
     }
 
-    public void setPost_count(int post_count) {
+    public Pool setPost_count(int post_count) {
         this.post_count = post_count;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public Pool setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     @Override
     public String toString() {
-        return "Pool [id=" + id + ", name=" + name + ", created_at=" + created_at + ", updated_at=" + updated_at + ", user_id=" + user_id + ", is_public=" + is_public + ", post_count=" + post_count + ", description=" + description + "]";
+        return JSON.toJSONString(this);
     }
-
 }

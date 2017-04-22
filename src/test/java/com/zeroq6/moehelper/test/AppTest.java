@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.zeroq6.moehelper.bean.Page;
+import com.zeroq6.moehelper.bean.Pool;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.utils.Kit;
@@ -41,7 +42,7 @@ public class AppTest {
                     String decode = URLDecoder.decode(link, "utf-8");
                     Integer productId = Integer.valueOf(decode.split(" ", 3)[1]);
                     Page page = new Page();
-                    page.initPage();
+                    page.setPosts(new ArrayList<Post>());
                     Post post = new Post();
                     page.getPosts().add(post);
                     postId2Page.put(productId + "", page);

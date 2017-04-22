@@ -1,5 +1,7 @@
 package com.zeroq6.moehelper.bean;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.List;
 
 /**
@@ -7,8 +9,6 @@ import java.util.List;
  * 
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
- * @version moehelper - v1.0.7
- * @url https://github.com/icgeass/moehelper
  */
 public class Post {
 
@@ -49,305 +49,332 @@ public class Post {
     private String frames_string;
     private List<Object> frames;
 
-    public Post() {
-    }
-
-    public Post(int id) {
-        this.id = id;
-    }
-
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public Post setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public Post setTags(String tags) {
         this.tags = tags;
+        return this;
     }
 
     public long getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(long created_at) {
+    public Post setCreated_at(long created_at) {
         this.created_at = created_at;
+        return this;
     }
 
     public int getCreator_id() {
         return creator_id;
     }
 
-    public void setCreator_id(int creator_id) {
+    public Post setCreator_id(int creator_id) {
         this.creator_id = creator_id;
+        return this;
     }
 
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public Post setAuthor(String author) {
         this.author = author;
+        return this;
     }
 
     public long getChange() {
         return change;
     }
 
-    public void setChange(long change) {
+    public Post setChange(long change) {
         this.change = change;
+        return this;
     }
 
     public String getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public Post setSource(String source) {
         this.source = source;
+        return this;
     }
 
     public int getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public Post setScore(int score) {
         this.score = score;
+        return this;
     }
 
     public String getMd5() {
         return md5;
     }
 
-    public void setMd5(String md5) {
+    public Post setMd5(String md5) {
         this.md5 = md5;
+        return this;
     }
 
     public long getFile_size() {
         return file_size;
     }
 
-    public void setFile_size(long file_size) {
+    public Post setFile_size(long file_size) {
         this.file_size = file_size;
+        return this;
     }
 
     public String getFile_url() {
         return file_url;
     }
 
-    public void setFile_url(String file_url) {
+    public Post setFile_url(String file_url) {
         this.file_url = file_url;
+        return this;
     }
 
     public boolean isIs_shown_in_index() {
         return is_shown_in_index;
     }
 
-    public void setIs_shown_in_index(boolean is_shown_in_index) {
+    public Post setIs_shown_in_index(boolean is_shown_in_index) {
         this.is_shown_in_index = is_shown_in_index;
+        return this;
     }
 
     public String getPreview_url() {
         return preview_url;
     }
 
-    public void setPreview_url(String preview_url) {
+    public Post setPreview_url(String preview_url) {
         this.preview_url = preview_url;
+        return this;
     }
 
     public int getPreview_width() {
         return preview_width;
     }
 
-    public void setPreview_width(int preview_width) {
+    public Post setPreview_width(int preview_width) {
         this.preview_width = preview_width;
+        return this;
     }
 
     public int getPreview_height() {
         return preview_height;
     }
 
-    public void setPreview_height(int preview_height) {
+    public Post setPreview_height(int preview_height) {
         this.preview_height = preview_height;
+        return this;
     }
 
     public int getActual_preview_width() {
         return actual_preview_width;
     }
 
-    public void setActual_preview_width(int actual_preview_width) {
+    public Post setActual_preview_width(int actual_preview_width) {
         this.actual_preview_width = actual_preview_width;
+        return this;
     }
 
     public int getActual_preview_height() {
         return actual_preview_height;
     }
 
-    public void setActual_preview_height(int actual_preview_height) {
+    public Post setActual_preview_height(int actual_preview_height) {
         this.actual_preview_height = actual_preview_height;
+        return this;
     }
 
     public String getSample_url() {
         return sample_url;
     }
 
-    public void setSample_url(String sample_url) {
+    public Post setSample_url(String sample_url) {
         this.sample_url = sample_url;
+        return this;
     }
 
     public long getSample_width() {
         return sample_width;
     }
 
-    public void setSample_width(long sample_width) {
+    public Post setSample_width(long sample_width) {
         this.sample_width = sample_width;
+        return this;
     }
 
     public long getSample_height() {
         return sample_height;
     }
 
-    public void setSample_height(long sample_height) {
+    public Post setSample_height(long sample_height) {
         this.sample_height = sample_height;
+        return this;
     }
 
     public long getSample_file_size() {
         return sample_file_size;
     }
 
-    public void setSample_file_size(long sample_file_size) {
+    public Post setSample_file_size(long sample_file_size) {
         this.sample_file_size = sample_file_size;
+        return this;
     }
 
     public String getJpeg_url() {
         return jpeg_url;
     }
 
-    public void setJpeg_url(String jpeg_url) {
+    public Post setJpeg_url(String jpeg_url) {
         this.jpeg_url = jpeg_url;
+        return this;
     }
 
     public long getJpeg_width() {
         return jpeg_width;
     }
 
-    public void setJpeg_width(long jpeg_width) {
+    public Post setJpeg_width(long jpeg_width) {
         this.jpeg_width = jpeg_width;
+        return this;
     }
 
     public long getJpeg_height() {
         return jpeg_height;
     }
 
-    public void setJpeg_height(long jpeg_height) {
+    public Post setJpeg_height(long jpeg_height) {
         this.jpeg_height = jpeg_height;
+        return this;
     }
 
     public long getJpeg_file_size() {
         return jpeg_file_size;
     }
 
-    public void setJpeg_file_size(long jpeg_file_size) {
+    public Post setJpeg_file_size(long jpeg_file_size) {
         this.jpeg_file_size = jpeg_file_size;
+        return this;
     }
 
     public String getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public Post setRating(String rating) {
         this.rating = rating;
+        return this;
     }
 
     public boolean isHas_children() {
         return has_children;
     }
 
-    public void setHas_children(boolean has_children) {
+    public Post setHas_children(boolean has_children) {
         this.has_children = has_children;
+        return this;
     }
 
     public int getParent_id() {
         return parent_id;
     }
 
-    public void setParent_id(int parent_id) {
+    public Post setParent_id(int parent_id) {
         this.parent_id = parent_id;
+        return this;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public Post setStatus(String status) {
         this.status = status;
+        return this;
     }
 
     public long getWidth() {
         return width;
     }
 
-    public void setWidth(long width) {
+    public Post setWidth(long width) {
         this.width = width;
+        return this;
     }
 
     public long getHeight() {
         return height;
     }
 
-    public void setHeight(long height) {
+    public Post setHeight(long height) {
         this.height = height;
+        return this;
     }
 
     public boolean isIs_held() {
         return is_held;
     }
 
-    public void setIs_held(boolean is_held) {
+    public Post setIs_held(boolean is_held) {
         this.is_held = is_held;
+        return this;
     }
 
     public String getFrames_pending_string() {
         return frames_pending_string;
     }
 
-    public void setFrames_pending_string(String frames_pending_string) {
+    public Post setFrames_pending_string(String frames_pending_string) {
         this.frames_pending_string = frames_pending_string;
+        return this;
     }
 
     public List<Object> getFrames_pending() {
         return frames_pending;
     }
 
-    public void setFrames_pending(List<Object> frames_pending) {
+    public Post setFrames_pending(List<Object> frames_pending) {
         this.frames_pending = frames_pending;
+        return this;
     }
 
     public String getFrames_string() {
         return frames_string;
     }
 
-    public void setFrames_string(String frames_string) {
+    public Post setFrames_string(String frames_string) {
         this.frames_string = frames_string;
+        return this;
     }
 
     public List<Object> getFrames() {
         return frames;
     }
 
-    public void setFrames(List<Object> frames) {
+    public Post setFrames(List<Object> frames) {
         this.frames = frames;
+        return this;
     }
 
     @Override
     public String toString() {
-        return "Post [id=" + id + ", tags=" + tags + ", created_at=" + created_at + ", creator_id=" + creator_id + ", author=" + author + ", change=" + change + ", source=" + source + ", score=" + score + ", md5=" + md5 + ", file_size=" + file_size + ", file_url=" + file_url + ", is_shown_in_index=" + is_shown_in_index + ", preview_url=" + preview_url + ", preview_width=" + preview_width + ", preview_height=" + preview_height + ", actual_preview_width=" + actual_preview_width + ", actual_preview_height=" + actual_preview_height + ", sample_url=" + sample_url + ", sample_width=" + sample_width
-                + ", sample_height=" + sample_height + ", sample_file_size=" + sample_file_size + ", jpeg_url=" + jpeg_url + ", jpeg_width=" + jpeg_width + ", jpeg_height=" + jpeg_height + ", jpeg_file_size=" + jpeg_file_size + ", rating=" + rating + ", has_children=" + has_children + ", parent_id=" + parent_id + ", status=" + status + ", width=" + width + ", height=" + height + ", is_held=" + is_held + ", frames_pending_string=" + frames_pending_string + ", frames_pending=" + frames_pending + ", frames_string=" + frames_string + ", frames=" + frames + "]";
+        return JSON.toJSONString(this);
     }
-
 }

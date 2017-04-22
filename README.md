@@ -10,7 +10,7 @@
 
 1. 图片下载使用火狐DownThemAll插件，对于链接中包含```...```无法导入情况，使用命令```find "..." <filePath>```（windows）找出，然后手动添加到下载列表
 2. 校验图片MD5使用RapidCRC Unicode并设置UTF-8编码
-3. jar文件与生成的文件夹，文件的相对位置不能修改，抓取pool链接时会读取上一次更新时pool的信息，判断之前的pool是否有更新
+3. jar文件与生成的文件（夹）的相对位置不能修改，抓取pool链接时会读取上一次抓取的pool信息，判断之前的pool中是否有图片更新
 4. 由于更新pool需要判断前面的pool是否有更新，所以pool id一律从1开始
 
 ### 常见问题
@@ -19,6 +19,7 @@
     - 判断页面json数据中pools数组长度
     - 正则匹配HTML页面内容```This post is #x in the xxx pool.```
     - 如果以上两者结果不一致则会提示并退出
+    - post是否在pool中以获取post信息的时间为准
 - 怎样确定pool被更新过
     - 每次更新pool保存每个pool对应的post信息，再次更新时如果当前pool的post均在上次更新时该pool的post中（使用MD5判断），则认为该pool没有更新，否则认为更新过
 - post.log日志中status属性的10串含义
@@ -26,9 +27,9 @@
 - post.log日志中 写入URL条数 和 写入MD5条数 为什么与 读取成功 数量不一致
     - 程序设计初期post获取方式只是为了抓取不在pool中post链接，所以这两者只记录不在pool中数量（post被标记为删除，通过解析HTML文档获得的链接包含在内）
     - 可以查看 Pool信息 行，从左至右数字依次表示：
-        1. 没有被标记为删除不在Pool中的post数量
-        2. 没有被标记为删除在Pool中的post数量
-        3. 被标记删除通过解析HTML获得的不在Pool中的post数量
-        4. 被标记删除通过解析HTML获得的在Pool中的post数量
+        1. 没有被标记为删除的不在Pool中的post数量
+        2. 没有被标记为删除的在Pool中的post数量
+        3. 被标记删除的通过解析HTML获得的不在Pool中的post数量
+        4. 被标记删除的通过解析HTML获得的在Pool中的post数量
 
 
