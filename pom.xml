@@ -2,13 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>loli.kanojo</groupId>
+	<groupId>com.zeroq6</groupId>
 	<artifactId>moehelper</artifactId>
-	<version>1.0.7-SNAPSHOT</version>
+	<version>1.0.8</version>
 	<packaging>jar</packaging>
 
 	<name>moehelper</name>
-	<url>https://github.com/icgeass/moehelper</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -61,7 +60,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>loli.kanojo.moehelper.linkstart.App</mainClass>
+							<mainClass>com.zeroq6.moehelper.linkstart.App</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

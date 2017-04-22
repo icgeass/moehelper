@@ -1,42 +1,34 @@
 # moehelper
-![moehelper logo](https://github.com/icgeass/moehelper/raw/master/etc/logo.png)
 
-### 介绍
-
-一个更新图片的辅助程序
-
- *`私用, 勿公开传播`* <br />
- *`Private Use, No Public Distribution`*
+一个维护k站、萌站图片画册更新的辅助程序
 
 ### 用法
 
-	java -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]
-
-### 常见问题
- 
-1. **如何判断指定post是否在pool中**<br/>
-正则和pools.size
-2. **怎样确定pool被更新过**<br />
-如果该pool上一次更新时含有本次更新所有post的MD5，则未更新，否则认为更新过。注意pool中只出现post被移除将不会被认为更新
-3. **post日志中status属性的10串含义**<br />
-从左至右依次表示：是否含有原图链接，是否为png格式，是否含有jpeg图链接，是否为jpg格式，是否含有sample图链接，是否为jpg格式
+```java -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]```
 
 ### 注意
 
-* 推荐校验MD5使用RapidCRC Unicode，并选择utf-8编码；导入链接使用DownThemAll!(文件名中含`...`可能无法导入，可用find命令找出)。程序已处理链接中非法字符
-* 对于post，更新时id范围按照1..n，n+1..2n，2n+1..3n依次类推；对于pool，每次更新均使用1..MaxPoolId，以方便检查更新。限定id范围1w以内，一般不区分pool，则使用all.lst（no_pool.lst和in_pool）；区分pool则使用no_pool.lst并且定时更新pool
-* post日志中`文件写入情况`行，`JSON条数`记录所有未被标记删除的post的JSON条数，`写入URL条数`和`写入MD5条数`仅统计不在pool中的post（但是含所有被标记为删除但找到链接的post，不区分是否在pool中）
-* `pool信息`行加号左边表示不在pool中的图片数量，右边表示在pool中
+1. 图片下载使用火狐DownThemAll插件，对于链接中包含```...```无法导入情况，使用命令```find "..." <filePath>```（windows）找出，然后手动添加到下载列表
+2. 校验图片MD5使用RapidCRC Unicode并设置UTF-8编码
+3. jar文件与生成的文件夹，文件的相对位置不能修改，抓取pool链接时会读取上一次更新时pool的信息，判断之前的pool是否有更新
+4. 由于更新pool需要判断前面的pool是否有更新，所以pool id一律从1开始
 
-### 更新历史
-
-* v1.0.7
-
-### 引用
-
-* [fastjson](https://github.com/alibaba/fastjson "fastjson")
-* [httpclient](http://hc.apache.org/httpcomponents-client-4.4.x/index.html "httpclient")
-* [jsoup](http://jsoup.org/ "jsoup")
-* [apache io commons](http://commons.apache.org/proper/commons-io/ "apache io commons")
+### 常见问题
+ 
+- 如何判断指定post是否在pool中
+    - 判断页面json数据中pools数组长度
+    - 正则匹配HTML页面内容```This post is #x in the xxx pool.```
+    - 如果以上两者结果不一致则会提示并退出
+- 怎样确定pool被更新过
+    - 每次更新pool保存每个pool对应的post信息，再次更新时如果当前pool的post均在上次更新时该pool的post中（使用MD5判断），则认为该pool没有更新，否则认为更新过
+- post.log日志中status属性的10串含义
+    - 从左至右依次表示：是否含有原图链接，是否为png格式，是否含有jpeg图链接，是否为jpg格式，是否含有sample图链接，是否为jpg格式
+- post.log日志中 写入URL条数 和 写入MD5条数 为什么与 读取成功 数量不一致
+    - 程序设计初期post获取方式只是为了抓取不在pool中post链接，所以这两者只记录不在pool中数量（post被标记为删除，通过解析HTML文档获得的链接包含在内）
+    - 可以查看 Pool信息 行，从左至右数字依次表示：
+        1. 没有被标记为删除不在Pool中的post数量
+        2. 没有被标记为删除在Pool中的post数量
+        3. 被标记删除通过解析HTML获得的不在Pool中的post数量
+        4. 被标记删除通过解析HTML获得的在Pool中的post数量
 
 
