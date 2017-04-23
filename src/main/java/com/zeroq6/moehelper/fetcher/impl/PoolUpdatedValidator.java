@@ -190,7 +190,7 @@ public class PoolUpdatedValidator {
                     }
                     String md5 = mapPostId2Md5.get(pool2post.getPost_id());
                     if (null == md5 || !pattern_md5.matcher(md5).matches()) {
-                        MyLogUtils.fatal("Error md5 format");
+                        throw new RuntimeException("错误的MD5格式, " + md5);
                     }
                     mapLastTimePageId2PostMd5List.get(pool2post.getPool_id()).add(md5);
 
