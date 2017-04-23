@@ -42,7 +42,7 @@ public class PoolUpdatedValidator {
     private static Map<Integer, Set<String>> mapLastTimePageId2PostMd5List = Collections.synchronizedMap(new HashMap<Integer, Set<String>>(100));
 
     // 来自lst（所有zip链接），lst文件中原本不含all deleted和empty两种情况
-    private static Map<Integer, Integer> mapLastTimePageId2ZipLinkNumInfo = Collections.synchronizedMap(new HashMap<Integer, Integer>(100));
+    private static Map<Integer, Integer> mapLastTimePageId2ZipLinkCountInfo = Collections.synchronizedMap(new HashMap<Integer, Integer>(100));
 
     // 私有
     private PoolUpdatedValidator() {
@@ -52,10 +52,10 @@ public class PoolUpdatedValidator {
         if (init) {
            throw new RuntimeException("只能初始化一次");
         }
-        // 两者顺序不能变, initMapLastTimePageId2ZipLinkNumInfo需要设置上一次更新的PoolId范围
-        initMapLastTimePageId2ZipLinkNumInfo();
+        // 两者顺序不能变, initMapLastTimePageId2ZipLinkCountInfo需要设置上一次更新的PoolId范围
+        initMapLastTimePageId2ZipLinkCountInfo();
         initMapLastTimePageId2PostMd5List();
-        if (!mapLastTimePageId2ZipLinkNumInfo.keySet().equals(mapLastTimePageId2PostMd5List.keySet())) {
+        if (!mapLastTimePageId2ZipLinkCountInfo.keySet().equals(mapLastTimePageId2PostMd5List.keySet())) {
             throw new RuntimeException("链接信息和MD5信息不一致");
         }
         init = true;
@@ -66,11 +66,11 @@ public class PoolUpdatedValidator {
      * 
      * @return void
      */
-    private static void initMapLastTimePageId2ZipLinkNumInfo() {
+    private static void initMapLastTimePageId2ZipLinkCountInfo() {
         File fileToRead = null;
         try {
             File dir = new File(Writer.W_WRITE_DIR);
-            List<String> liLastTimeAllPackageUrl = new ArrayList<String>(100);
+            List<String> liLastTimeAllPackageUrl = new ArrayList<String>();
             fileToRead = new File(Writer.W_WRITE_DIR + "/yande.re_-_a");
             for (File file : dir.listFiles()) {
                 if (pattern_filename_packages_all_url.matcher(file.getName()).matches()) {
@@ -81,12 +81,12 @@ public class PoolUpdatedValidator {
             }
             // 是否查找到文件
             if (fileToRead.getName().endsWith(".lst")) {
-                MyLogUtils.info("Read from " + fileToRead.getName() + "\r\n");
+                MyLogUtils.info("read from " + fileToRead.getName() + ".");
                 liLastTimeAllPackageUrl = FileUtils.readLines(fileToRead, "utf-8");
             }
             // 是否读取成功
             if (liLastTimeAllPackageUrl.isEmpty()) {
-                MyLogUtils.info("Read .lst file failed\r\n\r\n");
+                MyLogUtils.info("read .lst file failed.");
                 return;
             }
             // https://yande.re/pool/zip/3387/Dengeki%20Moeoh%202014-04%20(JPG).zip?jpeg=1
@@ -95,9 +95,9 @@ public class PoolUpdatedValidator {
             int lastTimeZipOriginalNum = 0;
             int lastTimeZipAllNum = 0;
             for (String url : liLastTimeAllPackageUrl) {
-                String[] splitStrArr = url.split("/", 6);
+                String[] splitStrArr = url.split("/");
                 if(null == splitStrArr || splitStrArr.length != 6){
-                    throw new RuntimeException("Error Pool url format: " + url);
+                    throw new RuntimeException("pool包链接格式不正确, " + url);
                 }
                 String pageIdString = splitStrArr[splitStrArr.length - 1];
                 Integer pageId = Integer.valueOf(pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?")));
@@ -107,28 +107,29 @@ public class PoolUpdatedValidator {
                 if (pageId < lastTimePageFrom) {
                     lastTimePageFrom = pageId;
                 }
-                if (!mapLastTimePageId2ZipLinkNumInfo.keySet().contains(pageId)) {
-                    mapLastTimePageId2ZipLinkNumInfo.put(pageId, new Integer(0));
+                if (!mapLastTimePageId2ZipLinkCountInfo.keySet().contains(pageId)) {
+                    mapLastTimePageId2ZipLinkCountInfo.put(pageId, new Integer(0));
                 }
                 if (url.contains(PoolFetcher.LINK_POOL_ZIP_SUFFIX_JPG)) {
                     lastTimeZipJpegNum++;
                     lastTimeZipAllNum++;
                     // 01
-                    mapLastTimePageId2ZipLinkNumInfo.put(pageId, mapLastTimePageId2ZipLinkNumInfo.get(pageId) + 1);
+                    mapLastTimePageId2ZipLinkCountInfo.put(pageId, mapLastTimePageId2ZipLinkCountInfo.get(pageId) + 1);
                 } else{
                     lastTimeZipOriginalNum++;
                     lastTimeZipAllNum++;
                     // 10
-                    mapLastTimePageId2ZipLinkNumInfo.put(pageId, mapLastTimePageId2ZipLinkNumInfo.get(pageId) + 2);
+                    mapLastTimePageId2ZipLinkCountInfo.put(pageId, mapLastTimePageId2ZipLinkCountInfo.get(pageId) + 2);
                 }
                 // 最终只会有0b10或0b11，判断0b01, 0b10是因为第一次处理链接时原图和jpeg图链接顺序不确定，而0b11是第二次有原图情况下的计数
-                if (mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b01 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b10 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b11) {
-                    MyLogUtils.fatal("Find a error zip pack number info, the page id is " + pageId);
+                Integer pageId2CountCurrent = mapLastTimePageId2ZipLinkCountInfo.get(pageId);
+                if (pageId2CountCurrent != 0b01 && pageId2CountCurrent != 0b10 && pageId2CountCurrent != 0b11) {
+                    throw new RuntimeException("pool id对应的pool链接数量不正确, " + pageId);
                 }
             }
-            MyLogUtils.info("Read file " + fileToRead.getName() + " success, " + mapLastTimePageId2ZipLinkNumInfo.size() + " Pool, " + liLastTimeAllPackageUrl.size() + " Pool zip package urls (jpeg: " + lastTimeZipJpegNum + ", original: " + lastTimeZipOriginalNum + ", all: " + lastTimeZipAllNum + ") in all.\r\n\r\n");
+            MyLogUtils.info("read file " + fileToRead.getName() + " success, " + mapLastTimePageId2ZipLinkCountInfo.size() + " Pool, " + liLastTimeAllPackageUrl.size() + " Pool zip package urls (jpeg: " + lastTimeZipJpegNum + ", original: " + lastTimeZipOriginalNum + ", all: " + lastTimeZipAllNum + ") in all.");
         } catch (Exception e) {
-            MyLogUtils.fatal("Read file " + fileToRead.getName() + " failed", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -152,12 +153,12 @@ public class PoolUpdatedValidator {
                 }
             }
             if (fileToRead.getName().endsWith(".json")) {
-                MyLogUtils.info("Read from " + fileToRead.getName() + "\r\n");
+                MyLogUtils.info("read from " + fileToRead.getName() + "\r\n");
                 liLastTimeJsonString = FileUtils.readLines(fileToRead, "utf-8");
             }
             // 判断文件是否读取成功
             if (liLastTimeJsonString.isEmpty()) {
-                MyLogUtils.info("Read .json file failed\r\n\r\n");
+                MyLogUtils.info("read .json file failed\r\n\r\n");
                 return;
             }
 
@@ -195,9 +196,9 @@ public class PoolUpdatedValidator {
 
                 }
             }
-            MyLogUtils.info("Read file " + fileToRead.getName() + " succeed, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found\r\n\r\n");
+            MyLogUtils.info("read file " + fileToRead.getName() + " succeed, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found\r\n\r\n");
         } catch (Exception e) {
-            MyLogUtils.fatal("Read file " + fileToRead.getName() + " failed", e);
+            MyLogUtils.fatal("read file " + fileToRead.getName() + " failed", e);
         }
     }
 
@@ -232,7 +233,7 @@ public class PoolUpdatedValidator {
             }
         }
         // pageId = null 始终返回POOL_STATUS_NEW用于初始mapLastTimePageId2PostMd5Li时跳过后面判断
-        if (null == pageId || !mapLastTimePageId2ZipLinkNumInfo.keySet().contains(pageId)) {
+        if (null == pageId || !mapLastTimePageId2ZipLinkCountInfo.keySet().contains(pageId)) {
             return PoolLog.POOL_STATUS_NEW; // 若上一次的empty和all deleted添加了Post也将任务是new
         }
         for (Post post : page.getPosts()) {
@@ -249,7 +250,7 @@ public class PoolUpdatedValidator {
     }
 
     public static Map<Integer, Integer> getMapLastTimePageId2ZipLinkCountInfo() {
-        return mapLastTimePageId2ZipLinkNumInfo;
+        return mapLastTimePageId2ZipLinkCountInfo;
     }
 
 }
