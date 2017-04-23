@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.zeroq6.moehelper.bean.Page;
+import com.zeroq6.moehelper.fetcher.impl.PostFetcher;
 import com.zeroq6.moehelper.log.Log;
 import com.zeroq6.moehelper.log.impl.PostLog;
 import com.zeroq6.moehelper.utils.MyLogUtils;
@@ -15,7 +16,6 @@ import com.zeroq6.moehelper.utils.MyDateUtils;
 import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Configuration;
-import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.writer.Writer;
 
@@ -125,11 +125,11 @@ public class PostWriter implements Writer {
     }
 
     private void validate() {
-        int ok_json = PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_JSON);
-        int ok_doc = PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_DOCUMENT);
-        int post_404 = PostLog.getPageNumStatus(Constants.POST_STATUS_404);
-        int post_exception = PostLog.getPageNumStatus(Constants.POST_STATUS_EXCEPTION);
-        int post_no_url = PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND);
+        int ok_json = PostLog.getPageNumStatus(PostFetcher.POST_STATUS_READ_BY_JSON);
+        int ok_doc = PostLog.getPageNumStatus(PostFetcher.POST_STATUS_READ_BY_DOCUMENT);
+        int post_404 = PostLog.getPageNumStatus(PostFetcher.POST_STATUS_404);
+        int post_exception = PostLog.getPageNumStatus(PostFetcher.POST_STATUS_EXCEPTION);
+        int post_no_url = PostLog.getPageNumStatus(PostFetcher.POST_STATUS_NO_LINK_FOUND);
         int allPosts = Integer.valueOf(Configuration.getToPage() - Configuration.getFromPage()) + 1;
         int successPosts = liPages.size();// ok_doc 和 ok_json都含有
         int failedPosts = ResourcesHolder.getReadFailedPageCount();
@@ -211,7 +211,7 @@ public class PostWriter implements Writer {
         li.add("读取成功: " + liPages.size());
         li.add("读取失败: " + ResourcesHolder.getReadFailedPageCount());
         li.add("JSON数据条数: " + liJsonOkPost.size());
-        li.add("详细计数: ok-json=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_JSON) + ", ok-doc-post-deleted=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_DOCUMENT) + ", 404=" + PostLog.getPageNumStatus(Constants.POST_STATUS_404) + ", exception=" + PostLog.getPageNumStatus(Constants.POST_STATUS_EXCEPTION) + ", no url=" + PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND));
+        li.add("详细计数: ok-json=" + PostLog.getPageNumStatus(PostFetcher.POST_STATUS_READ_BY_JSON) + ", ok-doc-post-deleted=" + PostLog.getPageNumStatus(PostFetcher.POST_STATUS_READ_BY_DOCUMENT) + ", 404=" + PostLog.getPageNumStatus(PostFetcher.POST_STATUS_404) + ", exception=" + PostLog.getPageNumStatus(PostFetcher.POST_STATUS_EXCEPTION) + ", no url=" + PostLog.getPageNumStatus(PostFetcher.POST_STATUS_NO_LINK_FOUND));
         li.add("Pool信息: " + logHelper(new int[4]));
         li.add("文件写入情况: JSON条数=" + liJsonOkPost.size() + ", 写入URL条数=" + liLinkNoPool.size() + ", 写入MD5条数=" + liMd5NoPool.size() + ", 记录Log条数=" + liLog.size());
         li.add("");

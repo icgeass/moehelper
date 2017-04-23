@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Configuration;
-import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.fetcher.Fetcher;
 import com.zeroq6.moehelper.log.impl.PostLog;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
@@ -28,6 +27,24 @@ import com.alibaba.fastjson.JSON;
  * @date 2015年6月2日
  */
 public class PostFetcher implements Fetcher {
+
+    /**
+     * post页面状态
+     */
+    // 页面404
+    public final static String POST_STATUS_404 = "404";
+    // 程序异常
+    public final static String POST_STATUS_EXCEPTION = "exception";
+    // 从Json中获取链接
+    public final static String POST_STATUS_READ_BY_JSON = "read_by_json";
+    // 从文档中中获取链接
+    public final static String POST_STATUS_READ_BY_DOCUMENT = "read_by_document";
+    // 未找到链接
+    public final static String POST_STATUS_NO_LINK_FOUND = "no_link_found";
+
+
+
+
 
     // 当图片被删除时用于查找文件url的标签属性对
     private static Map<String, String> mapTag2Prop = new HashMap<String, String>();
@@ -64,7 +81,7 @@ public class PostFetcher implements Fetcher {
             if (doc == null) {
                 ResourcesHolder.readPageFailed();
                 ResourcesHolder.getMapIdLog().put(this.pageId, new PostLog(this.pageId));
-                PostLog.logPageNumByType(Constants.POST_STATUS_404);
+                PostLog.logPageNumByType(POST_STATUS_404);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: 404, page not found");
                 return;
             }
@@ -78,7 +95,7 @@ public class PostFetcher implements Fetcher {
                     String json = line[i].substring(line[i].indexOf("(") + 1, line[i].lastIndexOf(")"));
                     ResourcesHolder.getMapIdJson().put(this.pageId, json);
                     page = JSON.parseObject(new String(json), Page.class);
-                    PostLog.logPageNumByType(Constants.POST_STATUS_READ_BY_JSON);
+                    PostLog.logPageNumByType(POST_STATUS_READ_BY_JSON);
                     break;
                 }
             }
@@ -128,7 +145,7 @@ public class PostFetcher implements Fetcher {
                 boolean isPostUrlMatched = false;
                 for (Element element : doc.getElementsByTag("a")) {
                     // 当图片被标记为删除时通过a标签不会获取到连接, 需要通过link meta标签
-                    Pattern p = Constants.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
+                    Pattern p = Configuration.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
                     if (p.matcher(element.absUrl("href")).matches()) {
                         // ---校验a标签中链接是否与page对象中的链接一致
                         // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug
@@ -158,7 +175,7 @@ public class PostFetcher implements Fetcher {
                     String file_url = null;
                     String tags = null;
                     String md5 = null;
-                    Pattern p = Constants.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
+                    Pattern p = Configuration.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
                     for (Element element : doc.getElementsByTag(key)) {
                         if (p.matcher(element.absUrl(mapTag2Prop.get(key))).matches()) {
                             // https://yuno.yande.re/image/dfad8806778d80d9a6843be2278b909b/yande.re%20286457%20ayase_eli%20love_live%21%20seifuku%20sonoda_umi%20uehara.jpg
@@ -175,7 +192,7 @@ public class PostFetcher implements Fetcher {
                             Post post = new Post();
                             post.setId(pageId).setFile_url(file_url).setMd5(md5).setTags(tags).setCreated_at(Configuration.DELETED_POST_CREATED_AT);
                             page.getPosts().add(post);
-                            PostLog.logPageNumByType(Constants.POST_STATUS_READ_BY_DOCUMENT);
+                            PostLog.logPageNumByType(POST_STATUS_READ_BY_DOCUMENT);
                             // 设置是否在pool中属性
                             if (isInPoolByDoc) {
                                 page.getPools().add(new Pool());
@@ -192,7 +209,7 @@ public class PostFetcher implements Fetcher {
             // ---------------判断page是否为空----------------------
             // 为空则不添加page,不设置log,log前面已添加
             if (page == null) {
-                PostLog.logPageNumByType(Constants.POST_STATUS_NO_LINK_FOUND);
+                PostLog.logPageNumByType(POST_STATUS_NO_LINK_FOUND);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: no url was found");
                 ResourcesHolder.readPageFailed();
             } else {

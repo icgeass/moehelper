@@ -15,13 +15,13 @@ import com.zeroq6.moehelper.utils.MyLogUtils;
 public class App {
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("line.separator", "\r\n");
         Configuration.init(args);
-        linkStart();
+        begin();
         Configuration.newWriter().writeToFile();
+        MyLogUtils.stdOut("所有操作已完成");
     }
 
-    private static void linkStart() throws InterruptedException {
+    private static void begin() throws InterruptedException {
         lab:
         while (true) {
             int pageId = ConnManager.getInstance().getPageId();
@@ -31,13 +31,13 @@ public class App {
                 // 对应下载完成但是本地是否解析完成的判断
                 int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
                 if (ResourcesHolder.getMapIdPage().size() + ResourcesHolder.getReadFailedPageCount() != allPageNum || ResourcesHolder.getMapIdLog().size() != allPageNum) {
-                    MyLogUtils.info("等待本地处理完成");
+                    MyLogUtils.stdOut("等待本地处理完成");
                     Thread.sleep(500);
                 }
                 // 若匹配完成则跳出外层循环,否则循环等待
                 while (true) {
                     if (ResourcesHolder.getMapIdPage().size() + ResourcesHolder.getReadFailedPageCount() == allPageNum && ResourcesHolder.getMapIdLog().size() == allPageNum) {
-                        MyLogUtils.info("本地处理完成");
+                        MyLogUtils.stdOut("本地处理完成");
                         break lab;
                     } else {
                         Thread.sleep(500);

@@ -9,9 +9,8 @@ import java.util.regex.Pattern;
 import com.alibaba.fastjson.JSON;
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Post;
-import com.zeroq6.moehelper.config.Constants;
+import com.zeroq6.moehelper.fetcher.impl.PoolFetcher;
 import com.zeroq6.moehelper.utils.MyDateUtils;
-import com.zeroq6.moehelper.utils.MyStringUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -351,7 +350,7 @@ public class AppTest {
             if(!StringUtils.isNumeric(pageIdString)){
                 throw new RuntimeException("pageId获取失败, " + pageIdString);
             }
-            if(url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)){
+            if(url.contains(PoolFetcher.LINK_POOL_ZIP_SUFFIX_JPG)){
                 url = url + "&myPoolId=" +  pageIdString;
             }else{
                 url = url + "?myPoolId=" + pageIdString;

@@ -3,7 +3,7 @@ package com.zeroq6.moehelper.log.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zeroq6.moehelper.config.Constants;
+import com.zeroq6.moehelper.fetcher.impl.PostFetcher;
 import com.zeroq6.moehelper.log.Log;
 
 /**
@@ -21,11 +21,11 @@ public class PostLog implements Log, Comparable<PostLog> {
     private String isReadOk = "no ";// 留一个空格方便输出
 
     static {
-        mapPageStatus2Count.put(Constants.POST_STATUS_READ_BY_JSON, new Integer(0));
-        mapPageStatus2Count.put(Constants.POST_STATUS_READ_BY_DOCUMENT, new Integer(0));
-        mapPageStatus2Count.put(Constants.POST_STATUS_NO_LINK_FOUND, new Integer(0));
-        mapPageStatus2Count.put(Constants.POST_STATUS_EXCEPTION, new Integer(0));
-        mapPageStatus2Count.put(Constants.POST_STATUS_404, new Integer(0));
+        mapPageStatus2Count.put(PostFetcher.POST_STATUS_READ_BY_JSON, new Integer(0));
+        mapPageStatus2Count.put(PostFetcher.POST_STATUS_READ_BY_DOCUMENT, new Integer(0));
+        mapPageStatus2Count.put(PostFetcher.POST_STATUS_NO_LINK_FOUND, new Integer(0));
+        mapPageStatus2Count.put(PostFetcher.POST_STATUS_EXCEPTION, new Integer(0));
+        mapPageStatus2Count.put(PostFetcher.POST_STATUS_404, new Integer(0));
     }
 
     public PostLog(int id) {

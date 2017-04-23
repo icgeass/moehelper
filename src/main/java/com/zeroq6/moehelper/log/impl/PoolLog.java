@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.log.Log;
 
 /**
@@ -15,6 +14,24 @@ import com.zeroq6.moehelper.log.Log;
  * @date 2015年6月2日
  */
 public class PoolLog implements Log, Comparable<PoolLog> {
+
+    /**
+     * pool页面状态
+     */
+    // 该页面404或不存在（被重定向到https://yande.re/pool, 表现为没有找到Json数据）
+    public final static String POOL_STATUS_NULL = "null";
+    // 页面存在, 没有Post（图片数量为0）, 一般是因为新创建的Pool未添加, Json中无数据, 为{"posts":[],"pool_posts":[],"pools":[],"tags":{},"votes":{}}
+    public final static String POOL_STATUS_EMPTY = "empty";
+    // 页面存在, 含至少一张Post, 但均显示为被删除（https://assets.yande.re/deleted-preview.png）, Json里面有数据不过没有file_url等字段, 如Pool=2057
+    public final static String POOL_STATUS_ALL_DELETED = "all deleted";
+    // 正常Pool, 相对于上次抓取时图片没有更新
+    public final static String POOL_STATUS_NO_CHANGE = "no change";
+    // 正常Pool, 相对于上次抓取时图片有更新
+    public final static String POOL_STATUS_MODIFIED = "modified";
+    // 正常Pool, 上次抓取时没有该Pool, 新添加的Pool
+    public final static String POOL_STATUS_NEW = "new";
+
+
 
     // 页面Id对页面类型
     private static Map<String, Integer> mapPageStatus2Count = new HashMap<String, Integer>(6);
@@ -26,12 +43,12 @@ public class PoolLog implements Log, Comparable<PoolLog> {
     private static Map<Integer, List<String>> mapPageId2ZipLinkPoolAll = Collections.synchronizedMap(new HashMap<Integer, List<String>>(200));
 
     static {
-        mapPageStatus2Count.put(Constants.POOL_STATUS_NULL, new Integer(0));
-        mapPageStatus2Count.put(Constants.POOL_STATUS_EMPTY, new Integer(0));
-        mapPageStatus2Count.put(Constants.POOL_STATUS_ALL_DELETED, new Integer(0));
-        mapPageStatus2Count.put(Constants.POOL_STATUS_NO_CHANGE, new Integer(0));
-        mapPageStatus2Count.put(Constants.POOL_STATUS_MODIFIED, new Integer(0));
-        mapPageStatus2Count.put(Constants.POOL_STATUS_NEW, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_NULL, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_EMPTY, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_ALL_DELETED, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_NO_CHANGE, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_MODIFIED, new Integer(0));
+        mapPageStatus2Count.put(POOL_STATUS_NEW, new Integer(0));
     }
 
     private int id = 0;

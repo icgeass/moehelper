@@ -47,9 +47,9 @@ public class Configuration {
 
     /////
 
-    private static boolean init = false;
 
     // 其他初始配置
+    private static boolean init = false;
     private static String[] inputParams = null;
     private static String beginTime = MyDateUtils.format(new Date(), "yyMMddHHmmss");
     private static int fromPage = -1;
@@ -115,6 +115,7 @@ public class Configuration {
             System.out.println("usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
             System.exit(-1);
         }
+        System.setProperty("line.separator", "\r\n");
         Configuration.inputParams = args;
         Configuration.fromPage = Integer.valueOf(args[0]);
         Configuration.toPage = Integer.valueOf(args[1]);
@@ -177,6 +178,7 @@ public class Configuration {
         }
         return true;
     }
+
 
 
 

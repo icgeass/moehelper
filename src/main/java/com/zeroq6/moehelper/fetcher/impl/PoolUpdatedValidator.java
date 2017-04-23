@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Pool_post;
 import com.zeroq6.moehelper.bean.Post;
-import com.zeroq6.moehelper.config.Constants;
+import com.zeroq6.moehelper.log.impl.PoolLog;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import com.zeroq6.moehelper.writer.Writer;
 import org.apache.commons.io.FileUtils;
@@ -30,7 +30,7 @@ public class PoolUpdatedValidator {
 
     private static int lastTimePageFrom = 99999;
     private static int lastTimePageTo = -1;
-    private static boolean isInited = false;
+    private static boolean init = false;
 
     private static Pattern pattern_filename_json = Pattern.compile("^yande.re_-_pool_[0-9]{12}_[0-9]{1,}_[0-9]{1,}[.]json$");
 
@@ -49,7 +49,7 @@ public class PoolUpdatedValidator {
     }
 
     public static synchronized void init() {
-        if (isInited) {
+        if (init) {
             MyLogUtils.fatal("the method init can be called only once");
         }
         // 两者顺序不能变, initMapLastTimePageId2ZipLinkNumInfo需要设置上一次更新的PoolId范围
@@ -58,7 +58,7 @@ public class PoolUpdatedValidator {
         if (!mapLastTimePageId2ZipLinkNumInfo.keySet().equals(mapLastTimePageId2PostMd5Li.keySet())) {
             MyLogUtils.fatal("cool");
         }
-        isInited = true;
+        init = true;
     }
 
     /**
@@ -110,7 +110,7 @@ public class PoolUpdatedValidator {
                 if (!mapLastTimePageId2ZipLinkNumInfo.keySet().contains(pageId)) {
                     mapLastTimePageId2ZipLinkNumInfo.put(pageId, new Integer(0));
                 }
-                if (url.contains(Constants.LINK_POOL_ZIP_SUFFIX_JPG)) {
+                if (url.contains(PoolFetcher.LINK_POOL_ZIP_SUFFIX_JPG)) {
                     lastTimeZipJpegNum++;
                     lastTimeZipAllNum++;
                     // 01
@@ -165,12 +165,12 @@ public class PoolUpdatedValidator {
             for (String jsonString : liLastTimeJsonString) {
                 Page page = JSON.parseObject(jsonString, Page.class);
                 String pageStatus = checkPageStatus(page, null);
-                if (Constants.POOL_STATUS_EMPTY.equals(pageStatus)) {
+                if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
                     MyLogUtils.info("Pool # NaN  Empty pool found\r\n");
                     continue;
                 }
-                if (Constants.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
+                if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
                     MyLogUtils.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", "") + " with all posts deleted\r\n");
                     continue;
@@ -214,10 +214,10 @@ public class PoolUpdatedValidator {
             MyLogUtils.fatal("wrong json format in pool page");
         }
         if (null == page) {
-            return Constants.POOL_STATUS_NULL;
+            return PoolLog.POOL_STATUS_NULL;
         }
         if (page.getPosts().isEmpty() || page.getPools().isEmpty()) {
-            return Constants.POOL_STATUS_EMPTY;
+            return PoolLog.POOL_STATUS_EMPTY;
         }
         {
             boolean isAllPostsDeleted = true;
@@ -228,20 +228,20 @@ public class PoolUpdatedValidator {
                 }
             }
             if (isAllPostsDeleted) {
-                return Constants.POOL_STATUS_ALL_DELETED;
+                return PoolLog.POOL_STATUS_ALL_DELETED;
             }
         }
         // pageId = null 始终返回POOL_STATUS_NEW用于初始mapLastTimePageId2PostMd5Li时跳过后面判断
         if (null == pageId || !mapLastTimePageId2ZipLinkNumInfo.keySet().contains(pageId)) {
-            return Constants.POOL_STATUS_NEW; // 若上一次的empty和all deleted添加了Post也将任务是new
+            return PoolLog.POOL_STATUS_NEW; // 若上一次的empty和all deleted添加了Post也将任务是new
         }
         for (Post post : page.getPosts()) {
             // 只要有新md5则认为被修改, 仅含有被移除md5不会被认为修改
             if (!mapLastTimePageId2PostMd5Li.get(pageId).contains(post.getMd5())) {
-                return Constants.POOL_STATUS_MODIFIED;
+                return PoolLog.POOL_STATUS_MODIFIED;
             }
         }
-        return Constants.POOL_STATUS_NO_CHANGE;
+        return PoolLog.POOL_STATUS_NO_CHANGE;
     }
 
     public static Map<Integer, Set<String>> getMapLastTimePageId2PostMd5Li() {
