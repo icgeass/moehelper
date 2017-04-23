@@ -29,7 +29,7 @@
     - 可以查看 Pool信息 行，从左至右数字依次表示：
         1. 没有被标记为删除的不在Pool中的post数量
         2. 没有被标记为删除的在Pool中的post数量
-        3. 被标记删除的通过解析HTML获得的不在Pool中的post数量
-        4. 被标记删除的通过解析HTML获得的在Pool中的post数量
+        3. 被标记为删除的通过解析HTML获得的不在Pool中的post数量
+        4. 被标记为删除的通过解析HTML获得的在Pool中的post数量
 
 

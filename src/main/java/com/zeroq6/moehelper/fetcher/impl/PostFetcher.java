@@ -11,7 +11,7 @@ import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.fetcher.Fetcher;
 import com.zeroq6.moehelper.log.impl.PostLog;
-import com.zeroq6.moehelper.rt.Runtime;
+import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.utils.Logger;
 import com.zeroq6.moehelper.bean.Pool;
 
@@ -62,21 +62,21 @@ public class PostFetcher implements Fetcher {
     public void run() {
         try {
             if (doc == null) {
-                Runtime.readPageFailed();
-                Runtime.getMapid2log().put(this.pageId, new PostLog(this.pageId));
+                ResourcesHolder.readPageFailed();
+                ResourcesHolder.getMapid2log().put(this.pageId, new PostLog(this.pageId));
                 PostLog.logPageNumByType(Constants.POST_STATUS_404);
                 Logger.error("Post #" + this.pageId + " read page failed. Reason: 404, page not found");
                 return;
             }
             PostLog log = new PostLog(this.pageId);
-            Runtime.getMapid2log().put(this.pageId, log);
+            ResourcesHolder.getMapid2log().put(this.pageId, log);
             // ----------------通过json获得Page对象----------------
             Page page = null;
             String[] line = doc.html().split("\n");
             for (int i = 0; i < line.length; i++) {
                 if (line[i].contains("Post.register_resp")) {
                     String json = line[i].substring(line[i].indexOf("(") + 1, line[i].lastIndexOf(")"));
-                    Runtime.getMapid2jsondata().put(this.pageId, json);
+                    ResourcesHolder.getMapid2jsondata().put(this.pageId, json);
                     page = JSON.parseObject(new String(json), Page.class);
                     PostLog.logPageNumByType(Constants.POST_STATUS_READ_BY_JSON);
                     break;
@@ -194,10 +194,10 @@ public class PostFetcher implements Fetcher {
             if (page == null) {
                 PostLog.logPageNumByType(Constants.POST_STATUS_NO_LINK_FOUND);
                 Logger.error("Post #" + this.pageId + " read page failed. Reason: no url was found");
-                Runtime.readPageFailed();
+                ResourcesHolder.readPageFailed();
             } else {
                 setLog(page, log);
-                Runtime.getMapid2page().put(this.pageId, page);
+                ResourcesHolder.getMapid2page().put(this.pageId, page);
             }
         } catch (Exception e) {
             Logger.fatal("Post #" + this.pageId + " read page failed, exception", e);

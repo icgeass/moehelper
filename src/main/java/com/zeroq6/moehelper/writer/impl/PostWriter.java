@@ -9,11 +9,12 @@ import java.util.List;
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.log.Log;
 import com.zeroq6.moehelper.log.impl.PostLog;
-import com.zeroq6.moehelper.utils.Kit;
+import com.zeroq6.moehelper.utils.MyDateUtils;
+import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.config.Constants;
-import com.zeroq6.moehelper.rt.Runtime;
+import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.utils.Logger;
 import com.zeroq6.moehelper.writer.Writer;
 
@@ -77,12 +78,12 @@ public class PostWriter implements Writer {
      * 初始化集合数据存在实例中, 注意避免修改原始数据
      */
     private void init() {
-        liPages.addAll(Runtime.getMapid2page().values());
+        liPages.addAll(ResourcesHolder.getMapid2page().values());
         // 仅处理post页面可以这样用, pool页面使用循环
         Collections.sort(liPages);
         for (int i = Configuration.getFromPage(); i <= Configuration.getToPage(); i++) {
-            if (Runtime.getMapid2log().keySet().contains(i)) {
-                liLog.add(Runtime.getMapid2log().get(i));
+            if (ResourcesHolder.getMapid2log().keySet().contains(i)) {
+                liLog.add(ResourcesHolder.getMapid2log().get(i));
             } else {
                 Logger.fatal("the key is not found in MapLog.");
             }
@@ -93,23 +94,23 @@ public class PostWriter implements Writer {
             // https://yuno.yande.re/image/dc831cdb5ec31232bea18062d2847af8/yande.re%20281641%20karory.jpg
             // https://yande.re/jpeg/eced93c44306c8f95bda9e47cfc0d5ef/yande.re%20268050%20bikini%20cleavage%20fukahire_sanba%20ruinon%20swimsuits.jpg
             String url = post.getFile_url();
-            int index = Kit.getInnerStrIndex(url, "/", 5);// 第5个"/"后为文件名
+            int index = MyStringUtils.getInnerStrIndex(url, "/", 5);// 第5个"/"后为文件名
             String prefix = url.substring(0, index + 1);
             String suffix = url.substring(index + 1);
             if (post.getCreated_at() == Configuration.DELETED_POST_CREATED_AT) {
                 liJsonDeletedPost.add(JSON.toJSONString(page));
             } else {
-                liJsonOkPost.add(Runtime.getMapid2jsondata().get(post.getId()));
+                liJsonOkPost.add(ResourcesHolder.getMapid2jsondata().get(post.getId()));
             }
-            liMd5All.add(post.getMd5() + " *" + Kit.formatFileName(suffix));
-            liLinkAll.add(Kit.formatUrlLink(prefix + suffix.replace("/", "_")));
+            liMd5All.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
+            liLinkAll.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
             if (page.getPools().size() == 0 || post.getCreated_at() == Configuration.DELETED_POST_CREATED_AT) {
                 // 被删除的Post, 不管是否在Pool内, 均归类在NoPool内
-                liMd5NoPool.add(post.getMd5() + " *" + Kit.formatFileName(suffix));
-                liLinkNoPool.add(Kit.formatUrlLink(prefix + suffix.replace("/", "_")));
+                liMd5NoPool.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
+                liLinkNoPool.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
             } else {
-                liMd5InPool.add(post.getMd5() + " *" + Kit.formatFileName(suffix));
-                liLinkInPool.add(Kit.formatUrlLink(prefix + suffix.replace("/", "_")));
+                liMd5InPool.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
+                liLinkInPool.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
             }
         }
     }
@@ -122,7 +123,7 @@ public class PostWriter implements Writer {
         int post_no_url = PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND);
         int allPosts = Integer.valueOf(Configuration.getToPage() - Configuration.getFromPage()) + 1;
         int successPosts = liPages.size();// ok_doc 和 ok_json都含有
-        int failedPosts = Runtime.getFailedPageNum();
+        int failedPosts = ResourcesHolder.getFailedPageNum();
         int[] post_pool_num = new int[4];
         logHelper(post_pool_num);
         int json_post_no_pool = post_pool_num[0];
@@ -189,7 +190,7 @@ public class PostWriter implements Writer {
 
     private void writeLog() throws IOException {
         List<String> li = new ArrayList<String>(100);
-        li.add(Kit.getFormatedCurrentTime());
+        li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         String userOption = "";
         for (String string : Configuration.getUserInputParams()) {
@@ -199,7 +200,7 @@ public class PostWriter implements Writer {
         li.add("用户参数: " + userOption.substring(0, userOption.length() - 1));
         li.add("页面总数: " + (Configuration.getToPage() - Configuration.getFromPage() + 1));
         li.add("读取成功: " + liPages.size());
-        li.add("读取失败: " + Runtime.getFailedPageNum());
+        li.add("读取失败: " + ResourcesHolder.getFailedPageNum());
         li.add("JSON数据条数: " + liJsonOkPost.size());
         li.add("详细计数: ok-json=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_JSON) + ", ok-doc-post-deleted=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_DOCUMENT) + ", 404=" + PostLog.getPageNumStatus(Constants.POST_STATUS_404) + ", exception=" + PostLog.getPageNumStatus(Constants.POST_STATUS_EXCEPTION) + ", no url=" + PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND));
         li.add("Pool信息: " + logHelper(new int[4]));

@@ -1,4 +1,4 @@
-package com.zeroq6.moehelper.linkstart;
+package com.zeroq6.moehelper.app;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import com.zeroq6.moehelper.conn.ConnThread;
 import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.conn.ConnManager;
-import com.zeroq6.moehelper.rt.Runtime;
+import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.utils.Logger;
 
 /**
@@ -39,13 +39,13 @@ public class App {
             } else if (pageId == ConnManager.FIND_PAGE_ID_ALL_COMPLETED) {
                 // 对应下载完成但是本地是否解析完成的判断
                 int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
-                if (Runtime.getMapid2page().size() + Runtime.getFailedPageNum() != allPageNum || Runtime.getMapid2log().size() != allPageNum) {
+                if (ResourcesHolder.getMapid2page().size() + ResourcesHolder.getFailedPageNum() != allPageNum || ResourcesHolder.getMapid2log().size() != allPageNum) {
                     Logger.stdOut("等待本地处理完成");
                     Thread.sleep(500);
                 }
                 // 若匹配完成则跳出外层循环,否则循环等待
                 while (true) {
-                    if (Runtime.getMapid2page().size() + Runtime.getFailedPageNum() == allPageNum && Runtime.getMapid2log().size() == allPageNum) {
+                    if (ResourcesHolder.getMapid2page().size() + ResourcesHolder.getFailedPageNum() == allPageNum && ResourcesHolder.getMapid2log().size() == allPageNum) {
                         Logger.stdOut("本地处理完成");
                         break lab;
                     } else {

@@ -1,7 +1,7 @@
 package com.zeroq6.moehelper.conn;
 
 import com.zeroq6.moehelper.config.Configuration;
-import com.zeroq6.moehelper.linkstart.App;
+import com.zeroq6.moehelper.app.App;
 import com.zeroq6.moehelper.utils.Logger;
 
 import org.apache.http.HttpHost;

@@ -7,8 +7,8 @@ import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.fetcher.Fetcher;
-import com.zeroq6.moehelper.rt.Runtime;
-import com.zeroq6.moehelper.utils.Kit;
+import com.zeroq6.moehelper.resources.ResourcesHolder;
+import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.utils.Logger;
 import com.zeroq6.moehelper.bean.Pool;
 import com.zeroq6.moehelper.log.impl.PoolLog;
@@ -46,15 +46,15 @@ public class PoolFetcher implements Fetcher {
         try {
             // HTTP Status=404
             if (this.doc == null) {
-                Runtime.readPageFailed();
-                Runtime.getMapid2log().put(this.pageId, new PoolLog(this.pageId));
+                ResourcesHolder.readPageFailed();
+                ResourcesHolder.getMapid2log().put(this.pageId, new PoolLog(this.pageId));
                 PoolLog.logPageNumByType(Constants.POOL_STATUS_NULL);
                 Logger.error("Post #" + this.pageId + " read page failed, 404, page not found");
                 return;
             }
             // HTTP Status=200
             PoolLog log = new PoolLog(this.pageId);
-            Runtime.getMapid2log().put(this.pageId, log);
+            ResourcesHolder.getMapid2log().put(this.pageId, log);
 
             Page page = null;
 
@@ -64,7 +64,7 @@ public class PoolFetcher implements Fetcher {
             for (int i = 0; i < arr.length; i++) {
                 if (arr[i].contains("Post.register_resp")) {
                     String json = arr[i].substring(arr[i].indexOf("(") + 1, arr[i].lastIndexOf(")")).trim();
-                    Runtime.getMapid2jsondata().put(this.pageId, json);
+                    ResourcesHolder.getMapid2jsondata().put(this.pageId, json);
                     page = JSON.parseObject(new String(json), Page.class);
                     break;
                 }
@@ -78,9 +78,9 @@ public class PoolFetcher implements Fetcher {
                     PoolLog.getMapPageId2ZipLinkPoolUpdated().put(this.pageId, liUrls);
                 }
                 PoolLog.getMapPageId2PoolDescription().put(this.pageId, getPoolInfo(pageId, page, this.doc));
-                Runtime.getMapid2page().put(this.pageId, page);
+                ResourcesHolder.getMapid2page().put(this.pageId, page);
             } else {
-                Runtime.readPageFailed();
+                ResourcesHolder.readPageFailed();
             }
         } catch (Exception e) {
             Logger.fatal("Pool #" + this.pageId + " read page failed, exception", e);
@@ -190,10 +190,10 @@ public class PoolFetcher implements Fetcher {
         re.append("Post count = " + currPool.getPost_count() + "\r\n");
         // Kit.getReadableFileSize(bytes0) + " (" + bytes0 + " Bytes)", Kit.getReadableFileSize(bytes1) + " (" + bytes1 + " Bytes)"
         if (hasPng(page)) {
-            re.append("JPGs zip package size = " + Kit.getReadableFileSize(zipPackageSize[0]) + " (" + zipPackageSize[0] + " Bytes)" + "\r\n");
-            re.append("PNGs zip package size = " + Kit.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
+            re.append("JPGs zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[0]) + " (" + zipPackageSize[0] + " Bytes)" + "\r\n");
+            re.append("PNGs zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
         } else {
-            re.append("zip package size = " + Kit.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
+            re.append("zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
         }
         re.append("User Id = " + currPool.getUser_id() + "\r\n");
         re.append("Created at = " + currPool.getCreated_at().replace("T", " ").replace("Z", "") + "\r\n");
@@ -262,14 +262,14 @@ public class PoolFetcher implements Fetcher {
         int postsNumNow = page.getPosts().size();
         int postsNumPre = PoolUpdatedValidator.getMapLastTimePageId2PostMd5Li().get(pageId).size();
         if (postsNumPre != postsNumNow) {
-            Logger.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + Kit.parseDigitWithSymbol(postsNumNow - postsNumPre, "-"));
+            Logger.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + MyStringUtils.insertBeforePlusOrMinus(postsNumNow - postsNumPre, "-"));
         }
         Integer zipNumStatusNow = log.getJpegPackages() + (log.getOriginalPackages() << 1);
         Integer zipNumStatusPre = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkNumInfo().get(pageId);
         if (!zipNumStatusPre.equals(zipNumStatusNow)) {
             int affectedZipNumJpg = (zipNumStatusNow & 0b01) - (zipNumStatusPre & 0b01);
             int affectedZipNumPng = (zipNumStatusNow >>> 1) - (zipNumStatusPre >>> 1);
-            Logger.debug("Pool #" + pageId + " jpeg packages affected " + Kit.parseDigitWithSymbol(affectedZipNumJpg, "-") + ", original packages affected " + Kit.parseDigitWithSymbol(affectedZipNumPng, "-"));
+            Logger.debug("Pool #" + pageId + " jpeg packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg, "-") + ", original packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng, "-"));
         }
     }
 

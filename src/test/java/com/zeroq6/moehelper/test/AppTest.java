@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.zeroq6.moehelper.bean.Page;
-import com.zeroq6.moehelper.bean.Pool;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Constants;
-import com.zeroq6.moehelper.utils.Kit;
+import com.zeroq6.moehelper.utils.MyDateUtils;
+import com.zeroq6.moehelper.utils.MyStringUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -307,7 +307,7 @@ public class AppTest {
                 default:
             }
         }
-        liResult.add(Kit.getFormatedCurrentTime());
+        liResult.add(MyDateUtils.formatCurrentTime());
         liResult.add("统计: ");
         liResult.add("");
         liResult.add("Id 范围: 1 - " + to);

@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.zeroq6.moehelper.utils.Kit;
+import com.zeroq6.moehelper.utils.MyDateUtils;
+import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.writer.Writer;
 import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.fetcher.impl.PoolUpdatedValidator;
 import com.zeroq6.moehelper.log.impl.PoolLog;
-import com.zeroq6.moehelper.rt.Runtime;
+import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.utils.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -68,7 +69,7 @@ public class PoolWriter implements Writer {
 
     private void writePoolIdToZipNumCount() throws IOException {
         List<String> li = new ArrayList<String>(100);
-        li.add(Kit.getFormatedCurrentTime());
+        li.add(MyDateUtils.formatCurrentTime());
         li.add("from Pool #" + Configuration.getFromPage() + " to Pool #" + Configuration.getToPage() + "\r\n");
         li.addAll(liPoolIdToZipNumCount);
         FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_info.txt"), "utf-8", li, false);
@@ -76,7 +77,7 @@ public class PoolWriter implements Writer {
 
     private void writePoolDescription() throws IOException {
         List<String> li = new ArrayList<String>(100);
-        li.add(Kit.getFormatedCurrentTime());
+        li.add(MyDateUtils.formatCurrentTime());
         li.add("from Pool #" + Configuration.getFromPage() + " to Pool #" + Configuration.getToPage() + "\r\n");
         li.addAll(liPoolDescription);
         FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_info_details.txt"), "utf-8", li, false);
@@ -92,7 +93,7 @@ public class PoolWriter implements Writer {
 
     private void writeUpdatedPoolLog() throws IOException {
         List<String> li = new ArrayList<String>(20);
-        li.add(Kit.getFormatedCurrentTime());
+        li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         li.add("");
         int updatedPoolNum = 0;
@@ -106,7 +107,7 @@ public class PoolWriter implements Writer {
         int zipNumNewPng = 0;
         int zipNumNewAll = 0;
         for (int i = Configuration.getFromPage(); i <= Configuration.getToPage(); i++) {
-            PoolLog log = (PoolLog) Runtime.getMapid2log().get(i);
+            PoolLog log = (PoolLog) ResourcesHolder.getMapid2log().get(i);
             if (Constants.POOL_STATUS_NEW.equals(log.getStatus()) || Constants.POOL_STATUS_MODIFIED.equals(log.getStatus())) {
                 zipNumUpdatedJpg += log.getJpegPackages();
                 zipNumUpdatedPng += log.getOriginalPackages();
@@ -136,7 +137,7 @@ public class PoolWriter implements Writer {
 
     private void writeLog() throws IOException {
         List<String> li = new ArrayList<String>(200);
-        li.add(Kit.getFormatedCurrentTime());
+        li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         String userOptions = "";
         for (String string : Configuration.getUserInputParams()) {
@@ -146,8 +147,8 @@ public class PoolWriter implements Writer {
         li.add("用户参数: " + userOptions.substring(0, userOptions.length() - 1));
         li.add("页面总数: " + (Configuration.getToPage() - Configuration.getFromPage() + 1));
         li.add("读取成功: " + (PoolLog.getPageNumStatus(Constants.POOL_STATUS_EMPTY) + PoolLog.getPageNumStatus(Constants.POOL_STATUS_ALL_DELETED) + PoolLog.getPageNumStatus(Constants.POOL_STATUS_NEW) + PoolLog.getPageNumStatus(Constants.POOL_STATUS_MODIFIED) + PoolLog.getPageNumStatus(Constants.POOL_STATUS_NO_CHANGE)));
-        li.add("读取失败: " + Runtime.getFailedPageNum());
-        li.add("JSON数据条数: " + Runtime.getMapid2jsondata().size());
+        li.add("读取失败: " + ResourcesHolder.getFailedPageNum());
+        li.add("JSON数据条数: " + ResourcesHolder.getMapid2jsondata().size());
         li.add("详细计数: null=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_NULL) + ", empty=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_EMPTY) + ", all-deleted=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_ALL_DELETED) + ", modified=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_MODIFIED) + ", new=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_NEW) + ", no-change=" + PoolLog.getPageNumStatus(Constants.POOL_STATUS_NO_CHANGE));
         li.add("写入情况: Log条数=" + liPoolLogAll.size() + ", json=" + liJsonData.size() + ", package计数=" + liPoolIdToZipNumCount.size() + ", pool-details=" + liPoolDescription.size() + "\r\n\t  all-package-url=" + liPoolZipUrlAll.size() + ", updated-package-url=" + liPoolZipUrlUpdated.size() + ", 被添加和更新Pool数=" + liPoolLogUpdated.size());
         li.add("");
@@ -163,14 +164,14 @@ public class PoolWriter implements Writer {
         int numPng = 0;
         int numAll = 0;
         for (int i = Configuration.getFromPage(); i <= Configuration.getToPage(); i++) {
-            PoolLog log = (PoolLog) Runtime.getMapid2log().get(i);
+            PoolLog log = (PoolLog) ResourcesHolder.getMapid2log().get(i);
             String pageStatus = log.getStatus();
             liPoolLogAll.add(String.format("# %5d  |" + log.getJpegPackages() + "   |" + log.getOriginalPackages() + "       |" + log.getAllPackages() + "    |" + log.getIsExist() + "   |" + log.getStatus(), log.getId()));
             if (Constants.POOL_STATUS_NULL.equals(pageStatus)) {
                 continue;
             }
             liPoolDescription.add(PoolLog.getMapPageId2PoolDescription().get(i));
-            liJsonData.add(Runtime.getMapid2jsondata().get(i));
+            liJsonData.add(ResourcesHolder.getMapid2jsondata().get(i));
             if (Constants.POOL_STATUS_EMPTY.equals(pageStatus) || Constants.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                 continue;
             }
@@ -192,7 +193,7 @@ public class PoolWriter implements Writer {
 
     private void validate() {
         boolean isValidateOk = true;
-        isValidateOk = isValidateOk && Runtime.getMapid2jsondata().keySet().equals(PoolLog.getMapPageId2PoolDescription().keySet());
+        isValidateOk = isValidateOk && ResourcesHolder.getMapid2jsondata().keySet().equals(PoolLog.getMapPageId2PoolDescription().keySet());
         isValidateOk = isValidateOk && liPoolIdToZipNumCount.size() == PoolLog.getMapPageId2ZipLinkPoolAll().size();
         isValidateOk = isValidateOk && liPoolLogUpdated.size() == PoolLog.getMapPageId2ZipLinkPoolUpdated().size();
         isValidateOk = isValidateOk && liPoolLogAll.size() == Configuration.getToPage() - Configuration.getFromPage() + 1;
@@ -231,7 +232,7 @@ public class PoolWriter implements Writer {
         }
         affectedZipNumJpgSum += affectedZipNumJpg; // 负
         affectedZipNumPngSum += affectedZipNumPng; // 负
-        Logger.warn("Pool that deleted " + affectedPoolNum + " in all, jpeg packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumJpg, "-") + ", original packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumPng, "-"));
+        Logger.warn("Pool that deleted " + affectedPoolNum + " in all, jpeg packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg, "-") + ", original packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng, "-"));
         Logger.info("");
         // 注意重置数据
         affectedPoolNum = 0;
@@ -250,7 +251,7 @@ public class PoolWriter implements Writer {
         }
         affectedZipNumJpgSum += affectedZipNumJpg; // 正
         affectedZipNumPngSum += affectedZipNumPng; // 正
-        Logger.warn("Pool that new " + affectedPoolNum + " in all, jpeg packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumJpg, "+") + ", original packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumPng, "+"));
+        Logger.warn("Pool that new " + affectedPoolNum + " in all, jpeg packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg, "+") + ", original packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng, "+"));
         Logger.info("");
         affectedPoolNum = 0;
         affectedZipNumJpg = 0;
@@ -258,7 +259,7 @@ public class PoolWriter implements Writer {
         // 检查本次修改过的pool中导致
         Logger.info("Pool modified:");
         for (int i = Configuration.getFromPage(); i <= Configuration.getToPage(); i++) {
-            PoolLog poolLog = (PoolLog) Runtime.getMapid2log().get(i);
+            PoolLog poolLog = (PoolLog) ResourcesHolder.getMapid2log().get(i);
             if (Constants.POOL_STATUS_MODIFIED.equals(poolLog.getStatus())) {
                 Integer statusPre = getLastTimePageId2ZipLinkNumInfoById(i);
                 Integer statusNow = getNowPageId2ZipLinkNumInfoById(i);
@@ -269,19 +270,19 @@ public class PoolWriter implements Writer {
                 if (!statusNow.equals(statusPre)) {
                     int jpegAffected = (statusNow & 0b01) - (statusPre & 0b01);
                     int pngAffected = (statusNow >>> 1) - (statusPre >>> 1);
-                    Logger.warn("Pool #" + poolLog.getId() + " jpeg packages affected " + Kit.parseDigitWithSymbol(jpegAffected, "-") + ", original packages affected " + Kit.parseDigitWithSymbol(pngAffected, "-"));
+                    Logger.warn("Pool #" + poolLog.getId() + " jpeg packages affected " + MyStringUtils.insertBeforePlusOrMinus(jpegAffected, "-") + ", original packages affected " + MyStringUtils.insertBeforePlusOrMinus(pngAffected, "-"));
                 }
             }
         }
         affectedZipNumJpgSum += affectedZipNumJpg; // 正、负、零
         affectedZipNumPngSum += affectedZipNumPng; // 正、负、零
-        Logger.warn("Pool that modified " + affectedPoolNum + " in all, jpeg packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumJpg, "-") + ", original packages affected: " + Kit.parseDigitWithSymbol(affectedZipNumPng, "-"));
+        Logger.warn("Pool that modified " + affectedPoolNum + " in all, jpeg packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg, "-") + ", original packages affected: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng, "-"));
         Logger.info("");
         affectedPoolNum = 0;
         affectedZipNumJpg = 0;
         affectedZipNumPng = 0;
         Logger.info("-------------result-------------");
-        Logger.warn("zip num affected: jpeg packages " + Kit.parseDigitWithSymbol(affectedZipNumJpgSum, "-") + " in all, original packages: " + Kit.parseDigitWithSymbol(affectedZipNumPngSum, "-") + " in all");
+        Logger.warn("zip num affected: jpeg packages " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpgSum, "-") + " in all, original packages: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPngSum, "-") + " in all");
         // -----------------------------------------------------
         int jpegZipsPre = 0;
         int originalZipsPre = 0;
@@ -326,7 +327,7 @@ public class PoolWriter implements Writer {
 
     private Integer getNowPageId2ZipLinkNumInfoById(Integer pageId) {
         Integer re = 0;
-        PoolLog poolLog = (PoolLog) Runtime.getMapid2log().get(pageId);
+        PoolLog poolLog = (PoolLog) ResourcesHolder.getMapid2log().get(pageId);
         re += poolLog.getJpegPackages();
         re += poolLog.getOriginalPackages() << 1;
         if (re != 0b10 && re != 0b11) {

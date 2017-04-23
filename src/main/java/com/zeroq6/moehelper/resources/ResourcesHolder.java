@@ -1,4 +1,4 @@
-package com.zeroq6.moehelper.rt;
+package com.zeroq6.moehelper.resources;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import com.zeroq6.moehelper.log.Log;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public class Runtime {
+public class ResourcesHolder {
 
     private final static Map<Integer, String> mapId2JsonData = Collections.synchronizedMap(new HashMap<Integer, String>(100));
     private final static Map<Integer, Log> mapId2Log = Collections.synchronizedMap(new HashMap<Integer, Log>(100));
@@ -21,7 +21,7 @@ public class Runtime {
 
     private static int failedPageNum = 0;
 
-    private Runtime() {
+    private ResourcesHolder() {
     }
 
     public synchronized static void readPageFailed() {
