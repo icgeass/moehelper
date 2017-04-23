@@ -6,6 +6,6 @@ package com.zeroq6.moehelper.log;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public interface Log extends Comparable<Log> {
+public interface Log {
 
 }

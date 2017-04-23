@@ -11,7 +11,7 @@ import java.util.Map;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public class Page implements Comparable<Page> {
+public class Page {
 
     private List<Post> posts;
     private List<Pool> pools;
@@ -69,15 +69,5 @@ public class Page implements Comparable<Page> {
         return JSON.toJSONString(this);
     }
 
-    /**
-     * 只用于post比较，posts大小必须为1
-     */
-    @Override
-    public int compareTo(Page o) {
-        if(this.getPosts().size() != 1 || o.getPosts().size() !=1){
-            throw new RuntimeException("posts大小必须为1");
-        }
-        return this.getPosts().get(0).getId() - o.getPosts().get(0).getId();
-    }
 
 }

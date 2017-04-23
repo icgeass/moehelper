@@ -14,7 +14,8 @@ import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Pool_post;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Constants;
-import com.zeroq6.moehelper.utils.Logger;
+import com.zeroq6.moehelper.utils.MyLogUtils;
+import com.zeroq6.moehelper.writer.Writer;
 import org.apache.commons.io.FileUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -49,13 +50,13 @@ public class PoolUpdatedValidator {
 
     public static synchronized void init() {
         if (isInited) {
-            Logger.fatal("the method init can be called only once");
+            MyLogUtils.fatal("the method init can be called only once");
         }
         // 两者顺序不能变, initMapLastTimePageId2ZipLinkNumInfo需要设置上一次更新的PoolId范围
         initMapLastTimePageId2ZipLinkNumInfo();
         initMapLastTimePageId2PostMd5Li();
         if (!mapLastTimePageId2ZipLinkNumInfo.keySet().equals(mapLastTimePageId2PostMd5Li.keySet())) {
-            Logger.fatal("cool");
+            MyLogUtils.fatal("cool");
         }
         isInited = true;
     }
@@ -68,9 +69,9 @@ public class PoolUpdatedValidator {
     private static void initMapLastTimePageId2ZipLinkNumInfo() {
         File fileToRead = null;
         try {
-            File dir = new File(Constants.W_WRITE_DIR);
+            File dir = new File(Writer.W_WRITE_DIR);
             List<String> liLastTimeAllPackageUrl = new ArrayList<String>(100);
-            fileToRead = new File(Constants.W_WRITE_DIR + "/yande.re_-_a");
+            fileToRead = new File(Writer.W_WRITE_DIR + "/yande.re_-_a");
             for (File file : dir.listFiles()) {
                 if (pattern_filename_packages_all_url.matcher(file.getName()).matches()) {
                     if (file.getName().compareTo(fileToRead.getName()) > 0) {
@@ -80,12 +81,12 @@ public class PoolUpdatedValidator {
             }
             // 是否查找到文件
             if (fileToRead.getName().endsWith(".lst")) {
-                Logger.info("Read from " + fileToRead.getName() + "\r\n");
+                MyLogUtils.info("Read from " + fileToRead.getName() + "\r\n");
                 liLastTimeAllPackageUrl = FileUtils.readLines(fileToRead, "utf-8");
             }
             // 是否读取成功
             if (liLastTimeAllPackageUrl.isEmpty()) {
-                Logger.info("Read .lst file failed\r\n\r\n");
+                MyLogUtils.info("Read .lst file failed\r\n\r\n");
                 return;
             }
             // https://yande.re/pool/zip/3387/Dengeki%20Moeoh%202014-04%20(JPG).zip?jpeg=1
@@ -122,12 +123,12 @@ public class PoolUpdatedValidator {
                 }
                 // 最终只会有0b10或0b11，判断0b01, 0b10是因为第一次处理链接时原图和jpeg图链接顺序不确定，而0b11是第二次有原图情况下的计数
                 if (mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b01 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b10 && mapLastTimePageId2ZipLinkNumInfo.get(pageId) != 0b11) {
-                    Logger.fatal("Find a error zip pack number info, the page id is " + pageId);
+                    MyLogUtils.fatal("Find a error zip pack number info, the page id is " + pageId);
                 }
             }
-            Logger.info("Read file " + fileToRead.getName() + " success, " + mapLastTimePageId2ZipLinkNumInfo.size() + " Pool, " + liLastTimeAllPackageUrl.size() + " Pool zip package urls (jpeg: " + lastTimeZipJpegNum + ", original: " + lastTimeZipOriginalNum + ", all: " + lastTimeZipAllNum + ") in all.\r\n\r\n");
+            MyLogUtils.info("Read file " + fileToRead.getName() + " success, " + mapLastTimePageId2ZipLinkNumInfo.size() + " Pool, " + liLastTimeAllPackageUrl.size() + " Pool zip package urls (jpeg: " + lastTimeZipJpegNum + ", original: " + lastTimeZipOriginalNum + ", all: " + lastTimeZipAllNum + ") in all.\r\n\r\n");
         } catch (Exception e) {
-            Logger.fatal("Read file " + fileToRead.getName() + " failed", e);
+            MyLogUtils.fatal("Read file " + fileToRead.getName() + " failed", e);
         }
     }
 
@@ -140,9 +141,9 @@ public class PoolUpdatedValidator {
         File fileToRead = null;
         try {
             // 读取本地json文件
-            File f = new File(Constants.W_WRITE_DIR);
+            File f = new File(Writer.W_WRITE_DIR);
             List<String> liLastTimeJsonString = new ArrayList<String>(100);
-            fileToRead = new File(Constants.W_WRITE_DIR + "/yande.re_-_a");
+            fileToRead = new File(Writer.W_WRITE_DIR + "/yande.re_-_a");
             for (File file : f.listFiles()) {
                 if (pattern_filename_json.matcher(file.getName()).matches()) {
                     if (file.getName().compareTo(fileToRead.getName()) > 0) {
@@ -151,12 +152,12 @@ public class PoolUpdatedValidator {
                 }
             }
             if (fileToRead.getName().endsWith(".json")) {
-                Logger.info("Read from " + fileToRead.getName() + "\r\n");
+                MyLogUtils.info("Read from " + fileToRead.getName() + "\r\n");
                 liLastTimeJsonString = FileUtils.readLines(fileToRead, "utf-8");
             }
             // 判断文件是否读取成功
             if (liLastTimeJsonString.isEmpty()) {
-                Logger.info("Read .json file failed\r\n\r\n");
+                MyLogUtils.info("Read .json file failed\r\n\r\n");
                 return;
             }
 
@@ -166,12 +167,12 @@ public class PoolUpdatedValidator {
                 String pageStatus = checkPageStatus(page, null);
                 if (Constants.POOL_STATUS_EMPTY.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    Logger.info("Pool # NaN  Empty pool found\r\n");
+                    MyLogUtils.info("Pool # NaN  Empty pool found\r\n");
                     continue;
                 }
                 if (Constants.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    Logger.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", "") + " with all posts deleted\r\n");
+                    MyLogUtils.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", "") + " with all posts deleted\r\n");
                     continue;
                 }
                 Map<Integer, String> mapPostId2Md5 = new HashMap<Integer, String>();
@@ -188,15 +189,15 @@ public class PoolUpdatedValidator {
                     }
                     String md5 = mapPostId2Md5.get(pool2post.getPost_id());
                     if (null == md5 || !pattern_md5.matcher(md5).matches()) {
-                        Logger.fatal("Error md5 format");
+                        MyLogUtils.fatal("Error md5 format");
                     }
                     mapLastTimePageId2PostMd5Li.get(pool2post.getPool_id()).add(md5);
 
                 }
             }
-            Logger.info("Read file " + fileToRead.getName() + " succeed, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found\r\n\r\n");
+            MyLogUtils.info("Read file " + fileToRead.getName() + " succeed, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found\r\n\r\n");
         } catch (Exception e) {
-            Logger.fatal("Read file " + fileToRead.getName() + " failed", e);
+            MyLogUtils.fatal("Read file " + fileToRead.getName() + " failed", e);
         }
     }
 
@@ -210,7 +211,7 @@ public class PoolUpdatedValidator {
     public static String checkPageStatus(Page page, Integer pageId) {
         // 校验, 对于非null的Pool来说, posts和 pools均为空或非空
         if (page != null && page.getPosts().isEmpty() != page.getPools().isEmpty()) {
-            Logger.fatal("wrong json format in pool page");
+            MyLogUtils.fatal("wrong json format in pool page");
         }
         if (null == page) {
             return Constants.POOL_STATUS_NULL;

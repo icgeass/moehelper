@@ -6,6 +6,6 @@ package com.zeroq6.moehelper.fetcher;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public interface Fetcher extends Runnable {
+public interface Fetcher extends Runnable{
 
 }

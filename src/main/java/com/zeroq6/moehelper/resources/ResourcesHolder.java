@@ -1,8 +1,7 @@
 package com.zeroq6.moehelper.resources;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.log.Log;
@@ -15,33 +14,33 @@ import com.zeroq6.moehelper.log.Log;
  */
 public class ResourcesHolder {
 
-    private final static Map<Integer, String> mapId2JsonData = Collections.synchronizedMap(new HashMap<Integer, String>(100));
-    private final static Map<Integer, Log> mapId2Log = Collections.synchronizedMap(new HashMap<Integer, Log>(100));
-    private final static Map<Integer, Page> mapId2Page = Collections.synchronizedMap(new HashMap<Integer, Page>(100));
+    private final static Map<Integer, String> mapIdJson = new ConcurrentHashMap<Integer, String>();
+    private final static Map<Integer, Log> mapIdLog = new ConcurrentHashMap<Integer, Log>();
+    private final static Map<Integer, Page> mapIdPage = new ConcurrentHashMap<Integer, Page>();
 
-    private static int failedPageNum = 0;
+    private static int readFailedPageCount = 0;
 
     private ResourcesHolder() {
     }
 
     public synchronized static void readPageFailed() {
-        failedPageNum++;
+        readFailedPageCount++;
     }
 
-    public static int getFailedPageNum() {
-        return failedPageNum;
+    public static int getReadFailedPageCount() {
+        return readFailedPageCount;
     }
 
-    public static Map<Integer, String> getMapid2jsondata() {
-        return mapId2JsonData;
+    public static Map<Integer, String> getMapIdJson() {
+        return mapIdJson;
     }
 
-    public static Map<Integer, Log> getMapid2log() {
-        return mapId2Log;
+    public static Map<Integer, Log> getMapIdLog() {
+        return mapIdLog;
     }
 
-    public static Map<Integer, Page> getMapid2page() {
-        return mapId2Page;
+    public static Map<Integer, Page> getMapIdPage() {
+        return mapIdPage;
     }
 
 }

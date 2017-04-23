@@ -4,18 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.log.Log;
 import com.zeroq6.moehelper.log.impl.PostLog;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import com.zeroq6.moehelper.utils.MyDateUtils;
 import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.config.Constants;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
-import com.zeroq6.moehelper.utils.Logger;
 import com.zeroq6.moehelper.writer.Writer;
 
 import org.apache.commons.io.FileUtils;
@@ -54,7 +55,7 @@ public class PostWriter implements Writer {
     public void writeToFile() {
         // 当没有任何数据时也可以处理
         try {
-            Logger.stdOut("开始写入文件");
+            MyLogUtils.stdOut("开始写入文件");
             // 开始写入到文件
             init();
             validate();
@@ -67,9 +68,9 @@ public class PostWriter implements Writer {
             writeLinkInPool();
             writeMD5InPool();
             writeLog();
-            Logger.stdOut("文件写入完毕");
+            MyLogUtils.stdOut("文件写入完毕");
         } catch (Exception e) {
-            Logger.info("error occur while writing");
+            MyLogUtils.info("error occur while writing");
             e.printStackTrace();
         }
     }
@@ -78,14 +79,22 @@ public class PostWriter implements Writer {
      * 初始化集合数据存在实例中, 注意避免修改原始数据
      */
     private void init() {
-        liPages.addAll(ResourcesHolder.getMapid2page().values());
+        liPages.addAll(ResourcesHolder.getMapIdPage().values());
         // 仅处理post页面可以这样用, pool页面使用循环
-        Collections.sort(liPages);
+        Collections.sort(liPages, new Comparator<Page>() {
+            @Override
+            public int compare(Page o1, Page o2) {
+                if (o1.getPosts().size() != 1 || o2.getPosts().size() != 1) {
+                    throw new RuntimeException("posts大小必须为1");
+                }
+                return o1.getPosts().get(0).getId() - o2.getPosts().get(0).getId();
+            }
+        });
         for (int i = Configuration.getFromPage(); i <= Configuration.getToPage(); i++) {
-            if (ResourcesHolder.getMapid2log().keySet().contains(i)) {
-                liLog.add(ResourcesHolder.getMapid2log().get(i));
+            if (ResourcesHolder.getMapIdLog().keySet().contains(i)) {
+                liLog.add(ResourcesHolder.getMapIdLog().get(i));
             } else {
-                Logger.fatal("the key is not found in MapLog.");
+                MyLogUtils.fatal("the key is not found in MapLog.");
             }
         }
         for (Page page : liPages) {
@@ -100,7 +109,7 @@ public class PostWriter implements Writer {
             if (post.getCreated_at() == Configuration.DELETED_POST_CREATED_AT) {
                 liJsonDeletedPost.add(JSON.toJSONString(page));
             } else {
-                liJsonOkPost.add(ResourcesHolder.getMapid2jsondata().get(post.getId()));
+                liJsonOkPost.add(ResourcesHolder.getMapIdJson().get(post.getId()));
             }
             liMd5All.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
             liLinkAll.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
@@ -123,7 +132,7 @@ public class PostWriter implements Writer {
         int post_no_url = PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND);
         int allPosts = Integer.valueOf(Configuration.getToPage() - Configuration.getFromPage()) + 1;
         int successPosts = liPages.size();// ok_doc 和 ok_json都含有
-        int failedPosts = ResourcesHolder.getFailedPageNum();
+        int failedPosts = ResourcesHolder.getReadFailedPageCount();
         int[] post_pool_num = new int[4];
         logHelper(post_pool_num);
         int json_post_no_pool = post_pool_num[0];
@@ -148,43 +157,43 @@ public class PostWriter implements Writer {
         isValidateOk = isValidateOk && (liLinkInPool.size() == json_post_in_pool);
         isValidateOk = isValidateOk && (liLinkNoPool.size() == doc_post_in_pool + doc_post_no_pool + json_post_no_pool);
         if (!isValidateOk) {
-            Logger.fatal("validate failed before write");
+            MyLogUtils.fatal("validate failed before write");
         }
     }
 
     private void writeDeletedPostJson() throws IOException {
-        File f = new File(Constants.W_FULL_PATH_PREFIX + ".deleted_post.json");
+        File f = new File(Writer.W_FULL_PATH_PREFIX + ".deleted_post.json");
         FileUtils.writeLines(f, "utf-8", liJsonDeletedPost, true);
 
     }
 
     private void writeOkJson() throws IOException {
-        File f = new File(Constants.W_FULL_PATH_PREFIX + ".json");
+        File f = new File(Writer.W_FULL_PATH_PREFIX + ".json");
         FileUtils.writeLines(f, "utf-8", liJsonOkPost, true);
     }
 
     private void writeMD5InPool() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_in_pool.md5"), "utf-8", liMd5InPool, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_in_pool.md5"), "utf-8", liMd5InPool, false);
     }
 
     private void writeLinkInPool() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_in_pool.lst"), "utf-8", liLinkInPool, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_in_pool.lst"), "utf-8", liLinkInPool, false);
     }
 
     private void writeLinkNoPool() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_no_pool.lst"), "utf-8", liLinkNoPool, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_no_pool.lst"), "utf-8", liLinkNoPool, false);
     }
 
     private void writeMD5NoPool() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_no_pool.md5"), "utf-8", liMd5NoPool, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_no_pool.md5"), "utf-8", liMd5NoPool, false);
     }
 
     private void writeMD5All() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_all.md5"), "utf-8", liMd5All, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_all.md5"), "utf-8", liMd5All, false);
     }
 
     private void writeLinkAll() throws IOException {
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post_all.lst"), "utf-8", liLinkAll, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post_all.lst"), "utf-8", liLinkAll, false);
 
     }
 
@@ -193,14 +202,14 @@ public class PostWriter implements Writer {
         li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         String userOption = "";
-        for (String string : Configuration.getUserInputParams()) {
+        for (String string : Configuration.getInputParams()) {
             userOption += string + " ";
         }
         li.add("");
         li.add("用户参数: " + userOption.substring(0, userOption.length() - 1));
         li.add("页面总数: " + (Configuration.getToPage() - Configuration.getFromPage() + 1));
         li.add("读取成功: " + liPages.size());
-        li.add("读取失败: " + ResourcesHolder.getFailedPageNum());
+        li.add("读取失败: " + ResourcesHolder.getReadFailedPageCount());
         li.add("JSON数据条数: " + liJsonOkPost.size());
         li.add("详细计数: ok-json=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_JSON) + ", ok-doc-post-deleted=" + PostLog.getPageNumStatus(Constants.POST_STATUS_READ_BY_DOCUMENT) + ", 404=" + PostLog.getPageNumStatus(Constants.POST_STATUS_404) + ", exception=" + PostLog.getPageNumStatus(Constants.POST_STATUS_EXCEPTION) + ", no url=" + PostLog.getPageNumStatus(Constants.POST_STATUS_NO_LINK_FOUND));
         li.add("Pool信息: " + logHelper(new int[4]));
@@ -213,7 +222,7 @@ public class PostWriter implements Writer {
             String details = "# %6d  |" + Integer.toBinaryString(postlog.getPostStatus()).substring(1) + "  |" + postlog.getIsReadOk() + "    |" + postlog.getIsInPool();
             li.add(String.format(details, postlog.getId()));
         }
-        FileUtils.writeLines(new File(Constants.W_FULL_PATH_PREFIX + "_post.log"), "utf-8", li, false);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + "_post.log"), "utf-8", li, false);
 
     }
 

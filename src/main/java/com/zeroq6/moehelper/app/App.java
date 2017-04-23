@@ -1,52 +1,43 @@
 package com.zeroq6.moehelper.app;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import com.zeroq6.moehelper.conn.ConnThread;
 import com.zeroq6.moehelper.config.Configuration;
 import com.zeroq6.moehelper.conn.ConnManager;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
-import com.zeroq6.moehelper.utils.Logger;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 
 /**
  * 主方法调用
- * 
+ *
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
 public class App {
-    
-    private final static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public static void main(String[] args) {
-        try {
-            System.setProperty("line.separator", "\r\n");
-            Configuration.init(args);
-            linkStart();// ヽ(✿ﾟ▽ﾟ)ノ
-            Configuration.getWriter().writeToFile();
-            Logger.stdOut("所有操作已完成");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws Exception {
+        System.setProperty("line.separator", "\r\n");
+        Configuration.init(args);
+        linkStart();
+        Configuration.newWriter().writeToFile();
     }
 
     private static void linkStart() throws InterruptedException {
-        lab: while (true) {
+        lab:
+        while (true) {
             int pageId = ConnManager.getInstance().getPageId();
-            if (pageId != ConnManager.FIND_PAGE_ID_ALL_COMPLETED && pageId != ConnManager.FIND_PAGE_ID_LOCKED) {
-                executorService.execute(new ConnThread(pageId));
-            } else if (pageId == ConnManager.FIND_PAGE_ID_ALL_COMPLETED) {
+            if (pageId != ConnManager.ALL_COMPLETED && pageId != ConnManager.LOCKED) {
+                new ConnThread(pageId).start();
+            } else if (pageId == ConnManager.ALL_COMPLETED) {
                 // 对应下载完成但是本地是否解析完成的判断
                 int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
-                if (ResourcesHolder.getMapid2page().size() + ResourcesHolder.getFailedPageNum() != allPageNum || ResourcesHolder.getMapid2log().size() != allPageNum) {
-                    Logger.stdOut("等待本地处理完成");
+                if (ResourcesHolder.getMapIdPage().size() + ResourcesHolder.getReadFailedPageCount() != allPageNum || ResourcesHolder.getMapIdLog().size() != allPageNum) {
+                    MyLogUtils.info("等待本地处理完成");
                     Thread.sleep(500);
                 }
                 // 若匹配完成则跳出外层循环,否则循环等待
                 while (true) {
-                    if (ResourcesHolder.getMapid2page().size() + ResourcesHolder.getFailedPageNum() == allPageNum && ResourcesHolder.getMapid2log().size() == allPageNum) {
-                        Logger.stdOut("本地处理完成");
+                    if (ResourcesHolder.getMapIdPage().size() + ResourcesHolder.getReadFailedPageCount() == allPageNum && ResourcesHolder.getMapIdLog().size() == allPageNum) {
+                        MyLogUtils.info("本地处理完成");
                         break lab;
                     } else {
                         Thread.sleep(500);
@@ -56,13 +47,6 @@ public class App {
             // 每隔0.02秒获取pageId
             Thread.sleep(20);
         }
-        // 关闭线程池
-        executorService.shutdown();
     }
 
-    
-    public static ExecutorService getExecutorservice() {
-        return executorService;
-    }
-    
 }

@@ -12,7 +12,7 @@ import com.zeroq6.moehelper.log.Log;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public class PostLog implements Log {
+public class PostLog implements Log, Comparable<PostLog> {
 
     private static Map<String, Integer> mapPageStatus2Count = new HashMap<String, Integer>();
     private int id = 0;
@@ -89,8 +89,7 @@ public class PostLog implements Log {
     }
 
     @Override
-    public int compareTo(Log o) {
-        return this.id - ((PostLog) o).id;
+    public int compareTo(PostLog o) {
+        return this.getId() - o.getId();
     }
-
 }

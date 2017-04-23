@@ -14,7 +14,7 @@ import com.zeroq6.moehelper.log.Log;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public class PoolLog implements Log {
+public class PoolLog implements Log, Comparable<PoolLog> {
 
     // 页面Id对页面类型
     private static Map<String, Integer> mapPageStatus2Count = new HashMap<String, Integer>(6);
@@ -134,9 +134,9 @@ public class PoolLog implements Log {
         this.status = status;
     }
 
-    @Override
-    public int compareTo(Log o) {
-        return this.id - ((PoolLog) o).id;
-    }
 
+    @Override
+    public int compareTo(PoolLog o) {
+        return this.getId() - o.getId();
+    }
 }

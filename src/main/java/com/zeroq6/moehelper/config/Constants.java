@@ -10,10 +10,6 @@ import java.util.regex.Pattern;
  */
 public class Constants {
 
-    public final static String W_ROOT_DIR = Configuration.getConnParam("host");
-    public final static String W_WRITE_DIR = "./" + W_ROOT_DIR + "/" + Configuration.getConnParam("linkType");
-    public final static String W_FILE_NAME_PREFIX = Configuration.getConnParam("host") + "_-_" + Configuration.getConnParam("linkType") + "_" + Configuration.getBeginTime() + "_" + Configuration.getFromPage() + "_" + Configuration.getToPage();
-    public final static String W_FULL_PATH_PREFIX = W_WRITE_DIR + "/" + W_FILE_NAME_PREFIX;
 
     // moe主机常量
     public final static String HOST_MOE = "yande.re";
