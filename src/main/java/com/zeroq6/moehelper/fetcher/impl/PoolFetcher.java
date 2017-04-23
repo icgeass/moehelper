@@ -41,7 +41,7 @@ public class PoolFetcher implements Fetcher {
     }
 
     static {
-        PoolUpdatedValidator.init();
+        PrevPoolCheckUtils.init();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class PoolFetcher implements Fetcher {
                 if (arr[i].contains("Post.register_resp")) {
                     String json = arr[i].substring(arr[i].indexOf("(") + 1, arr[i].lastIndexOf(")")).trim();
                     ResourcesHolder.getMapIdJson().put(this.pageId, json);
-                    page = JSON.parseObject(new String(json), Page.class);
+                    page = JSON.parseObject(json, Page.class);
                     break;
                 }
             }
@@ -102,7 +102,7 @@ public class PoolFetcher implements Fetcher {
     private List<String> setPoolLogInfo(Page page, PoolLog log, Document doc) {
         List<String> re = new ArrayList<String>();
         // 设置Pool状态, 注意顺序, Null和No change不错误输出
-        String pageStatus = PoolUpdatedValidator.checkPageStatus(page, this.pageId);
+        String pageStatus = PrevPoolCheckUtils.checkPageStatus(page, this.pageId);
         String poolName = null;
         if (page != null) {
             poolName = this.doc.getElementById("pool-show").getElementsByTag("h4").text().replace("Pool:", "").trim();
@@ -171,7 +171,7 @@ public class PoolFetcher implements Fetcher {
      */
     private String getPoolInfo(int pageId, Page page, Document doc) {
         StringBuffer re = new StringBuffer(50);
-        String pageStatus = PoolUpdatedValidator.checkPageStatus(page, this.pageId);
+        String pageStatus = PrevPoolCheckUtils.checkPageStatus(page, this.pageId);
         // 先处理没有图片或所有图片被删除的情况
         if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus) || PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
             re.append("Id = " + pageId + "\r\n");
@@ -263,12 +263,12 @@ public class PoolFetcher implements Fetcher {
             MyLogUtils.fatal("call when pool status is no change");
         }
         int postsNumNow = page.getPosts().size();
-        int postsNumPre = PoolUpdatedValidator.getMapLastTimePageId2PostMd5List().get(pageId).size();
+        int postsNumPre = PrevPoolCheckUtils.getMapLastTimePageId2PostMd5List().get(pageId).size();
         if (postsNumPre != postsNumNow) {
             MyLogUtils.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + MyStringUtils.insertBeforePlusOrMinus(postsNumNow - postsNumPre, "-"));
         }
         Integer zipNumStatusNow = log.getJpegPackages() + (log.getOriginalPackages() << 1);
-        Integer zipNumStatusPre = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
+        Integer zipNumStatusPre = PrevPoolCheckUtils.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
         if (!zipNumStatusPre.equals(zipNumStatusNow)) {
             int affectedZipNumJpg = (zipNumStatusNow & 0b01) - (zipNumStatusPre & 0b01);
             int affectedZipNumPng = (zipNumStatusNow >>> 1) - (zipNumStatusPre >>> 1);

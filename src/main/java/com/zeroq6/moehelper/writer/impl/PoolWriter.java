@@ -12,7 +12,7 @@ import com.zeroq6.moehelper.utils.MyDateUtils;
 import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.writer.Writer;
 import com.zeroq6.moehelper.config.Configuration;
-import com.zeroq6.moehelper.fetcher.impl.PoolUpdatedValidator;
+import com.zeroq6.moehelper.fetcher.impl.PrevPoolCheckUtils;
 import com.zeroq6.moehelper.log.impl.PoolLog;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
 
@@ -214,7 +214,7 @@ public class PoolWriter implements Writer {
         int affectedZipNumJpgSum = 0;
         int affectedZipNumPngSum = 0;
         // 比较均只针对于new, modified, no change
-        Set<Integer> setLastTimePoolId = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().keySet();
+        Set<Integer> setLastTimePoolId = PrevPoolCheckUtils.getMapLastTimePageId2ZipLinkCountInfo().keySet();
         Set<Integer> setNowPoolId = PoolLog.getMapPageId2ZipLinkPoolAll().keySet();
         // PoolId在本次更新范围内的上一次更新范围含有而本次不含有, 则认为是被删除
         for (Integer poolId : setLastTimePoolId) {
@@ -318,7 +318,7 @@ public class PoolWriter implements Writer {
     }
 
     private Integer getLastTimePageId2ZipLinkNumInfoById(Integer pageId) {
-        Integer re = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
+        Integer re = PrevPoolCheckUtils.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
         if (re != 0b10 && re != 0b11) {
             MyLogUtils.fatal("Find a error zip pack number info, the page id is " + pageId);
         }

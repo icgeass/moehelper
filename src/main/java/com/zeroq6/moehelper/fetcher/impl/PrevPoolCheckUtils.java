@@ -26,7 +26,7 @@ import com.alibaba.fastjson.JSON;
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
-public class PoolUpdatedValidator {
+public class PrevPoolCheckUtils {
 
     private static int lastTimePageFrom = 99999;
     private static int lastTimePageTo = -1;
@@ -45,7 +45,7 @@ public class PoolUpdatedValidator {
     private static Map<Integer, Integer> mapLastTimePageId2ZipLinkCountInfo = Collections.synchronizedMap(new HashMap<Integer, Integer>(100));
 
     // 私有
-    private PoolUpdatedValidator() {
+    private PrevPoolCheckUtils() {
     }
 
     public static synchronized void init() {
@@ -143,7 +143,7 @@ public class PoolUpdatedValidator {
         try {
             // 读取本地json文件
             File f = new File(Writer.W_WRITE_DIR);
-            List<String> liLastTimeJsonString = new ArrayList<String>(100);
+            List<String> liLastTimeJsonString = new ArrayList<String>();
             fileToRead = new File(Writer.W_WRITE_DIR + "/yande.re_-_a");
             for (File file : f.listFiles()) {
                 if (pattern_filename_json.matcher(file.getName()).matches()) {
@@ -153,12 +153,12 @@ public class PoolUpdatedValidator {
                 }
             }
             if (fileToRead.getName().endsWith(".json")) {
-                MyLogUtils.info("read from " + fileToRead.getName() + "\r\n");
+                MyLogUtils.info("read from " + fileToRead.getName() + "");
                 liLastTimeJsonString = FileUtils.readLines(fileToRead, "utf-8");
             }
             // 判断文件是否读取成功
             if (liLastTimeJsonString.isEmpty()) {
-                MyLogUtils.info("read .json file failed\r\n\r\n");
+                MyLogUtils.info("read .json file failed");
                 return;
             }
 
@@ -168,21 +168,27 @@ public class PoolUpdatedValidator {
                 String pageStatus = checkPageStatus(page, null);
                 if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    MyLogUtils.info("Pool # NaN  Empty pool found\r\n");
+                    MyLogUtils.info("Pool # NaN  Empty pool found");
                     continue;
                 }
                 if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    MyLogUtils.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", "") + " with all posts deleted\r\n");
+                    MyLogUtils.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", " ") + " with all posts deleted.");
                     continue;
                 }
+                // 其余都是NEW
                 Map<Integer, String> mapPostId2Md5 = new HashMap<Integer, String>();
                 for (Post post : page.getPosts()) {
                     mapPostId2Md5.put(post.getId(), post.getMd5());
                 }
+                if(page.getPosts().size() != page.getPool_posts().size()){
+                    MyLogUtils.fatal("TEST1=>" + page.toString());
+                }
                 for (Pool_post pool2post : page.getPool_posts()) {
                     // 上次更新的id范围依lst文件为准
                     if (pool2post.getPool_id() > lastTimePageTo || pool2post.getPool_id() < lastTimePageFrom) {
+                        //
+                        MyLogUtils.fatal("TEST2=>" + page.toString());
                         continue;
                     }
                     if (!mapLastTimePageId2PostMd5List.keySet().contains(pool2post.getPool_id())) {
@@ -196,9 +202,9 @@ public class PoolUpdatedValidator {
 
                 }
             }
-            MyLogUtils.info("read file " + fileToRead.getName() + " succeed, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found\r\n\r\n");
+            MyLogUtils.info("read file " + fileToRead.getName() + " success, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found");
         } catch (Exception e) {
-            MyLogUtils.fatal("read file " + fileToRead.getName() + " failed", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -212,7 +218,7 @@ public class PoolUpdatedValidator {
     public static String checkPageStatus(Page page, Integer pageId) {
         // 校验, 对于非null的Pool来说, posts和 pools均为空或非空
         if (page != null && page.getPosts().isEmpty() != page.getPools().isEmpty()) {
-            MyLogUtils.fatal("wrong json format in pool page");
+            throw new RuntimeException("非法的json数据格式, " + pageId);
         }
         if (null == page) {
             return PoolLog.POOL_STATUS_NULL;
@@ -232,7 +238,7 @@ public class PoolUpdatedValidator {
                 return PoolLog.POOL_STATUS_ALL_DELETED;
             }
         }
-        // pageId = null 始终返回POOL_STATUS_NEW用于初始mapLastTimePageId2PostMd5Li时跳过后面判断
+        // pageId = null 始终返回POOL_STATUS_NEW用于初始mapLastTimePageId2PostMd5List时跳过后面判断
         if (null == pageId || !mapLastTimePageId2ZipLinkCountInfo.keySet().contains(pageId)) {
             return PoolLog.POOL_STATUS_NEW; // 若上一次的empty和all deleted添加了Post也将任务是new
         }
