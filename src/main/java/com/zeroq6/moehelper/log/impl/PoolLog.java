@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.zeroq6.moehelper.log.Log;
 
@@ -32,15 +33,14 @@ public class PoolLog implements Log, Comparable<PoolLog> {
     public final static String POOL_STATUS_NEW = "new";
 
 
-
-    // 页面Id对页面类型
-    private static Map<String, Integer> mapPageStatus2Count = new HashMap<String, Integer>(6);
+    // 页面状态-对应页面数量
+    private static Map<String, Integer> mapPageStatus2Count = new ConcurrentHashMap<String, Integer>(6);
     // 页面Id对Pool详细描述
-    private static Map<Integer, String> mapPageId2PoolDescription = Collections.synchronizedMap(new HashMap<Integer, String>(200));
+    private static Map<Integer, String> mapPageId2PoolDescription = new ConcurrentHashMap<Integer, String>();
     // Id对zip链接的List集合（对照上次处理结果，需要更新的）
-    private static Map<Integer, List<String>> mapPageId2ZipLinkPoolUpdated = Collections.synchronizedMap(new HashMap<Integer, List<String>>(200));
+    private static Map<Integer, List<String>> mapPageId2ZipLinkPoolUpdated = new ConcurrentHashMap<Integer, List<String>>();
     // Id对zip链接的List集合（本次所有，页面状态为no change, modified, new共三种）
-    private static Map<Integer, List<String>> mapPageId2ZipLinkPoolAll = Collections.synchronizedMap(new HashMap<Integer, List<String>>(200));
+    private static Map<Integer, List<String>> mapPageId2ZipLinkPoolAll = new ConcurrentHashMap<Integer, List<String>>();
 
     static {
         mapPageStatus2Count.put(POOL_STATUS_NULL, new Integer(0));
@@ -63,6 +63,9 @@ public class PoolLog implements Log, Comparable<PoolLog> {
 
     private String status = "null";
 
+    public PoolLog() {
+    }
+
     public PoolLog(int id) {
         this.id = id;
     }
@@ -73,11 +76,11 @@ public class PoolLog implements Log, Comparable<PoolLog> {
      * @param pageStatus
      * @return void
      */
-    public static synchronized void logPageNumByType(String pageStatus) {
+    public static synchronized void logPageCountByPageStatus(String pageStatus) {
         if (mapPageStatus2Count.containsKey(pageStatus)) {
             mapPageStatus2Count.put(pageStatus, mapPageStatus2Count.get(pageStatus) + 1);
         } else {
-            throw new UnsupportedOperationException("For input " + pageStatus);
+            throw new RuntimeException("传入页面状态错误, " + pageStatus);
         }
     }
 
@@ -87,11 +90,11 @@ public class PoolLog implements Log, Comparable<PoolLog> {
      * @param pageStatus
      * @return int
      */
-    public static synchronized int getPageNumStatus(String pageStatus) {
+    public static synchronized int getPageCountByPageStatus(String pageStatus) {
         if (mapPageStatus2Count.containsKey(pageStatus)) {
             return mapPageStatus2Count.get(pageStatus);
         } else {
-            throw new UnsupportedOperationException("For input " + pageStatus);
+            throw new RuntimeException("传入页面状态错误, " + pageStatus);
         }
     }
 
@@ -107,50 +110,64 @@ public class PoolLog implements Log, Comparable<PoolLog> {
         return mapPageId2ZipLinkPoolAll;
     }
 
+
+
+    ///////
+
+
     public int getId() {
         return id;
+    }
+
+    public PoolLog setId(int id) {
+        this.id = id;
+        return this;
     }
 
     public int getJpegPackages() {
         return jpegPackages;
     }
 
-    public void setJpegPackages(int jpegPackages) {
+    public PoolLog setJpegPackages(int jpegPackages) {
         this.jpegPackages = jpegPackages;
+        return this;
     }
 
     public int getOriginalPackages() {
         return originalPackages;
     }
 
-    public void setOriginalPackages(int originalPackages) {
+    public PoolLog setOriginalPackages(int originalPackages) {
         this.originalPackages = originalPackages;
+        return this;
     }
 
     public int getAllPackages() {
         return allPackages;
     }
 
-    public void setAllPackages(int allPackages) {
+    public PoolLog setAllPackages(int allPackages) {
         this.allPackages = allPackages;
+        return this;
     }
 
     public String getIsExist() {
         return isExist;
     }
 
-    public void setIsExist(String isExist) {
+    public PoolLog setIsExist(String isExist) {
         this.isExist = isExist;
+        return this;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public PoolLog setStatus(String status) {
         this.status = status;
+        return this;
     }
-
 
     @Override
     public int compareTo(PoolLog o) {

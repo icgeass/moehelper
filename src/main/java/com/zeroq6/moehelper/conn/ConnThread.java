@@ -42,7 +42,7 @@ public class ConnThread extends Thread {
     private String linkType = Configuration.getLinkType();
     private String host = Configuration.getHost();
     private String protocol = Configuration.getProtocol();
-    private int port = Integer.valueOf(Configuration.getPort());
+    private int port = Configuration.getPort();
 
     public ConnThread(int pageId) {
         this.pageId = pageId;

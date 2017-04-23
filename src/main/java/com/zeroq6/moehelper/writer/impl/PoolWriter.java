@@ -146,10 +146,10 @@ public class PoolWriter implements Writer {
         li.add("");
         li.add("用户参数: " + userOptions.substring(0, userOptions.length() - 1));
         li.add("页面总数: " + (Configuration.getToPage() - Configuration.getFromPage() + 1));
-        li.add("读取成功: " + (PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NO_CHANGE)));
+        li.add("读取成功: " + (PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NO_CHANGE)));
         li.add("读取失败: " + ResourcesHolder.getReadFailedPageCount());
         li.add("JSON数据条数: " + ResourcesHolder.getMapIdJson().size());
-        li.add("详细计数: null=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NULL) + ", empty=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_EMPTY) + ", all-deleted=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_ALL_DELETED) + ", modified=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_MODIFIED) + ", new=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NEW) + ", no-change=" + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NO_CHANGE));
+        li.add("详细计数: null=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NULL) + ", empty=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_EMPTY) + ", all-deleted=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_ALL_DELETED) + ", modified=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_MODIFIED) + ", new=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NEW) + ", no-change=" + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NO_CHANGE));
         li.add("写入情况: Log条数=" + liPoolLogAll.size() + ", json=" + liJsonData.size() + ", package计数=" + liPoolIdToZipNumCount.size() + ", pool-details=" + liPoolDescription.size() + "\r\n\t  all-package-url=" + liPoolZipUrlAll.size() + ", updated-package-url=" + liPoolZipUrlUpdated.size() + ", 被添加和更新Pool数=" + liPoolLogUpdated.size());
         li.add("");
         li.add("Pool Id  jpeg original all   isexist  status");
@@ -198,7 +198,7 @@ public class PoolWriter implements Writer {
         isValidateOk = isValidateOk && liPoolLogUpdated.size() == PoolLog.getMapPageId2ZipLinkPoolUpdated().size();
         isValidateOk = isValidateOk && liPoolLogAll.size() == Configuration.getToPage() - Configuration.getFromPage() + 1;
         int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
-        int logAllPageNumByPageStatus = PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NULL) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageNumStatus(PoolLog.POOL_STATUS_NO_CHANGE);
+        int logAllPageNumByPageStatus = PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NULL) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NO_CHANGE);
         isValidateOk = isValidateOk && (allPageNum == logAllPageNumByPageStatus);
         if (!isValidateOk) {
             MyLogUtils.fatal("validate failed");
@@ -214,7 +214,7 @@ public class PoolWriter implements Writer {
         int affectedZipNumJpgSum = 0;
         int affectedZipNumPngSum = 0;
         // 比较均只针对于new, modified, no change
-        Set<Integer> setLastTimePoolId = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkNumInfo().keySet();
+        Set<Integer> setLastTimePoolId = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().keySet();
         Set<Integer> setNowPoolId = PoolLog.getMapPageId2ZipLinkPoolAll().keySet();
         // PoolId在本次更新范围内的上一次更新范围含有而本次不含有, 则认为是被删除
         for (Integer poolId : setLastTimePoolId) {
@@ -318,7 +318,7 @@ public class PoolWriter implements Writer {
     }
 
     private Integer getLastTimePageId2ZipLinkNumInfoById(Integer pageId) {
-        Integer re = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkNumInfo().get(pageId);
+        Integer re = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
         if (re != 0b10 && re != 0b11) {
             MyLogUtils.fatal("Find a error zip pack number info, the page id is " + pageId);
         }

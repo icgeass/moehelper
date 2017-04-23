@@ -39,7 +39,7 @@ public class PoolUpdatedValidator {
     private static Pattern pattern_md5 = Pattern.compile("^[0-9a-z]{32}$");
 
     // 来自json文件, 读取时忽略all deleted和empty两种情况
-    private static Map<Integer, Set<String>> mapLastTimePageId2PostMd5Li = Collections.synchronizedMap(new HashMap<Integer, Set<String>>(100));
+    private static Map<Integer, Set<String>> mapLastTimePageId2PostMd5List = Collections.synchronizedMap(new HashMap<Integer, Set<String>>(100));
 
     // 来自lst（所有zip链接），lst文件中原本不含all deleted和empty两种情况
     private static Map<Integer, Integer> mapLastTimePageId2ZipLinkNumInfo = Collections.synchronizedMap(new HashMap<Integer, Integer>(100));
@@ -50,13 +50,13 @@ public class PoolUpdatedValidator {
 
     public static synchronized void init() {
         if (init) {
-            MyLogUtils.fatal("the method init can be called only once");
+           throw new RuntimeException("只能初始化一次");
         }
         // 两者顺序不能变, initMapLastTimePageId2ZipLinkNumInfo需要设置上一次更新的PoolId范围
         initMapLastTimePageId2ZipLinkNumInfo();
-        initMapLastTimePageId2PostMd5Li();
-        if (!mapLastTimePageId2ZipLinkNumInfo.keySet().equals(mapLastTimePageId2PostMd5Li.keySet())) {
-            MyLogUtils.fatal("cool");
+        initMapLastTimePageId2PostMd5List();
+        if (!mapLastTimePageId2ZipLinkNumInfo.keySet().equals(mapLastTimePageId2PostMd5List.keySet())) {
+            throw new RuntimeException("链接信息和MD5信息不一致");
         }
         init = true;
     }
@@ -137,7 +137,7 @@ public class PoolUpdatedValidator {
      * 
      * @return void
      */
-    private static void initMapLastTimePageId2PostMd5Li() {
+    private static void initMapLastTimePageId2PostMd5List() {
         File fileToRead = null;
         try {
             // 读取本地json文件
@@ -184,14 +184,14 @@ public class PoolUpdatedValidator {
                     if (pool2post.getPool_id() > lastTimePageTo || pool2post.getPool_id() < lastTimePageFrom) {
                         continue;
                     }
-                    if (!mapLastTimePageId2PostMd5Li.keySet().contains(pool2post.getPool_id())) {
-                        mapLastTimePageId2PostMd5Li.put(pool2post.getPool_id(), new HashSet<String>());
+                    if (!mapLastTimePageId2PostMd5List.keySet().contains(pool2post.getPool_id())) {
+                        mapLastTimePageId2PostMd5List.put(pool2post.getPool_id(), new HashSet<String>());
                     }
                     String md5 = mapPostId2Md5.get(pool2post.getPost_id());
                     if (null == md5 || !pattern_md5.matcher(md5).matches()) {
                         MyLogUtils.fatal("Error md5 format");
                     }
-                    mapLastTimePageId2PostMd5Li.get(pool2post.getPool_id()).add(md5);
+                    mapLastTimePageId2PostMd5List.get(pool2post.getPool_id()).add(md5);
 
                 }
             }
@@ -237,18 +237,18 @@ public class PoolUpdatedValidator {
         }
         for (Post post : page.getPosts()) {
             // 只要有新md5则认为被修改, 仅含有被移除md5不会被认为修改
-            if (!mapLastTimePageId2PostMd5Li.get(pageId).contains(post.getMd5())) {
+            if (!mapLastTimePageId2PostMd5List.get(pageId).contains(post.getMd5())) {
                 return PoolLog.POOL_STATUS_MODIFIED;
             }
         }
         return PoolLog.POOL_STATUS_NO_CHANGE;
     }
 
-    public static Map<Integer, Set<String>> getMapLastTimePageId2PostMd5Li() {
-        return mapLastTimePageId2PostMd5Li;
+    public static Map<Integer, Set<String>> getMapLastTimePageId2PostMd5List() {
+        return mapLastTimePageId2PostMd5List;
     }
 
-    public static Map<Integer, Integer> getMapLastTimePageId2ZipLinkNumInfo() {
+    public static Map<Integer, Integer> getMapLastTimePageId2ZipLinkCountInfo() {
         return mapLastTimePageId2ZipLinkNumInfo;
     }
 

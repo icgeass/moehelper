@@ -51,7 +51,7 @@ public class PoolFetcher implements Fetcher {
             if (this.doc == null) {
                 ResourcesHolder.readPageFailed();
                 ResourcesHolder.getMapIdLog().put(this.pageId, new PoolLog(this.pageId));
-                PoolLog.logPageNumByType(PoolLog.POOL_STATUS_NULL);
+                PoolLog.logPageCountByPageStatus(PoolLog.POOL_STATUS_NULL);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed, 404, page not found");
                 return;
             }
@@ -154,7 +154,7 @@ public class PoolFetcher implements Fetcher {
                 }
             }
         }
-        PoolLog.logPageNumByType(pageStatus);
+        PoolLog.logPageCountByPageStatus(pageStatus);
         if (log.getStatus().equals(PoolLog.POOL_STATUS_NO_CHANGE)) {
             checkIsPoolOnlyPostsRemove(page, log);
         }
@@ -263,12 +263,12 @@ public class PoolFetcher implements Fetcher {
             MyLogUtils.fatal("call when pool status is no change");
         }
         int postsNumNow = page.getPosts().size();
-        int postsNumPre = PoolUpdatedValidator.getMapLastTimePageId2PostMd5Li().get(pageId).size();
+        int postsNumPre = PoolUpdatedValidator.getMapLastTimePageId2PostMd5List().get(pageId).size();
         if (postsNumPre != postsNumNow) {
             MyLogUtils.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + MyStringUtils.insertBeforePlusOrMinus(postsNumNow - postsNumPre, "-"));
         }
         Integer zipNumStatusNow = log.getJpegPackages() + (log.getOriginalPackages() << 1);
-        Integer zipNumStatusPre = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkNumInfo().get(pageId);
+        Integer zipNumStatusPre = PoolUpdatedValidator.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
         if (!zipNumStatusPre.equals(zipNumStatusNow)) {
             int affectedZipNumJpg = (zipNumStatusNow & 0b01) - (zipNumStatusPre & 0b01);
             int affectedZipNumPng = (zipNumStatusNow >>> 1) - (zipNumStatusPre >>> 1);

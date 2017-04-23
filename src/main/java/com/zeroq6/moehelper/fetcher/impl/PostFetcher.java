@@ -28,23 +28,6 @@ import com.alibaba.fastjson.JSON;
  */
 public class PostFetcher implements Fetcher {
 
-    /**
-     * post页面状态
-     */
-    // 页面404
-    public final static String POST_STATUS_404 = "404";
-    // 程序异常
-    public final static String POST_STATUS_EXCEPTION = "exception";
-    // 从Json中获取链接
-    public final static String POST_STATUS_READ_BY_JSON = "read_by_json";
-    // 从文档中中获取链接
-    public final static String POST_STATUS_READ_BY_DOCUMENT = "read_by_document";
-    // 未找到链接
-    public final static String POST_STATUS_NO_LINK_FOUND = "no_link_found";
-
-
-
-
 
     // 当图片被删除时用于查找文件url的标签属性对
     private static Map<String, String> mapTag2Prop = new HashMap<String, String>();
@@ -81,7 +64,7 @@ public class PostFetcher implements Fetcher {
             if (doc == null) {
                 ResourcesHolder.readPageFailed();
                 ResourcesHolder.getMapIdLog().put(this.pageId, new PostLog(this.pageId));
-                PostLog.logPageNumByType(POST_STATUS_404);
+                PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_404);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: 404, page not found");
                 return;
             }
@@ -95,7 +78,7 @@ public class PostFetcher implements Fetcher {
                     String json = line[i].substring(line[i].indexOf("(") + 1, line[i].lastIndexOf(")"));
                     ResourcesHolder.getMapIdJson().put(this.pageId, json);
                     page = JSON.parseObject(new String(json), Page.class);
-                    PostLog.logPageNumByType(POST_STATUS_READ_BY_JSON);
+                    PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_JSON);
                     break;
                 }
             }
@@ -192,7 +175,7 @@ public class PostFetcher implements Fetcher {
                             Post post = new Post();
                             post.setId(pageId).setFile_url(file_url).setMd5(md5).setTags(tags).setCreated_at(Configuration.DELETED_POST_CREATED_AT);
                             page.getPosts().add(post);
-                            PostLog.logPageNumByType(POST_STATUS_READ_BY_DOCUMENT);
+                            PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_DOCUMENT);
                             // 设置是否在pool中属性
                             if (isInPoolByDoc) {
                                 page.getPools().add(new Pool());
@@ -209,7 +192,7 @@ public class PostFetcher implements Fetcher {
             // ---------------判断page是否为空----------------------
             // 为空则不添加page,不设置log,log前面已添加
             if (page == null) {
-                PostLog.logPageNumByType(POST_STATUS_NO_LINK_FOUND);
+                PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_NO_LINK_FOUND);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: no url was found");
                 ResourcesHolder.readPageFailed();
             } else {
