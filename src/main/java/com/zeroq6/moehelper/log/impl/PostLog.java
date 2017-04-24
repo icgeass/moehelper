@@ -71,12 +71,12 @@ public class PostLog implements Log, Comparable<PostLog> {
      * @param pageStatus
      * @return int
      */
-    public static synchronized int getPageCountByPageStatus(String pageStatus) {
+    public static synchronized Integer getPageCountByPageStatus(String pageStatus) {
         if (mapPageStatus2Count.containsKey(pageStatus)) {
             return mapPageStatus2Count.get(pageStatus);
         } else {
             MyLogUtils.fatal("传入页面状态错误, " + pageStatus);
-            return -1;
+            return null;
         }
     }
 
