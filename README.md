@@ -31,5 +31,8 @@
         2. 没有被标记为删除的在Pool中的post数量
         3. 被标记为删除的通过解析HTML获得的不在Pool中的post数量
         4. 被标记为删除的通过解析HTML获得的在Pool中的post数量
+- 使用代理
+    - 添加命令行参数，如```java -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080 -jar ...```
+    - [查看详细](http://docs.oracle.com/javase/7/docs/technotes/guides/net/proxies.html)
 
 

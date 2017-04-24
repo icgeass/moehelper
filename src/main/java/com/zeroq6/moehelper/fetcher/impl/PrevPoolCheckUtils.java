@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.zeroq6.moehelper.bean.Page;
+import com.zeroq6.moehelper.bean.Pool;
 import com.zeroq6.moehelper.bean.Pool_post;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.log.impl.PoolLog;
@@ -165,6 +166,7 @@ public class PrevPoolCheckUtils {
             int numEmptyAndAllDeletedPool = 0;
             for (String jsonString : liLastTimeJsonString) {
                 Page page = JSON.parseObject(jsonString, Page.class);
+                // 除了EMPTY，ALL_DELETED，其余都是NEW
                 String pageStatus = checkPageStatus(page, null);
                 if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
@@ -173,22 +175,18 @@ public class PrevPoolCheckUtils {
                 }
                 if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    MyLogUtils.info("Pool # " + page.getPools().get(0).getId() + " " + page.getPools().get(0).getName().replace("_", " ") + " with all posts deleted.");
+                    Pool pool = page.getPools().get(0); // json数据中有多个pool时，不准确，没必要处理
+                    MyLogUtils.info("Pool # " + pool.getId() + " " + pool.getName() + " with all posts deleted.");
                     continue;
                 }
-                // 其余都是NEW
                 Map<Integer, String> mapPostId2Md5 = new HashMap<Integer, String>();
                 for (Post post : page.getPosts()) {
                     mapPostId2Md5.put(post.getId(), post.getMd5());
                 }
-                if(page.getPosts().size() != page.getPool_posts().size()){
-                    MyLogUtils.fatal("TEST1=>" + page.toString());
-                }
                 for (Pool_post pool2post : page.getPool_posts()) {
-                    // 上次更新的id范围依lst文件为准
+                    // 如果json数据中包括了多个pool信息，而输入（上一次）指定的pool id范围没有包括其中一个或多个pool信息对应的id，则url list和md5 list大小不一致，后续校验出错
+                    // 上次更新的id范围依lst文件为准，其他过滤掉
                     if (pool2post.getPool_id() > lastTimePageTo || pool2post.getPool_id() < lastTimePageFrom) {
-                        //
-                        MyLogUtils.fatal("TEST2=>" + page.toString());
                         continue;
                     }
                     if (!mapLastTimePageId2PostMd5List.keySet().contains(pool2post.getPool_id())) {
