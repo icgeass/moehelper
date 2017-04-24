@@ -34,5 +34,7 @@
 - 使用代理
     - 添加命令行参数，如```java -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080 -jar ...```
     - [查看详细](http://docs.oracle.com/javase/7/docs/technotes/guides/net/proxies.html)
+- 错误日志文件乱码
+    - 和代理一样，添加命令行参数，```-Dfile.encoding=UTF-8```
 
 

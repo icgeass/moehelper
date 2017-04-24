@@ -65,7 +65,7 @@ public class PostFetcher implements Fetcher {
                 ResourcesHolder.readPageFailed();
                 ResourcesHolder.getMapIdLog().put(this.pageId, new PostLog(this.pageId));
                 PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_404);
-                MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: 404, page not found");
+                MyLogUtils.error("Post #" + this.pageId + " read page failed. reason: 404, page not found");
                 return;
             }
             PostLog log = new PostLog(this.pageId);
@@ -100,21 +100,21 @@ public class PostFetcher implements Fetcher {
             if (page == null) {
                 if (!isDeletedByDoc) {
                     // ---Post是否删除校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. Reason: post url was not deleted in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in document");
                 }
             } else {
                 // moe 305487, 1楼 评论: This post was deleted......., OTL, debug
                 if (isDeletedByDoc) {
                     // ---Post是否删除校验2
-                    MyLogUtils.debug("Post #" + this.pageId + " match error. Reason: post url was deleted in document");
+                    MyLogUtils.debug("Post #" + this.pageId + " match error. reason: post url was deleted in document");
                 }
                 if ((page.getPools().size() == 0 && isInPoolByDoc)) {
                     // ---Post是否在Pool校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. Reason: post was in pool in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in document");
                 }
                 if (page.getPools().size() != 0 && !isInPoolByDoc) {
                     // ---Post是否在Pool校验2
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. Reason: post was not in pool in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in document");
                 }
                 // ---校验json数据中post文件链接是否为原图/image/
                 String fileUrl = page.getPosts().get(0).getFile_url();
@@ -123,7 +123,7 @@ public class PostFetcher implements Fetcher {
                     page.getPosts().get(0).setFile_url(fileUrl);
                 }
                 if (!(fileUrl.startsWith("http") && fileUrl.contains("/image/"))) {
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. Reason: post url was not correct in json");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not correct in json");
                 }
                 boolean isPostUrlMatched = false;
                 for (Element element : doc.getElementsByTag("a")) {
@@ -133,7 +133,7 @@ public class PostFetcher implements Fetcher {
                         // ---校验a标签中链接是否与page对象中的链接一致
                         // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug
                         if (!page.getPosts().get(0).getFile_url().equals(element.absUrl("href"))) {
-                            MyLogUtils.debug("Post #" + this.pageId + " match error. Reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from document in tag a is " + element.absUrl("href"));
+                            MyLogUtils.debug("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from document in tag a is " + element.absUrl("href"));
                         }
                         isPostUrlMatched = true;
                         // 防止有多个不匹配链接被找到而造成的重复打印
@@ -144,10 +144,10 @@ public class PostFetcher implements Fetcher {
                 if (isDeletedByDoc == isPostUrlMatched) {
                     if (!isDeletedByDoc) {
                         // moe 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接, debug
-                        MyLogUtils.debug("Post #" + this.pageId + " match error. Reason: this post was not deleted in pattern but not found the matched url in document in tag a.");
+                        MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in document in tag a.");
                     } else {
                         // moe 305487, 1楼 评论
-                        MyLogUtils.debug("Post #" + this.pageId + " match error. Reason: this post was deleted in pattern but found the matched url in document in tag a.");
+                        MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in document in tag a.");
                     }
                 }
             }
@@ -193,7 +193,7 @@ public class PostFetcher implements Fetcher {
             // 为空则不添加page,不设置log,log前面已添加
             if (page == null) {
                 PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_NO_LINK_FOUND);
-                MyLogUtils.error("Post #" + this.pageId + " read page failed. Reason: no url was found");
+                MyLogUtils.error("Post #" + this.pageId + " read page failed. reason: no url was found");
                 ResourcesHolder.readPageFailed();
             } else {
                 setLog(page, log);

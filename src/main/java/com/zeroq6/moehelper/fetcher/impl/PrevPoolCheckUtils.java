@@ -170,7 +170,7 @@ public class PrevPoolCheckUtils {
                 String pageStatus = checkPageStatus(page, null);
                 if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
-                    MyLogUtils.info("Pool # NaN  Empty pool found");
+                    MyLogUtils.info("Pool # NaN empty pool found");
                     continue;
                 }
                 if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {

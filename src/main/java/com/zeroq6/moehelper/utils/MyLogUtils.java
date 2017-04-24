@@ -60,7 +60,7 @@ public class MyLogUtils {
             String msg = fatal + " in class " + stacks[2].getClassName() + "." + stacks[2].getMethodName() + " at line " + stacks[2].getLineNumber();
             formattedLog(msg, LOG_LEVEL_FATAL);
             if(null != e){
-                e.getCause().printStackTrace();
+                e.printStackTrace();
             }
         } finally {
             System.exit(-2);

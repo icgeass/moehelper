@@ -1,8 +1,6 @@
 package com.zeroq6.moehelper.config;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -123,14 +121,13 @@ public class Configuration {
         Configuration.fromPage = Integer.valueOf(args[0]);
         Configuration.toPage = Integer.valueOf(args[1]);
         ConnManager.getInstance().putRange(fromPage, toPage);
-        // 标准重定向
-        File f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
-        FileUtils.write(f, "", "utf-8", true);
-        System.setOut(new PrintStream(new FileOutputStream(f), true, "utf-8"));
         // 错误重定向
-        f = new File(Writer.W_FULL_PATH_PREFIX + "_stderr.txt");
-        FileUtils.write(f, "", "utf-8", true);
+        File f = new File(Writer.W_FULL_PATH_PREFIX + "_stderr.txt");
         System.setErr(new PrintStream(new FileOutputStream(f), true, "utf-8"));
+        f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
+        // 标准重定向
+        System.setOut(new PrintStream(new FileOutputStream(f), true, "utf-8"));
+        //
         MyLogUtils.info("标准错误输出重定向");
         MyLogUtils.stdOut("标准输出重定向");
         // 提示文件

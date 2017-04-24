@@ -2,6 +2,7 @@ package com.zeroq6.moehelper.bean;
 
 import com.alibaba.fastjson.JSON;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,12 @@ public class Page {
     private List<Pool_post> pool_posts;
     private Map<String, Object> tags;
     private Map<String, Object> votes;
+
+    public Page() {
+        posts = new ArrayList<Post>();
+        pools = new ArrayList<Pool>();
+        pool_posts = new ArrayList<Pool_post>();
+    }
 
     public List<Post> getPosts() {
         return posts;
