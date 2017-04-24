@@ -27,19 +27,19 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PoolWriter implements Writer {
 
-    private List<String> liJsonData = new ArrayList<String>(100);
+    private List<String> liJsonData = new ArrayList<String>();
 
-    private List<String> liPoolDescription = new ArrayList<String>(100);
+    private List<String> liPoolDescription = new ArrayList<String>();
 
-    private List<String> liPoolZipUrlUpdated = new ArrayList<String>(100);
+    private List<String> liPoolZipUrlUpdated = new ArrayList<String>();
 
-    private List<String> liPoolZipUrlAll = new ArrayList<String>(100);
+    private List<String> liPoolZipUrlAll = new ArrayList<String>();
 
-    private List<String> liPoolLogUpdated = new ArrayList<String>(100);
+    private List<String> liPoolLogUpdated = new ArrayList<String>();
 
-    private List<String> liPoolLogAll = new ArrayList<String>(100);
+    private List<String> liPoolLogAll = new ArrayList<String>();
 
-    private List<String> liPoolIdToZipNumCount = new ArrayList<String>(100);
+    private List<String> liPoolIdToZipNumCount = new ArrayList<String>();
 
     public PoolWriter() {
     }
@@ -67,7 +67,7 @@ public class PoolWriter implements Writer {
     }
 
     private void writePoolIdToZipNumCount() throws IOException {
-        List<String> li = new ArrayList<String>(100);
+        List<String> li = new ArrayList<String>();
         li.add(MyDateUtils.formatCurrentTime());
         li.add("from Pool #" + Configuration.getFromPage() + " to Pool #" + Configuration.getToPage() + "\r\n");
         li.addAll(liPoolIdToZipNumCount);
@@ -75,7 +75,7 @@ public class PoolWriter implements Writer {
     }
 
     private void writePoolDescription() throws IOException {
-        List<String> li = new ArrayList<String>(100);
+        List<String> li = new ArrayList<String>();
         li.add(MyDateUtils.formatCurrentTime());
         li.add("from Pool #" + Configuration.getFromPage() + " to Pool #" + Configuration.getToPage() + "\r\n");
         li.addAll(liPoolDescription);
@@ -91,7 +91,7 @@ public class PoolWriter implements Writer {
     }
 
     private void writeUpdatedPoolLog() throws IOException {
-        List<String> li = new ArrayList<String>(20);
+        List<String> li = new ArrayList<String>();
         li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         li.add("");
@@ -135,7 +135,7 @@ public class PoolWriter implements Writer {
     }
 
     private void writeLog() throws IOException {
-        List<String> li = new ArrayList<String>(200);
+        List<String> li = new ArrayList<String>();
         li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         String userOptions = "";

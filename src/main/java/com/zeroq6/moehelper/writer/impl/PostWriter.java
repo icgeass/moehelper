@@ -31,21 +31,21 @@ import com.alibaba.fastjson.JSON;
 public class PostWriter implements Writer {
 
     // 图片未被标记为删除和标记为删除但是从html标签中找到链接的page
-    private List<Page> liPages = new ArrayList<Page>(100);
+    private List<Page> liPages = new ArrayList<Page>();
     // 同上
-    private List<String> liMd5All = new ArrayList<String>(100);
+    private List<String> liMd5All = new ArrayList<String>();
     // 图片未被标记未删除并且在Pool中的链接
-    private List<String> liMd5InPool = new ArrayList<String>(100);
+    private List<String> liMd5InPool = new ArrayList<String>();
     // 图片未被标记为删除并且不在Pool中的链接和图片标记为删除的在和不在Pool的链接
-    private List<String> liMd5NoPool = new ArrayList<String>(100);
-    private List<String> liLinkAll = new ArrayList<String>(100);
-    private List<String> liLinkInPool = new ArrayList<String>(100);
-    private List<String> liLinkNoPool = new ArrayList<String>(100);
+    private List<String> liMd5NoPool = new ArrayList<String>();
+    private List<String> liLinkAll = new ArrayList<String>();
+    private List<String> liLinkInPool = new ArrayList<String>();
+    private List<String> liLinkNoPool = new ArrayList<String>();
     // 图片未被标记为删除的JSON
-    private List<String> liJsonOkPost = new ArrayList<String>(100);
+    private List<String> liJsonOkPost = new ArrayList<String>();
     // 图片标记为删除但是从html中找到链接的JSON
-    private List<String> liJsonDeletedPost = new ArrayList<String>(100);
-    private List<Log> liLog = new ArrayList<Log>(200);
+    private List<String> liJsonDeletedPost = new ArrayList<String>();
+    private List<Log> liLog = new ArrayList<Log>();
 
     public PostWriter() {
     }
@@ -159,14 +159,12 @@ public class PostWriter implements Writer {
     }
 
     private void writeDeletedPostJson() throws IOException {
-        File f = new File(Writer.W_FULL_PATH_PREFIX + ".deleted_post.json");
-        FileUtils.writeLines(f, "utf-8", liJsonDeletedPost, true);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + ".deleted_post.json"), "utf-8", liJsonDeletedPost, true);
 
     }
 
     private void writeOkJson() throws IOException {
-        File f = new File(Writer.W_FULL_PATH_PREFIX + ".json");
-        FileUtils.writeLines(f, "utf-8", liJsonOkPost, true);
+        FileUtils.writeLines(new File(Writer.W_FULL_PATH_PREFIX + ".json"), "utf-8", liJsonOkPost, true);
     }
 
     private void writeMD5InPool() throws IOException {
@@ -195,7 +193,7 @@ public class PostWriter implements Writer {
     }
 
     private void writeLog() throws IOException {
-        List<String> li = new ArrayList<String>(100);
+        List<String> li = new ArrayList<String>();
         li.add(MyDateUtils.formatCurrentTime());
         li.add("统计: ");
         String userOption = "";
