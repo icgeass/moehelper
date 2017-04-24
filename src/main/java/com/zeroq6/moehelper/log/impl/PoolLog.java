@@ -64,9 +64,6 @@ public class PoolLog implements Log, Comparable<PoolLog> {
 
     private String status = "null";
 
-    public PoolLog() {
-    }
-
     public PoolLog(int id) {
         this.id = id;
     }
@@ -121,10 +118,6 @@ public class PoolLog implements Log, Comparable<PoolLog> {
         return id;
     }
 
-    public PoolLog setId(int id) {
-        this.id = id;
-        return this;
-    }
 
     public int getJpegPackages() {
         return jpegPackages;

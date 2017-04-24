@@ -58,8 +58,7 @@ public class PoolWriter implements Writer {
             writeUpdatedPoolLog();
             writeLog();
         } catch (Exception e) {
-            MyLogUtils.info("error occur while writing, now exiting");
-            e.printStackTrace();
+            MyLogUtils.fatal("文件写入错误", e);
         }
     }
 
@@ -201,7 +200,7 @@ public class PoolWriter implements Writer {
         int logAllPageNumByPageStatus = PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NULL) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NO_CHANGE);
         isValidateOk = isValidateOk && (allPageNum == logAllPageNumByPageStatus);
         if (!isValidateOk) {
-            MyLogUtils.fatal("validate failed");
+            MyLogUtils.fatal("数据验证失败");
         }
     }
 

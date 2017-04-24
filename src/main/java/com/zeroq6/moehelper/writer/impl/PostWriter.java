@@ -69,8 +69,7 @@ public class PostWriter implements Writer {
             writeLog();
             MyLogUtils.stdOut("文件写入完毕");
         } catch (Exception e) {
-            MyLogUtils.info("error occur while writing");
-            e.printStackTrace();
+            MyLogUtils.fatal("写入文件错误", e);
         }
     }
 
@@ -79,7 +78,6 @@ public class PostWriter implements Writer {
      */
     private void init() {
         liPages.addAll(ResourcesHolder.getMapIdPage().values());
-        // 仅处理post页面可以这样用, pool页面使用循环
         Collections.sort(liPages, new Comparator<Page>() {
             @Override
             public int compare(Page o1, Page o2) {
@@ -93,7 +91,7 @@ public class PostWriter implements Writer {
             if (ResourcesHolder.getMapIdLog().keySet().contains(i)) {
                 liLog.add(ResourcesHolder.getMapIdLog().get(i));
             } else {
-                MyLogUtils.fatal("the key is not found in MapLog.");
+                MyLogUtils.fatal("日志记录中不包含页面id, " + i);
             }
         }
         for (Page page : liPages) {
@@ -129,15 +127,15 @@ public class PostWriter implements Writer {
         int post_404 = PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_404);
         int post_exception = PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_EXCEPTION);
         int post_no_url = PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_NO_LINK_FOUND);
-        int allPosts = Integer.valueOf(Configuration.getToPage() - Configuration.getFromPage()) + 1;
+        int allPosts = Configuration.getToPage() - Configuration.getFromPage() + 1;
         int successPosts = liPages.size();// ok_doc 和 ok_json都含有
         int failedPosts = ResourcesHolder.getReadFailedPageCount();
-        int[] post_pool_num = new int[4];
-        logHelper(post_pool_num);
-        int json_post_no_pool = post_pool_num[0];
-        int json_post_in_pool = post_pool_num[1];
-        int doc_post_no_pool = post_pool_num[2];
-        int doc_post_in_pool = post_pool_num[3];
+        int[] post_pool_info_count = new int[4];
+        fillingPostPoolInfoCount(post_pool_info_count);
+        int json_post_no_pool = post_pool_info_count[0];
+        int json_post_in_pool = post_pool_info_count[1];
+        int doc_post_no_pool = post_pool_info_count[2];
+        int doc_post_in_pool = post_pool_info_count[3];
         boolean isValidateOk = true;
         isValidateOk = isValidateOk && (allPosts == (successPosts + failedPosts));
         isValidateOk = isValidateOk && (allPosts == liLog.size());
@@ -156,7 +154,7 @@ public class PostWriter implements Writer {
         isValidateOk = isValidateOk && (liLinkInPool.size() == json_post_in_pool);
         isValidateOk = isValidateOk && (liLinkNoPool.size() == doc_post_in_pool + doc_post_no_pool + json_post_no_pool);
         if (!isValidateOk) {
-            MyLogUtils.fatal("validate failed before write");
+            MyLogUtils.fatal("数据验证失败");
         }
     }
 
@@ -204,14 +202,15 @@ public class PostWriter implements Writer {
         for (String string : Configuration.getInputParams()) {
             userOption += string + " ";
         }
+        userOption = userOption.trim();
         li.add("");
-        li.add("用户参数: " + userOption.substring(0, userOption.length() - 1));
+        li.add("用户参数: " + userOption);
         li.add("页面总数: " + (Configuration.getToPage() - Configuration.getFromPage() + 1));
         li.add("读取成功: " + liPages.size());
         li.add("读取失败: " + ResourcesHolder.getReadFailedPageCount());
         li.add("JSON数据条数: " + liJsonOkPost.size());
         li.add("详细计数: ok-json=" + PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_JSON) + ", ok-doc-post-deleted=" + PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_DOCUMENT) + ", 404=" + PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_404) + ", exception=" + PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_EXCEPTION) + ", no url=" + PostLog.getPageCountByPageStatus(PostLog.POST_STATUS_NO_LINK_FOUND));
-        li.add("Pool信息: " + logHelper(new int[4]));
+        li.add("Pool信息: " + fillingPostPoolInfoCount(new int[4]));
         li.add("文件写入情况: JSON条数=" + liJsonOkPost.size() + ", 写入URL条数=" + liLinkNoPool.size() + ", 写入MD5条数=" + liMd5NoPool.size() + ", 记录Log条数=" + liLog.size());
         li.add("");
         li.add("Post id   Status   Read OK In Pool");
@@ -225,7 +224,7 @@ public class PostWriter implements Writer {
 
     }
 
-    private String logHelper(int[] arr) {
+    private String fillingPostPoolInfoCount(int[] arr) {
         for (Page page : liPages) {
             Post post = page.getPosts().get(0);
             if (post.getCreated_at() != Configuration.DELETED_POST_CREATED_AT) {

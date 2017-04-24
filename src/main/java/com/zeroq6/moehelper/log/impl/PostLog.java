@@ -45,8 +45,6 @@ public class PostLog implements Log, Comparable<PostLog> {
         mapPageStatus2Count.put(POST_STATUS_404, new Integer(0));
     }
 
-    public PostLog(){}
-
     public PostLog(int id) {
         this.id = id;
     }
@@ -84,10 +82,6 @@ public class PostLog implements Log, Comparable<PostLog> {
         return id;
     }
 
-    public PostLog setId(int id) {
-        this.id = id;
-        return this;
-    }
 
     public int getPostStatus() {
         return postStatus;

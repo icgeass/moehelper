@@ -14,6 +14,7 @@ import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.bean.Pool;
 
 import com.zeroq6.moehelper.utils.MyLogUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -29,20 +30,74 @@ import com.alibaba.fastjson.JSON;
 public class PostFetcher implements Fetcher {
 
 
+    private static Pattern pattern_md5 = Pattern.compile("^[0-9a-z]{32}$");
+
+
+    /**
+     * https://yande.re/post/show/370071
+     *
+      <div class="status-notice">
+    This post was deleted.
+
+      Reason: nah. MD5: 76993a9c9fb245648d072613d79621db
+  </div>
+     *
+     */
+    private static Pattern pattern_moe_post_deleted = Pattern.compile("^.*This post was deleted[.].*$", Pattern.CASE_INSENSITIVE);
+    /**
+     * https://yande.re/post/show/384769
+     *
+    <p>
+        <a href="/post/show/383864?pool_id=4496">« Previous</a>
+        <a href="/post/show/384770?pool_id=4496">Next »</a>
+      This post is <span id="pool-seq-4496">#2</span> in the <a href="/pool/show/4496">Canvas (Morikura En)  - kigae</a> pool.
+
+    </p>
+     */
+
+    private static Pattern pattern_moe_post_in_pool = Pattern.compile("^.*This post is.*in the <a href=\"/pool/show/[1-9][0-9]{0,}\">.*pool[.].*$", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * https://yande.re/post/show/384769
+     *  匹配后缀jpngifsw中3个字符，jpg,png,gif,swf
+     *
+        <li><a class="original-file-unchanged" id="png" href="https://files.yande.re/image/8ccda771321e2836477beb2d74b2a16e/yande.re%20384769%20canvas_%28morikura_en%29%20morikura_en%20pantsu%20seifuku%20sweater%20undressing.png">Download PNG (3.13 MB)</a>
+        </li>
+     */
+    private static Pattern pattern_moe_post_url_exist = Pattern.compile("^.*https://((.*[.])?)yande[.]re/image/[0-9a-f]{32}/yande[.]re%20[1-9][0-9]{0,}%20.*[.][pngjifswe]{3,4}.*$", Pattern.CASE_INSENSITIVE);
+
+
+    /**
+     * http://konachan.com/post/show/1853
+     *
+      <div class="status-notice">
+    This post was deleted.
+
+      Reason: Very poor quality, rating:e loli. MD5: 8ba08d158c3aff442a4b5f0c1f5f9a42
+  </div>
+     */
+    private static Pattern pattern_kona_post_deleted0 = Pattern.compile("^.*This post was deleted[.].*$", Pattern.CASE_INSENSITIVE);
+
+
+    /**
+     * http://konachan.com/post/show/240519
+     *
+      This post is <span id="pool-seq-419">#3</span> in the <a href="/pool/show/419">Sugina Miki - Kasou</a> pool.
+     */
+    private static Pattern pattern_kona_post_in_pool = Pattern.compile("^.*This post is.*in the <a href=\"/pool/show/[1-9][0-9]{0,}\">.*pool[.].*$", Pattern.CASE_INSENSITIVE);
+
+
+    /**
+     * http://konachan.com/post/show/240519
+     *
+        <li><a class="original-file-unchanged" href="//konachan.com/image/08ff068f6b8292f13f7ef981825b371c/Konachan.com%20-%20240519%20flowers_%28game%29%20innocent_grey%20sugina_miki.png" id="png">Download PNG (12.7 MB)</a>
+        </li>
+     */
+    private static Pattern pattern_kona_post_url_exist = Pattern.compile("^.*//(.*[.])?konachan[.]com/image/[0-9a-f]{32}/Konachan[.]com.*[.][pngjgifswe]{3,4}.*$", Pattern.CASE_INSENSITIVE);
+
+
     // 当图片被删除时用于查找文件url的标签属性对
     private static Map<String, String> mapTag2Prop = new HashMap<String, String>();
-
-    // 正则
-    private static Pattern pattern_moe_post_deleted = Pattern.compile("^.*?This post was deleted[.].*?$", Pattern.CASE_INSENSITIVE);
-    private static Pattern pattern_moe_post_in_pool = Pattern.compile("^.*?This post is.*?in the <a href=\"/pool/show/[1-9][0-9]{0,}\">.*?pool[.].*?$", Pattern.CASE_INSENSITIVE);
-    private static Pattern pattern_moe_post_url_exist = Pattern.compile("^.*?https://((.*?[.])?)yande[.]re/image/[0-9a-f]{32}/yande[.]re%20[1-9][0-9]{0,}%20.*?[.][jpngifsw]{3}.*?$", Pattern.CASE_INSENSITIVE);
-    private static Pattern pattern_kona_post_deleted0 = Pattern.compile("^.*?<p>This post does not exist[.]</p>.*?$", Pattern.CASE_INSENSITIVE);
-    private static Pattern pattern_kona_post_deleted1 = pattern_moe_post_deleted;
-    // @see http://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E5%92%96%E5%95%A1%E5%A3%B6%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE
-    // http://konachan.com/post/show/1853
-    private static Pattern pattern_kona_post_deleted2 = Pattern.compile("^.*?<p>HTTP/1.1 418.*?</p>.*?$", Pattern.CASE_INSENSITIVE);
-    private static Pattern pattern_kona_post_in_pool = pattern_moe_post_in_pool;
-    private static Pattern pattern_kona_post_url_exist = Pattern.compile("^.*?http://((.*?[.])?)konachan[.]com/image/[0-9a-f]{32}/Konachan[.]com.*?[.][pngjgifswe]{3,4}.*?$", Pattern.CASE_INSENSITIVE);
 
     static {
         mapTag2Prop.put("link", "href");
@@ -77,12 +132,12 @@ public class PostFetcher implements Fetcher {
                 if (line[i].contains("Post.register_resp")) {
                     String json = line[i].substring(line[i].indexOf("(") + 1, line[i].lastIndexOf(")"));
                     ResourcesHolder.getMapIdJson().put(this.pageId, json);
-                    page = JSON.parseObject(new String(json), Page.class);
+                    page = JSON.parseObject(json, Page.class);
                     PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_JSON);
                     break;
                 }
             }
-            // ----------------通过docment校验得到的Page信息是否准确----------------
+            // ----------------通过HTML校验得到的Page信息是否准确----------------
             // 与上面循环分开以便代码结构清晰
             boolean isDeletedByDoc = false;
             boolean isInPoolByDoc = false;
@@ -90,9 +145,10 @@ public class PostFetcher implements Fetcher {
                 if (isDeletedByDoc && isInPoolByDoc) {
                     break;
                 }
-                if (pattern_moe_post_deleted.matcher(line[i]).matches() || pattern_kona_post_deleted0.matcher(line[i]).matches() || pattern_kona_post_deleted1.matcher(line[i]).matches() || pattern_kona_post_deleted2.matcher(line[i]).matches()) {
+                String currLine = line[i];
+                if (pattern_moe_post_deleted.matcher(currLine).matches() || pattern_kona_post_deleted0.matcher(currLine).matches()) {
                     isDeletedByDoc = true;
-                } else if (pattern_moe_post_in_pool.matcher(line[i]).matches() || pattern_kona_post_in_pool.matcher(line[i]).matches()) {
+                } else if (pattern_moe_post_in_pool.matcher(currLine).matches() || pattern_kona_post_in_pool.matcher(currLine).matches()) {
                     isInPoolByDoc = true;
                 }
             }
@@ -100,30 +156,30 @@ public class PostFetcher implements Fetcher {
             if (page == null) {
                 if (!isDeletedByDoc) {
                     // ---Post是否删除校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in html but no json data found");
                 }
             } else {
-                // moe 305487, 1楼 评论: This post was deleted......., OTL, debug
+                // moe 305487, 1楼 评论: This post was deleted......., OTL, debug TODO
                 if (isDeletedByDoc) {
                     // ---Post是否删除校验2
-                    MyLogUtils.debug("Post #" + this.pageId + " match error. reason: post url was deleted in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was deleted in html but found json data");
                 }
                 if ((page.getPools().size() == 0 && isInPoolByDoc)) {
                     // ---Post是否在Pool校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in html but pools.size() = 0 in json data");
                 }
                 if (page.getPools().size() != 0 && !isInPoolByDoc) {
                     // ---Post是否在Pool校验2
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in document");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in html but pools.size() != 0 in json date");
                 }
                 // ---校验json数据中post文件链接是否为原图/image/
                 String fileUrl = page.getPosts().get(0).getFile_url();
-                if(fileUrl.startsWith("//")){
+                if(fileUrl.startsWith("//")){ // konachan.com的json数据中链接更改为//开头(为了兼容http与https协议)，这里处理成当前协议对应
                     fileUrl = Configuration.getProtocol() + ":" + fileUrl;
                     page.getPosts().get(0).setFile_url(fileUrl);
                 }
                 if (!(fileUrl.startsWith("http") && fileUrl.contains("/image/"))) {
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not correct in json");
+                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not correct in json, url should be start with \"http\" and contains \"/image/\"");
                 }
                 boolean isPostUrlMatched = false;
                 for (Element element : doc.getElementsByTag("a")) {
@@ -131,29 +187,29 @@ public class PostFetcher implements Fetcher {
                     Pattern p = Configuration.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
                     if (p.matcher(element.absUrl("href")).matches()) {
                         // ---校验a标签中链接是否与page对象中的链接一致
-                        // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug
+                        // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug TODO
                         if (!page.getPosts().get(0).getFile_url().equals(element.absUrl("href"))) {
-                            MyLogUtils.debug("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from document in tag a is " + element.absUrl("href"));
+                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from html in tag a is " + element.absUrl("href"));
                         }
                         isPostUrlMatched = true;
-                        // 防止有多个不匹配链接被找到而造成的重复打印
+                        // 防止有多个不匹配链接被找到而造成的重复打印 TODO
                         break;
                     }
                 }
-                // ---校验图片被删除, 则能不能找到匹配链接, 否则能找到匹配链接
+                // ---校验图片被删除, 则能不能找到匹配链接, 否则能找到匹配链接，校验html内的信息没有涉及json数据，实际可以忽略
                 if (isDeletedByDoc == isPostUrlMatched) {
                     if (!isDeletedByDoc) {
-                        // moe 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接, debug
-                        MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in document in tag a.");
+                        // moe 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接, debug TODO
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in html in tag a.");
                     } else {
-                        // moe 305487, 1楼 评论
-                        MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in document in tag a.");
+                        // moe 305487, 1楼 评论 TODO
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in html in tag a.");
                     }
                 }
             }
             // ----------------如果未获取到Page对象的处理--------------------
             if (page == null) {
-                MyLogUtils.warn("Post #" + this.pageId + " this post was flagged for deletion, now try to read by html tag. Details: " + getReasonForDeleted(doc));
+                MyLogUtils.warn("Post #" + this.pageId + " this post was flagged for deletion, try to read by html tag. Details: " + getReasonForDeleted(doc));
                 lab: for (String key : mapTag2Prop.keySet()) {
                     String file_url = null;
                     String tags = null;
@@ -167,8 +223,15 @@ public class PostFetcher implements Fetcher {
                             // 分割成的字符串数组最大长度6
                             String[] arr = file_url.split("/", 6);
                             tags = URLDecoder.decode(arr[arr.length - 1], "utf-8").replace("yande.re " + pageId + " ", "").replace("Konachan.com - " + pageId + " - ", "").replace("Konachan.com - " + pageId + " ", "").trim();
-                            tags = tags.substring(0, tags.length() - 4);
+                            tags = tags.substring(0, tags.lastIndexOf("."));
                             md5 = arr[arr.length - 2];
+                            // 校验
+                            if(StringUtils.containsIgnoreCase(tags,"yande.re") || StringUtils.containsIgnoreCase(tags, "konachan.com")){
+                                MyLogUtils.fatal("Post #" + this.pageId + " read by html, error tag format in url " + file_url + ", may be parse error.");
+                            }
+                            if(!pattern_md5.matcher(md5).matches()){
+                                MyLogUtils.fatal("Post #" + this.pageId + " read by html, error md5 format in url " + file_url + ", may be parse error.");
+                            }
                             // 设置page属性
                             // 被标记删除的图片但是在html中找到链接的page对象含有Post: id, url, md5, tags, created_at; Pool: id, name
                             page = new Page();
@@ -200,6 +263,7 @@ public class PostFetcher implements Fetcher {
                 ResourcesHolder.getMapIdPage().put(this.pageId, page);
             }
         } catch (Exception e) {
+            PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_EXCEPTION);
             MyLogUtils.fatal("Post #" + this.pageId + " read page failed, exception", e);
         }
     }
@@ -207,12 +271,12 @@ public class PostFetcher implements Fetcher {
     // 设置log的post状态和是否包含在pool中, 最终page不为null时调用
     private void setLog(Page page, PostLog log) {
         if (page == null) {
-            throw new UnsupportedOperationException();
+            MyLogUtils.fatal("page can not be null");
         }
         Post post = page.getPosts().get(0);
         String[] url = { post.getFile_url(), post.getJpeg_url(), post.getSample_url() };
         for (int i = 0; i < url.length; i++) {
-            // 由document-deleted设置时会出现null
+            // 由html-deleted设置时会出现null，因为这种情况下只设置了file_url
             if (url[i] == null) {
                 url[i] = "";
             }
@@ -245,14 +309,7 @@ public class PostFetcher implements Fetcher {
 
     // 当页面图片被删除时, 得到图片被删除的原因
     private String getReasonForDeleted(Document doc) {
-        String re = null;
-        try {
-            re = doc.getElementById("post-view").getElementsByClass("status-notice").get(0).text();
-        } catch (Exception e) {
-            // @see http://konachan.com/post/show/1853
-            re = "HTTP/1.1 418: I'm a teapot";
-        }
-        return re;
+        return doc.getElementById("post-view").getElementsByClass("status-notice").get(0).text();
     }
 
     // 当页面图片被删除时, 如果存在设置Post对应Pool的name和id, 只会设置最后一个Pool信息(Pool有多个情况下)
