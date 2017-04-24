@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.zeroq6.moehelper.log.Log;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 
 /**
  * Post日志类, 存放解析处理的结果
@@ -60,7 +61,7 @@ public class PostLog implements Log, Comparable<PostLog> {
         if (mapPageStatus2Count.containsKey(pageStatus)) {
             mapPageStatus2Count.put(pageStatus, mapPageStatus2Count.get(pageStatus) + 1);
         } else {
-            throw new RuntimeException("传入页面状态错误, " + pageStatus);
+            MyLogUtils.fatal("传入页面状态错误, " + pageStatus);
         }
     }
 
@@ -74,7 +75,8 @@ public class PostLog implements Log, Comparable<PostLog> {
         if (mapPageStatus2Count.containsKey(pageStatus)) {
             return mapPageStatus2Count.get(pageStatus);
         } else {
-            throw new RuntimeException("传入页面状态错误, " + pageStatus);
+            MyLogUtils.fatal("传入页面状态错误, " + pageStatus);
+            return -1;
         }
     }
 

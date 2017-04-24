@@ -48,7 +48,7 @@ public class MyStringUtils {
             suffix = replaceIllegalCharInFilename(suffix);
             suffix = URLEncoder.encode(suffix, "utf-8");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            MyLogUtils.fatal(e.getMessage(), e);
         }
         return prefix + suffix.replace("+", "%20");// 由于此时的re已经是URL编码,所以原有的"+"不会被替换掉
     }
@@ -76,14 +76,14 @@ public class MyStringUtils {
             re = URLDecoder.decode(fileName, "utf-8");
             re = replaceIllegalCharInFilename(re);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            MyLogUtils.fatal(e.getMessage(), e);
         }
         return re;
     }
 
     public static String insertBeforePlusOrMinus(Integer number, String charInsertWhenZero) {
         if (!"+".equals(charInsertWhenZero) && !"-".equals(charInsertWhenZero)) {
-            throw new RuntimeException("只能输入\"+\"或者\"-\"");
+            MyLogUtils.fatal("只能输入\"+\"或者\"-\"");
         }
         if (0 == number) {
             return charInsertWhenZero + number;
@@ -106,10 +106,10 @@ public class MyStringUtils {
         int count = 0;
         int pos = 0;
         if (sourceStr == null || targetSubStr == null) {
-            throw new RuntimeException("sourceStr，targetSubStr不能为null");
+            MyLogUtils.fatal("sourceStr，targetSubStr不能为null");
         }
         if(times < 0){
-            throw new RuntimeException("times不能小于0");
+            MyLogUtils.fatal("times不能小于0");
         }
         while (count != times) {
             re = sourceStr.indexOf(targetSubStr, pos);

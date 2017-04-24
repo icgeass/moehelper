@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.zeroq6.moehelper.fetcher.Fetcher;
 import com.zeroq6.moehelper.utils.MyDateUtils;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import com.zeroq6.moehelper.writer.Writer;
 import com.zeroq6.moehelper.writer.impl.PoolWriter;
 import com.zeroq6.moehelper.writer.impl.PostWriter;
@@ -60,7 +61,7 @@ public class Configuration {
     private Configuration() {
     }
 
-    {
+    static {
         Configuration.linkType = POST;
         Configuration.host = HOST_MOE;
         Configuration.protocol = "https";
@@ -79,7 +80,8 @@ public class Configuration {
         } else if (POOL.equals(getLinkType())) {
             return new PoolWriter();
         } else {
-            throw new RuntimeException("Unreachable Code");
+            MyLogUtils.fatal("Unreachable Code");
+            return null;
         }
     }
 
@@ -96,7 +98,8 @@ public class Configuration {
         } else if (POOL.equals(getLinkType())) {
             return new PoolFetcher(pageId, doc);
         } else {
-            throw new RuntimeException("Unreachable Code");
+            MyLogUtils.fatal("Unreachable Code");
+            return null;
         }
     }
 
@@ -109,7 +112,7 @@ public class Configuration {
      */
     public synchronized static void init(String[] args) throws Exception {
         if (init) {
-            throw new RuntimeException("只能初始化一次");
+            MyLogUtils.fatal("只能初始化一次");
         }
         if (!checkParams(args)) {
             System.out.println("usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
@@ -122,12 +125,14 @@ public class Configuration {
         ConnManager.getInstance().putRange(fromPage, toPage);
         // 标准重定向
         File f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
-        FileUtils.write(f, "标准重定向\r\n", "utf-8");
+        FileUtils.write(f, "", "utf-8", true);
         System.setOut(new PrintStream(new FileOutputStream(f), true, "utf-8"));
         // 错误重定向
         f = new File(Writer.W_FULL_PATH_PREFIX + "_stderr.txt");
-        FileUtils.write(f, "错误重定向\r\n", "utf-8");
+        FileUtils.write(f, "", "utf-8", true);
         System.setErr(new PrintStream(new FileOutputStream(f), true, "utf-8"));
+        MyLogUtils.info("标准错误输出重定向");
+        MyLogUtils.stdOut("标准输出重定向");
         // 提示文件
         FileUtils.write(new File("./" + Writer.W_ROOT_DIR + "/NOTICE"), "Private Use Only", "utf-8", false);
         init = true;

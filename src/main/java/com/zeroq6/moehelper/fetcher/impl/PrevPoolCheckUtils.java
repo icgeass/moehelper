@@ -50,13 +50,13 @@ public class PrevPoolCheckUtils {
 
     public static synchronized void init() {
         if (init) {
-           throw new RuntimeException("只能初始化一次");
+           MyLogUtils.fatal("只能初始化一次");
         }
         // 两者顺序不能变, initMapLastTimePageId2ZipLinkCountInfo需要设置上一次更新的PoolId范围
         initMapLastTimePageId2ZipLinkCountInfo();
         initMapLastTimePageId2PostMd5List();
         if (!mapLastTimePageId2ZipLinkCountInfo.keySet().equals(mapLastTimePageId2PostMd5List.keySet())) {
-            throw new RuntimeException("链接信息和MD5信息不一致");
+            MyLogUtils.fatal("链接信息和MD5信息不一致");
         }
         init = true;
     }
@@ -97,7 +97,7 @@ public class PrevPoolCheckUtils {
             for (String url : liLastTimeAllPackageUrl) {
                 String[] splitStrArr = url.split("/");
                 if(null == splitStrArr || splitStrArr.length != 6){
-                    throw new RuntimeException("pool包链接格式不正确, " + url);
+                    MyLogUtils.fatal("pool包链接格式不正确, " + url);
                 }
                 String pageIdString = splitStrArr[splitStrArr.length - 1];
                 Integer pageId = Integer.valueOf(pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?")));
@@ -124,12 +124,12 @@ public class PrevPoolCheckUtils {
                 // 最终只会有0b10或0b11，判断0b01, 0b10是因为第一次处理链接时原图和jpeg图链接顺序不确定，而0b11是第二次有原图情况下的计数
                 Integer pageId2CountCurrent = mapLastTimePageId2ZipLinkCountInfo.get(pageId);
                 if (pageId2CountCurrent != 0b01 && pageId2CountCurrent != 0b10 && pageId2CountCurrent != 0b11) {
-                    throw new RuntimeException("pool id对应的pool链接数量不正确, " + pageId);
+                    MyLogUtils.fatal("pool id对应的pool链接数量不正确, " + pageId);
                 }
             }
             MyLogUtils.info("read file " + fileToRead.getName() + " success, " + mapLastTimePageId2ZipLinkCountInfo.size() + " Pool, " + liLastTimeAllPackageUrl.size() + " Pool zip package urls (jpeg: " + lastTimeZipJpegNum + ", original: " + lastTimeZipOriginalNum + ", all: " + lastTimeZipAllNum + ") in all.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            MyLogUtils.fatal(e.getMessage(), e);
         }
     }
 
@@ -196,7 +196,7 @@ public class PrevPoolCheckUtils {
                     }
                     String md5 = mapPostId2Md5.get(pool2post.getPost_id());
                     if (null == md5 || !pattern_md5.matcher(md5).matches()) {
-                        throw new RuntimeException("错误的MD5格式, " + md5);
+                        MyLogUtils.fatal("错误的MD5格式, " + md5);
                     }
                     mapLastTimePageId2PostMd5List.get(pool2post.getPool_id()).add(md5);
 
@@ -204,7 +204,7 @@ public class PrevPoolCheckUtils {
             }
             MyLogUtils.info("read file " + fileToRead.getName() + " success, " + liLastTimeJsonString.size() + " JSON string(Pool) in all, " + numEmptyAndAllDeletedPool + " empty(or all post deleted) pool found");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            MyLogUtils.fatal(e.getMessage(), e);
         }
     }
 
@@ -218,7 +218,7 @@ public class PrevPoolCheckUtils {
     public static String checkPageStatus(Page page, Integer pageId) {
         // 校验, 对于非null的Pool来说, posts和 pools均为空或非空
         if (page != null && page.getPosts().isEmpty() != page.getPools().isEmpty()) {
-            throw new RuntimeException("非法的json数据格式, " + pageId);
+            MyLogUtils.fatal("非法的json数据格式, " + pageId);
         }
         if (null == page) {
             return PoolLog.POOL_STATUS_NULL;

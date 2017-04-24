@@ -313,7 +313,7 @@ public class PoolWriter implements Writer {
         MyLogUtils.warn("all url this time:");
         MyLogUtils.warn("all: " + allZipNow + ", jpeg: " + jpegZipsNow + ", original: " + originalZipsNow);
         if(allZipNow != allZipPre + affectedZipNumJpgSum + affectedZipNumPngSum || jpegZipsNow != jpegZipsPre + affectedZipNumJpgSum || originalZipsNow != originalZipsPre + affectedZipNumPngSum){
-            throw new RuntimeException("zips url number info predicted not match actual!");
+            MyLogUtils.fatal("zips url number info predicted not match actual!");
         }
     }
 
@@ -350,13 +350,13 @@ public class PoolWriter implements Writer {
         }
         String[] splitStrArr = url.split("/", 6);
         if(null == splitStrArr || splitStrArr.length != 6){
-            throw new RuntimeException("Error Pool url format: " + url);
+            MyLogUtils.fatal("Error Pool url format: " + url);
         }
         String pageIdString = splitStrArr[splitStrArr.length - 1];
         pageIdString = pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?"));
         pageIdString = StringUtils.leftPad(pageIdString, 4, "0");
         if(!StringUtils.isNumeric(pageIdString)){
-            throw new RuntimeException("pageId获取失败, " + pageIdString);
+            MyLogUtils.fatal("pageId获取失败, " + pageIdString);
         }
         if(url.contains(PoolFetcher.LINK_POOL_ZIP_SUFFIX_JPG)){
             url = url + "&myPoolId=" +  pageIdString;

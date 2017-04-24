@@ -57,7 +57,7 @@ public final class ConnManager {
      */
     public synchronized void putRange(int from, int to) {
         if (init) {
-            throw new RuntimeException("只能初始化一次");
+            MyLogUtils.fatal("只能初始化一次");
         }
         this.fromPage = from;
         this.index = new int[to - from + 1];
@@ -118,7 +118,7 @@ public final class ConnManager {
             this.currentConnThreadCount--;
             MyLogUtils.stdOut("页面 # " + id + "下载成功, 剩余页面数 " + this.currentLeftPageCount + ", 当前连接数 " + this.currentConnThreadCount);
         } else {
-            throw new RuntimeException("Unreachable Code");
+            MyLogUtils.fatal("Unreachable Code");
         }
     }
 
@@ -134,7 +134,7 @@ public final class ConnManager {
             this.currentConnThreadCount--;
             MyLogUtils.stdOut("页面 # " + id + "下载失败, 等待其它线程处理, 剩余页面数 " + this.currentLeftPageCount + ", 当前连接数 " + this.currentConnThreadCount);
         } else {
-            throw new RuntimeException("Unreachable Code");
+            MyLogUtils.fatal("Unreachable Code");
         }
     }
 }

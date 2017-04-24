@@ -12,6 +12,7 @@ import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.fetcher.impl.PoolFetcher;
 import com.zeroq6.moehelper.utils.MyDateUtils;
 
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class AppTest {
                     post.setFile_url(link);
                     post.setMd5(link.substring(link.indexOf("/image/") + "/image/".length(), link.lastIndexOf("/yande.re")));
                     if (!pattern.matcher(post.getMd5()).matches()) {
-                        throw new RuntimeException("非法md5格式");
+                        MyLogUtils.fatal("非法md5格式");
                     }
                     post.setTags(URLDecoder.decode(link.substring(link.indexOf(post.getMd5()) + post.getMd5().length() + 1), "utf-8").split(" ", 3)[2]);
                     post.setTags(post.getTags().substring(0, post.getTags().lastIndexOf(".")));
@@ -333,7 +334,7 @@ public class AppTest {
     public void processZipUrl() throws Exception{
         String srcPath = "D://yande.re_-_pool_170204103710_1_4431_packages_updated_url.lst";
         if(!srcPath.endsWith(".lst")){
-            throw new RuntimeException("不支持的文件格式");
+            MyLogUtils.fatal("不支持的文件格式");
         }
         String desPath = srcPath.replace(".lst", "." + System.currentTimeMillis() + ".lst");
         List<String> li = FileUtils.readLines(new File(srcPath), "utf-8");
@@ -342,13 +343,13 @@ public class AppTest {
             String url = li.get(i);
             String[] splitStrArr = url.split("/", 6);
             if(null == splitStrArr || splitStrArr.length != 6){
-                throw new RuntimeException("Error Pool url format: " + url);
+                MyLogUtils.fatal("Error Pool url format: " + url);
             }
             String pageIdString = splitStrArr[splitStrArr.length - 1];
             pageIdString = pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?"));
             pageIdString = StringUtils.leftPad(pageIdString, 4, "0");
             if(!StringUtils.isNumeric(pageIdString)){
-                throw new RuntimeException("pageId获取失败, " + pageIdString);
+                MyLogUtils.fatal("pageId获取失败, " + pageIdString);
             }
             if(url.contains(PoolFetcher.LINK_POOL_ZIP_SUFFIX_JPG)){
                 url = url + "&myPoolId=" +  pageIdString;

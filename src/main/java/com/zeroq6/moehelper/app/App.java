@@ -14,11 +14,15 @@ import com.zeroq6.moehelper.utils.MyLogUtils;
  */
 public class App {
 
-    public static void main(String[] args) throws Exception {
-        Configuration.init(args);
-        begin();
-        Configuration.newWriter().writeToFile();
-        MyLogUtils.stdOut("所有操作已完成");
+    public static void main(String[] args) {
+        try{
+            Configuration.init(args);
+            begin();
+            Configuration.newWriter().writeToFile();
+            MyLogUtils.stdOut("所有操作已完成");
+        }catch (Exception e){
+            MyLogUtils.fatal(e.getMessage(), e);
+        }
     }
 
     private static void begin() throws InterruptedException {

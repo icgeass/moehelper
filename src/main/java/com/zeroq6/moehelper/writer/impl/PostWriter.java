@@ -84,7 +84,7 @@ public class PostWriter implements Writer {
             @Override
             public int compare(Page o1, Page o2) {
                 if (o1.getPosts().size() != 1 || o2.getPosts().size() != 1) {
-                    throw new RuntimeException("posts大小必须为1");
+                    MyLogUtils.fatal("posts大小必须为1");
                 }
                 return o1.getPosts().get(0).getId() - o2.getPosts().get(0).getId();
             }

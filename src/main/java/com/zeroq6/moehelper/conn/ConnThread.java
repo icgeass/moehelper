@@ -83,7 +83,7 @@ public class ConnThread extends Thread {
                 new Thread(Configuration.newFetcher(pageId, doc)).start();
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else {
-                throw new RuntimeException("Unreachable Code");
+                MyLogUtils.fatal("Unreachable Code");
             }
         } catch (Exception e) {
             if (!isDocProcessing) {
