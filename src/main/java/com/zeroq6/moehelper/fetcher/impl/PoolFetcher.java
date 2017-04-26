@@ -9,6 +9,7 @@ import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.fetcher.Fetcher;
 import com.zeroq6.moehelper.resources.ResourcesHolder;
 import com.zeroq6.moehelper.utils.MyLogUtils;
+import com.zeroq6.moehelper.utils.MyPoolUtils;
 import com.zeroq6.moehelper.utils.MyStringUtils;
 import com.zeroq6.moehelper.bean.Pool;
 import com.zeroq6.moehelper.log.impl.PoolLog;
@@ -21,16 +22,22 @@ import com.alibaba.fastjson.JSON;
 
 /**
  * Pool页面的解析和资源存储
- * 将解析后的结果放入Rumtime和PoolLog中
  * 
  * @author icgeass@hotmail.com
  * @date 2015年6月2日
  */
 public class PoolFetcher implements Fetcher {
 
-    // Pool-JPG包链接后缀
+
+    /**
+     * https://yande.re/pool/show/6
+     *
+        <li><a href="/pool/zip/6?jpeg=1" onclick="if(!User.run_login_onclick(event)) return false; return true;">Download JPGs (49.7 MB)</a></li>
+    <li class="advanced-editing"><a href="/pool/zip/6" onclick="if(!User.run_login_onclick(event)) return false; return true;">Download PNGs (59.8 MB)</a></li>
+     */
     public final static String LINK_POOL_ZIP_SUFFIX_JPG = "?jpeg=1";
-    public static Pattern pattern_zip_link = Pattern.compile("^(.*?)(/pool/zip/[1-9][0-9]{0,})(([?]jpeg=1)?)(.*?)$");
+
+    public static Pattern pattern_zip_link = Pattern.compile("^(.*)(/pool/zip/[1-9][0-9]{0,})([?]jpeg=1)?(.*)$");
     private int pageId = -1;
 
     private Document doc = null;
@@ -73,11 +80,13 @@ public class PoolFetcher implements Fetcher {
                 }
             }
             List<String> liUrls = setPoolLogInfo(page, log, doc);
+            String pageStatus = log.getStatus();
+            PoolLog.logPageCountByPageStatus(pageStatus);
             if (page != null) {
-                if (log.getStatus().equals(PoolLog.POOL_STATUS_NEW) || log.getStatus().equals(PoolLog.POOL_STATUS_MODIFIED) || log.getStatus().equals(PoolLog.POOL_STATUS_NO_CHANGE)) {
+                if (pageStatus.equals(PoolLog.POOL_STATUS_NEW) || pageStatus.equals(PoolLog.POOL_STATUS_MODIFIED) || pageStatus.equals(PoolLog.POOL_STATUS_NO_CHANGE)) {
                     PoolLog.getMapPageId2ZipLinkPoolAll().put(this.pageId, liUrls);
                 }
-                if (log.getStatus().equals(PoolLog.POOL_STATUS_NEW) || log.getStatus().equals(PoolLog.POOL_STATUS_MODIFIED)) {
+                if (pageStatus.equals(PoolLog.POOL_STATUS_NEW) || pageStatus.equals(PoolLog.POOL_STATUS_MODIFIED)) {
                     PoolLog.getMapPageId2ZipLinkPoolUpdated().put(this.pageId, liUrls);
                 }
                 PoolLog.getMapPageId2PoolDescription().put(this.pageId, getPoolInfo(pageId, page, this.doc));
@@ -86,7 +95,7 @@ public class PoolFetcher implements Fetcher {
                 ResourcesHolder.readPageFailed();
             }
         } catch (Exception e) {
-            MyLogUtils.fatal("Pool #" + this.pageId + " read page failed, exception", e);
+            MyLogUtils.fatal("Pool #" + this.pageId + " read page failed, exception.", e);
         }
 
     }
@@ -108,7 +117,7 @@ public class PoolFetcher implements Fetcher {
             poolName = this.doc.getElementById("pool-show").getElementsByTag("h4").text().replace("Pool:", "").trim();
         }
         if (PoolLog.POOL_STATUS_NULL.equals(pageStatus)) {
-            // Logger.warn("Pool #" + pageId + "  " + poolName + " ---->Null");
+            // MyLogUtils.warn("Pool #" + pageId + "  " + poolName + " ---->Null");
         } else if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus)) {
             MyLogUtils.warn("Pool #" + pageId + "  " + poolName + " ---->No Posts");
         } else if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
@@ -118,9 +127,9 @@ public class PoolFetcher implements Fetcher {
         } else if (PoolLog.POOL_STATUS_MODIFIED.equals(pageStatus)) {
             MyLogUtils.warn("Pool #" + pageId + "  " + poolName + " ---->Modified");
         } else if (PoolLog.POOL_STATUS_NO_CHANGE.equals(pageStatus)) {
-            // Logger.warn("Pool #" + pageId + "  " + poolName + " ---->No change");
+            // MyLogUtils.warn("Pool #" + pageId + "  " + poolName + " ---->No change");
         } else {
-            MyLogUtils.fatal("Unreachable code");
+            MyLogUtils.fatal("Unreachable Code");
         }
         log.setStatus(pageStatus);
         // Pool是否存在
@@ -130,8 +139,8 @@ public class PoolFetcher implements Fetcher {
             log.setIsExist("false");
         }
         if (!pageStatus.equals(PoolLog.POOL_STATUS_NULL) && !pageStatus.equals(PoolLog.POOL_STATUS_EMPTY) && !pageStatus.equals(PoolLog.POOL_STATUS_ALL_DELETED)) {
-            Elements eles = this.doc.getElementsByTag("a");
-            for (Element element : eles) {
+            Elements elements = this.doc.getElementsByTag("a");
+            for (Element element : elements) {
                 if (pattern_zip_link.matcher(element.absUrl("href")).matches()) {
                     String zipUrl = element.absUrl("href").trim();
                     re.add(zipUrl);
@@ -146,17 +155,16 @@ public class PoolFetcher implements Fetcher {
             // 校验数目是否正确
             if (hasPng(page)) {
                 if (log.getJpegPackages() != 1 || log.getOriginalPackages() != 1 || log.getAllPackages() != 2) {
-                    MyLogUtils.fatal("Error zip pack number info, the page id is " + this.pageId);
+                    MyLogUtils.fatal("Pool #" + this.pageId + " error zip pack count info, find png pic in json data, the jpegPackages, originalPackages, allPackages count should be 1, 1, 2");
                 }
             } else {
                 if (log.getJpegPackages() != 0 || log.getOriginalPackages() != 1 || log.getAllPackages() != 1) {
-                    MyLogUtils.fatal("Error zip pack number info, the page id is " + this.pageId);
+                    MyLogUtils.fatal("Pool #" + this.pageId + " error zip pack count info, not find png pic in json data, the jpegPackages, originalPackages, allPackages count should be 0, 1, 1");
                 }
             }
         }
-        PoolLog.logPageCountByPageStatus(pageStatus);
-        if (log.getStatus().equals(PoolLog.POOL_STATUS_NO_CHANGE)) {
-            checkIsPoolOnlyPostsRemove(page, log);
+        if (PoolLog.POOL_STATUS_NO_CHANGE.equals(log.getStatus())) {
+            checkIfPoolOnlyPostsRemove(page, log);
         }
         return re;
     }
@@ -170,7 +178,7 @@ public class PoolFetcher implements Fetcher {
      * @return String
      */
     private String getPoolInfo(int pageId, Page page, Document doc) {
-        StringBuffer re = new StringBuffer(50);
+        StringBuffer re = new StringBuffer();
         String pageStatus = PrevPoolCheckUtils.checkPageStatus(page, this.pageId);
         // 先处理没有图片或所有图片被删除的情况
         if (PoolLog.POOL_STATUS_EMPTY.equals(pageStatus) || PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
@@ -191,7 +199,6 @@ public class PoolFetcher implements Fetcher {
         re.append("Id = " + currPool.getId() + "\r\n");
         re.append("Name = " + currPool.getName().replace("_", " ") + "\r\n");
         re.append("Post count = " + currPool.getPost_count() + "\r\n");
-        // Kit.getReadableFileSize(bytes0) + " (" + bytes0 + " Bytes)", Kit.getReadableFileSize(bytes1) + " (" + bytes1 + " Bytes)"
         if (hasPng(page)) {
             re.append("JPGs zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[0]) + " (" + zipPackageSize[0] + " Bytes)" + "\r\n");
             re.append("PNGs zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
@@ -199,8 +206,8 @@ public class PoolFetcher implements Fetcher {
             re.append("zip package size = " + MyStringUtils.getReadableFileSize(zipPackageSize[1]) + " (" + zipPackageSize[1] + " Bytes)" + "\r\n");
         }
         re.append("User Id = " + currPool.getUser_id() + "\r\n");
-        re.append("Created at = " + currPool.getCreated_at().replace("T", " ").replace("Z", "") + "\r\n");
-        re.append("Updated at = " + currPool.getUpdated_at().replace("T", " ").replace("Z", "") + "\r\n");
+        re.append("Created at = " + currPool.getCreated_at() + "\r\n");
+        re.append("Updated at = " + currPool.getUpdated_at() + "\r\n");
         re.append("Description = " + currPool.getDescription().replace("\r\n", "\r\n\t      ") + "\r\n");
         re.append("\r\n");
         return re.toString();
@@ -213,15 +220,13 @@ public class PoolFetcher implements Fetcher {
      * @return boolean
      */
     private boolean hasPng(Page page) {
-        boolean re = false;
         for (Post post : page.getPosts()) {
             // null对应遍历到图片被删除, file_url为空
             if (post.getFile_url() != null && post.getFile_url().trim().endsWith(".png")) {
-                re = true;
-                break;
+                return true;
             }
         }
-        return re;
+        return false;
     }
 
     /**
@@ -232,14 +237,13 @@ public class PoolFetcher implements Fetcher {
      * @return Pool
      */
     private Pool getPoolByPageId(Page page, int pageId) {
-        Pool re = null;
         for (Pool pool : page.getPools()) {
             if (pool.getId() == pageId) {
-                re = pool;
-                break;
+                return pool;
             }
         }
-        return re;
+        MyLogUtils.fatal("can not find pool by pageId " + pageId);
+        return null;
     }
 
     /**
@@ -258,21 +262,27 @@ public class PoolFetcher implements Fetcher {
         return new long[] { bytesJpg, bytesPng };
     }
 
-    private void checkIsPoolOnlyPostsRemove(Page page, PoolLog log) {
+    private void checkIfPoolOnlyPostsRemove(Page page, PoolLog log) {
         if (!PoolLog.POOL_STATUS_NO_CHANGE.equals(log.getStatus())) {
-            MyLogUtils.fatal("call when pool status is no change");
+            MyLogUtils.fatal("Unreachable Code");
         }
         int postsNumNow = page.getPosts().size();
         int postsNumPre = PrevPoolCheckUtils.getMapLastTimePageId2PostMd5List().get(pageId).size();
         if (postsNumPre != postsNumNow) {
-            MyLogUtils.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + MyStringUtils.insertBeforePlusOrMinus(postsNumNow - postsNumPre, "-"));
+            if(postsNumPre > postsNumNow){ // 因为是在no_change下
+                MyLogUtils.debug("Pool #" + pageId + " only has posts removed, will be classified as no change pool, posts number affected " + MyStringUtils.insertBeforePlusOrMinus(postsNumNow - postsNumPre));
+            }else{
+                MyLogUtils.fatal("Unreachable Code");
+            }
         }
         Integer zipNumStatusNow = log.getJpegPackages() + (log.getOriginalPackages() << 1);
         Integer zipNumStatusPre = PrevPoolCheckUtils.getMapLastTimePageId2ZipLinkCountInfo().get(pageId);
         if (!zipNumStatusPre.equals(zipNumStatusNow)) {
-            int affectedZipNumJpg = (zipNumStatusNow & 0b01) - (zipNumStatusPre & 0b01);
-            int affectedZipNumPng = (zipNumStatusNow >>> 1) - (zipNumStatusPre >>> 1);
-            MyLogUtils.debug("Pool #" + pageId + " jpeg packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg, "-") + ", original packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng, "-"));
+            int affectedZipNumJpg = MyPoolUtils.toPoolJpegCount(zipNumStatusNow) - MyPoolUtils.toPoolJpegCount(zipNumStatusPre);
+            int affectedZipNumPng = MyPoolUtils.toPoolOriginalCount(zipNumStatusNow) - MyPoolUtils.toPoolOriginalCount(zipNumStatusPre);
+            MyLogUtils.debug("Pool #" + pageId + " jpeg packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg)
+                    + ", original packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPng)
+                    + ", all packages affected " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpg + affectedZipNumPng));
         }
     }
 

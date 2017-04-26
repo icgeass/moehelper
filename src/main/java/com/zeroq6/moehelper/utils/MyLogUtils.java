@@ -25,7 +25,7 @@ public class MyLogUtils {
     static {
         long offset = TimeZone.getDefault().getRawOffset();
         String tzStr = "GMT" + String.format("%s%02d:%02d", offset >= 0 ? "+" : "-", offset / 3600000, (offset / 60000) % 60);
-        info("Use time zone " + tzStr);
+        info("use time zone " + tzStr);
     }
 
     // 用于stderr.txt
@@ -54,10 +54,10 @@ public class MyLogUtils {
         formattedLog(message, LOG_LEVEL_ERROR);
     }
 
-    public static synchronized void fatal(String fatal, Exception e) {
+    public static synchronized void fatal(String message, Exception e) {
         try {
             StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
-            String msg = fatal + " in class " + stacks[2].getClassName() + "." + stacks[2].getMethodName() + " at line " + stacks[2].getLineNumber();
+            String msg = message + " in class " + stacks[2].getClassName() + "." + stacks[2].getMethodName() + " at line " + stacks[2].getLineNumber();
             formattedLog(msg, LOG_LEVEL_FATAL);
             if(null != e){
                 e.printStackTrace();

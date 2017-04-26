@@ -1,13 +1,7 @@
 package com.zeroq6.moehelper.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 /**
  * 工具类
@@ -35,7 +29,8 @@ public class MyStringUtils {
     }
 
     /**
-     * 替换URL连接中包含的非法字符为_
+     * 替换URL连接中最后一个/之后的非法字符为_
+     *
      * 
      * @param url
      * @return String
@@ -48,7 +43,7 @@ public class MyStringUtils {
             suffix = replaceIllegalCharInFilename(suffix);
             suffix = URLEncoder.encode(suffix, "utf-8");
         } catch (Exception e) {
-            MyLogUtils.fatal(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
         return prefix + suffix.replace("+", "%20");// 由于此时的re已经是URL编码,所以原有的"+"不会被替换掉
     }
@@ -76,17 +71,14 @@ public class MyStringUtils {
             re = URLDecoder.decode(fileName, "utf-8");
             re = replaceIllegalCharInFilename(re);
         } catch (Exception e) {
-            MyLogUtils.fatal(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
         return re;
     }
 
-    public static String insertBeforePlusOrMinus(Integer number, String charInsertWhenZero) {
-        if (!"+".equals(charInsertWhenZero) && !"-".equals(charInsertWhenZero)) {
-            MyLogUtils.fatal("只能输入\"+\"或者\"-\"");
-        }
+    public static String insertBeforePlusOrMinus(Integer number) {
         if (0 == number) {
-            return charInsertWhenZero + number;
+            return number + "";
         }
         return number > 0 ? "+" + number : String.valueOf(number);
     }
@@ -106,10 +98,10 @@ public class MyStringUtils {
         int count = 0;
         int pos = 0;
         if (sourceStr == null || targetSubStr == null) {
-            MyLogUtils.fatal("sourceStr，targetSubStr不能为null");
+            throw new RuntimeException("sourceStr，targetSubStr不能为null");
         }
         if(times < 0){
-            MyLogUtils.fatal("times不能小于0");
+            throw new RuntimeException("times不能小于0");
         }
         while (count != times) {
             re = sourceStr.indexOf(targetSubStr, pos);
@@ -121,5 +113,7 @@ public class MyStringUtils {
         }
         return re;
     }
+
+
 
 }
