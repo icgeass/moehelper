@@ -1,7 +1,9 @@
 package com.zeroq6.moehelper.fetcher.impl;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -104,6 +106,42 @@ public class PostFetcher implements Fetcher {
         mapTag2Prop.put("meta", "content");
     }
 
+    /**
+     * 忽略校验的特殊id
+     */
+
+    private final static List<Integer> IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST = new ArrayList<Integer>(){{
+        add(305487);
+
+    }};
+    private final static List<Integer> IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST = new ArrayList<Integer>(){{
+
+
+    }};
+    private final static List<Integer> IGNORE_DOC_IN_POOL_JSON_NOT_IN_POOL_LIST = new ArrayList<Integer>(){{
+
+
+    }};
+    private final static List<Integer> IGNORE_DOC_NOT_IN_POOL_JSON_IN_POOL_LIST = new ArrayList<Integer>(){{
+
+
+    }};
+
+    private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
+
+    }};
+
+    private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
+        add(305487);
+    }};
+
+    private final static List<Integer> IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED = new ArrayList<Integer>(){{
+
+    }};
+
+
+
+
     private int pageId = -1;
 
     private Document doc = null;
@@ -156,21 +194,29 @@ public class PostFetcher implements Fetcher {
             if (page == null) {
                 if (!isDeletedByDoc) {
                     // ---Post是否删除校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in html but no json data found");
+                    if(!IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST.contains(this.pageId)){
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in html but no json data found");
+                    }
                 }
             } else {
                 // moe 305487, 1楼 评论: This post was deleted......., OTL, debug TODO
                 if (isDeletedByDoc) {
                     // ---Post是否删除校验2
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was deleted in html but found json data");
+                    if(!IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST.contains(this.pageId)){
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was deleted in html but found json data");
+                    }
                 }
                 if ((page.getPools().size() == 0 && isInPoolByDoc)) {
                     // ---Post是否在Pool校验1
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in html but pools.size() = 0 in json data");
+                    if(!IGNORE_DOC_IN_POOL_JSON_NOT_IN_POOL_LIST.contains(this.pageId)){
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in html but pools.size() = 0 in json data");
+                    }
                 }
                 if (page.getPools().size() != 0 && !isInPoolByDoc) {
                     // ---Post是否在Pool校验2
-                    MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in html but pools.size() != 0 in json date");
+                    if(!IGNORE_DOC_NOT_IN_POOL_JSON_IN_POOL_LIST.contains(this.pageId)){
+                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in html but pools.size() != 0 in json date");
+                    }
                 }
                 // ---校验json数据中post文件链接是否为原图/image/
                 String fileUrl = page.getPosts().get(0).getFile_url();
@@ -189,7 +235,9 @@ public class PostFetcher implements Fetcher {
                         // ---校验a标签中链接是否与page对象中的链接一致
                         // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug TODO
                         if (!page.getPosts().get(0).getFile_url().equals(element.absUrl("href"))) {
-                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from html in tag a is " + element.absUrl("href"));
+                            if(!IGNORE_DOC_JSON_URL_NOT_EQUALS.contains(this.pageId)){
+                                MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from html in tag a is " + element.absUrl("href"));
+                            }
                         }
                         isPostUrlMatched = true;
                         // 防止有多个不匹配链接被找到而造成的重复打印 TODO
@@ -200,10 +248,14 @@ public class PostFetcher implements Fetcher {
                 if (isDeletedByDoc == isPostUrlMatched) {
                     if (!isDeletedByDoc) {
                         // moe 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接, debug TODO
-                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in html in tag a.");
+                        if(!IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED.contains(this.pageId)){
+                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in html in tag a.");
+                        }
                     } else {
                         // moe 305487, 1楼 评论 TODO
-                        MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in html in tag a.");
+                        if(!IGNORE_DOC_DELETED_URL_MATCHED.contains(this.pageId)){
+                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in html in tag a.");
+                        }
                     }
                 }
             }

@@ -89,7 +89,7 @@ public class ConnThread extends Thread {
             if (!isDocProcessing) {
                 // 在调用子线程之前出现的异常均可忽略重新处理
                 ConnManager.getInstance().unlockCurrentPage(this.pageId);
-                MyLogUtils.info("Page #" + this.pageId + ", " + e.getMessage() + ", try later");
+                MyLogUtils.info("Page #" + this.pageId + " " + e.getMessage() + ", try later");
             } else {
                 MyLogUtils.fatal("Page " + this.pageId + " Exception occur while calling sub thread to handle this page.", e);
             }

@@ -123,9 +123,11 @@ public class Configuration {
         ConnManager.getInstance().putRange(fromPage, toPage);
         // 错误重定向
         File f = new File(Writer.W_FULL_PATH_PREFIX + "_stderr.txt");
+        FileUtils.write(f, "", "utf-8", false);
         System.setErr(new PrintStream(new FileOutputStream(f), true, "utf-8"));
         f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
         // 标准重定向
+        FileUtils.write(f, "", "utf-8", false);
         System.setOut(new PrintStream(new FileOutputStream(f), true, "utf-8"));
         //
         MyLogUtils.info("标准错误输出重定向");

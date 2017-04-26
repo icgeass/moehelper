@@ -108,7 +108,7 @@ public class MyStringUtils {
             if (re == -1) {
                 break;
             }
-            pos += targetSubStr.length();
+            pos += re + targetSubStr.length();
             count++;
         }
         return re;

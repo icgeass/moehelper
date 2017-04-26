@@ -215,9 +215,6 @@ public class PoolWriter implements Writer {
 
     }
 
-    public static void main(String[] args) {
-        System.out.println();
-    }
 
     private void logPoolChangeToStdErr() {
         MyLogUtils.info("====================check zip packages changes begin========================");
