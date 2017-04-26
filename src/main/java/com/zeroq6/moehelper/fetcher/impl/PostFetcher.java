@@ -128,15 +128,16 @@ public class PostFetcher implements Fetcher {
     }};
 
     private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
-
     }};
 
     private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
+        // moe 305487, 1楼 评论: This post was deleted......., OTL, debug TODO
         add(305487);
     }};
 
     private final static List<Integer> IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED = new ArrayList<Integer>(){{
-
+        add(294894);
+        add(294895);
     }};
 
 
@@ -199,7 +200,6 @@ public class PostFetcher implements Fetcher {
                     }
                 }
             } else {
-                // moe 305487, 1楼 评论: This post was deleted......., OTL, debug TODO
                 if (isDeletedByDoc) {
                     // ---Post是否删除校验2
                     if(!IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST.contains(this.pageId)){
@@ -231,12 +231,22 @@ public class PostFetcher implements Fetcher {
                 for (Element element : doc.getElementsByTag("a")) {
                     // 当图片被标记为删除时通过a标签不会获取到连接, 需要通过link meta标签
                     Pattern p = Configuration.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
-                    if (p.matcher(element.absUrl("href")).matches()) {
+                    String urlInHtml = element.absUrl("href");
+                    Post post = page.getPosts().get(0);
+                    if (p.matcher(urlInHtml).matches()) {
+                        try{
+                            if(element.parent().parent().parent().hasClass("comment")){
+                                MyLogUtils.debug("Post #" + this.pageId + " found post url link in comment area, skip it, the url is " + element.absUrl("href") + ", the url from json is " + post.getFile_url());
+                                continue;
+                            }
+                        }catch (Exception e){
+                            // ignore
+                        }
                         // ---校验a标签中链接是否与page对象中的链接一致
-                        // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同, debug TODO
-                        if (!page.getPosts().get(0).getFile_url().equals(element.absUrl("href"))) {
+                        // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同；这里是两个问题，前面已经过滤评论区a标签链接了
+                        if (!post.getFile_url().equals(urlInHtml)) {
                             if(!IGNORE_DOC_JSON_URL_NOT_EQUALS.contains(this.pageId)){
-                                MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + page.getPosts().get(0).getFile_url() + ", while the url from html in tag a is " + element.absUrl("href"));
+                                MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + post.getFile_url() + ", while the url from html in tag a is " + urlInHtml);
                             }
                         }
                         isPostUrlMatched = true;

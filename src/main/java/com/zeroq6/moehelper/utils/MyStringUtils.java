@@ -96,7 +96,6 @@ public class MyStringUtils {
     public static int getInnerStrIndex(String sourceStr, String targetSubStr, int times) {
         int re = -1;
         int count = 0;
-        int pos = 0;
         if (sourceStr == null || targetSubStr == null) {
             throw new RuntimeException("sourceStr，targetSubStr不能为null");
         }
@@ -104,11 +103,10 @@ public class MyStringUtils {
             throw new RuntimeException("times不能小于0");
         }
         while (count != times) {
-            re = sourceStr.indexOf(targetSubStr, pos);
+            re = sourceStr.indexOf(targetSubStr, re + targetSubStr.length());
             if (re == -1) {
                 break;
             }
-            pos += re + targetSubStr.length();
             count++;
         }
         return re;

@@ -91,7 +91,7 @@ public class ConnThread extends Thread {
                 ConnManager.getInstance().unlockCurrentPage(this.pageId);
                 MyLogUtils.info("Page #" + this.pageId + " " + e.getMessage() + ", try later");
             } else {
-                MyLogUtils.fatal("Page " + this.pageId + " Exception occur while calling sub thread to handle this page.", e);
+                MyLogUtils.fatal("Page " + this.pageId + " exception occur while calling sub thread to handle this page.", e);
             }
         } finally {
             try {
