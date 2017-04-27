@@ -128,14 +128,20 @@ public class PostFetcher implements Fetcher {
     }};
 
     private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
+        add(294894);
+        add(294895);
     }};
 
     private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
-        // moe 305487, 1楼 评论: This post was deleted......., OTL, debug TODO
         add(305487);
     }};
 
+    /**
+     * 页面太多，用debug处理
+     */
+    @Deprecated
     private final static List<Integer> IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED = new ArrayList<Integer>(){{
+        add(304104);
         add(294894);
         add(294895);
     }};
@@ -194,6 +200,7 @@ public class PostFetcher implements Fetcher {
             // -------------------校验信息---------------------------
             if (page == null) {
                 if (!isDeletedByDoc) {
+                    // ###############=========>>>重要校验<<<=========####################
                     // ---Post是否删除校验1
                     if(!IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST.contains(this.pageId)){
                         MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not deleted in html but no json data found");
@@ -207,6 +214,7 @@ public class PostFetcher implements Fetcher {
                     }
                 }
                 if ((page.getPools().size() == 0 && isInPoolByDoc)) {
+                    // ###############=========>>>重要校验<<<=========####################
                     // ---Post是否在Pool校验1
                     if(!IGNORE_DOC_IN_POOL_JSON_NOT_IN_POOL_LIST.contains(this.pageId)){
                         MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in html but pools.size() = 0 in json data");
@@ -224,6 +232,7 @@ public class PostFetcher implements Fetcher {
                     fileUrl = Configuration.getProtocol() + ":" + fileUrl;
                     page.getPosts().get(0).setFile_url(fileUrl);
                 }
+                // ###############=========>>>重要校验<<<=========####################
                 if (!(fileUrl.startsWith("http") && fileUrl.contains("/image/"))) {
                     MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not correct in json, url should be start with \"http\" and contains \"/image/\"");
                 }
@@ -234,37 +243,31 @@ public class PostFetcher implements Fetcher {
                     String urlInHtml = element.absUrl("href");
                     Post post = page.getPosts().get(0);
                     if (p.matcher(urlInHtml).matches()) {
-                        try{
-                            if(element.parent().parent().parent().hasClass("comment")){
-                                MyLogUtils.debug("Post #" + this.pageId + " found post url link in comment area, skip it, the url is " + element.absUrl("href") + ", the url from json is " + post.getFile_url());
-                                continue;
-                            }
-                        }catch (Exception e){
-                            // ignore
-                        }
                         // ---校验a标签中链接是否与page对象中的链接一致
-                        // moe 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同；这里是两个问题，前面已经过滤评论区a标签链接了
                         if (!post.getFile_url().equals(urlInHtml)) {
+                            // yande.re 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同
+                            // 可以限制url不能在评论区，这里采用加入忽略列表
                             if(!IGNORE_DOC_JSON_URL_NOT_EQUALS.contains(this.pageId)){
                                 MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + post.getFile_url() + ", while the url from html in tag a is " + urlInHtml);
                             }
                         }
                         isPostUrlMatched = true;
-                        // 防止有多个不匹配链接被找到而造成的重复打印 TODO
+                        // 防止有多个不匹配链接被找到而造成的重复打印
                         break;
                     }
                 }
                 // ---校验图片被删除, 则能不能找到匹配链接, 否则能找到匹配链接，校验html内的信息没有涉及json数据，实际可以忽略
                 if (isDeletedByDoc == isPostUrlMatched) {
                     if (!isDeletedByDoc) {
-                        // moe 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接, debug TODO
+                        // yande.re 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接
+                        // 不影响url抓取准确性，且页面太多（页面1-20000中有55个，20170427），使用debug处理
                         if(!IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED.contains(this.pageId)){
-                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was not deleted in pattern but not found the matched url in html in tag a.");
+                            MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was not deleted in html but not found the matched url in html in tag a.");
                         }
                     } else {
-                        // moe 305487, 1楼 评论 TODO
+                        // yande.re 305487, 1楼 评论: This post was deleted.
                         if(!IGNORE_DOC_DELETED_URL_MATCHED.contains(this.pageId)){
-                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in pattern but found the matched url in html in tag a.");
+                            MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in html but found the matched url in html in tag a.");
                         }
                     }
                 }

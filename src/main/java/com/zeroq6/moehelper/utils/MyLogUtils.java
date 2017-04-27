@@ -54,14 +54,16 @@ public class MyLogUtils {
         formattedLog(message, LOG_LEVEL_ERROR);
     }
 
-    public static synchronized void fatal(String message, Exception... e) {
+    public static synchronized void fatal(String message, Exception... exceptions) {
         try {
             StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
             String msg = message + " in class " + stacks[2].getClassName() + "." + stacks[2].getMethodName() + " at line " + stacks[2].getLineNumber();
             formattedLog(msg, LOG_LEVEL_FATAL);
-            if(null != e && e.length > 0){
-                e[0].printStackTrace();
+            if (null != exceptions && exceptions.length > 0) {
+                exceptions[0].printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             System.exit(-2);
         }
