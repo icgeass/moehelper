@@ -75,7 +75,7 @@ public class PoolWriter implements Writer {
             if (PoolLog.POOL_STATUS_NULL.equals(pageStatus)) {
                 continue;
             }
-            String jsonData = PoolLog.getMapPageId2PoolDescription().get(i);
+            String jsonData = ResourcesHolder.getMapIdJson().get(i);
             if(null == jsonData){
                 MyLogUtils.fatal("no json found, index: " + i);
             }
