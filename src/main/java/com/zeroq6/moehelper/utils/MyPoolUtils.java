@@ -11,6 +11,6 @@ public class MyPoolUtils
         return status & 0b01;
     }
     public static int toPoolOriginalCount(Integer status){
-        return status & 0b10 >>> 1;
+        return (status & 0b10) >>> 1;
     }
 }

@@ -301,7 +301,7 @@ public class PoolWriter implements Writer {
             Integer statusPre = getLastTimePageId2ZipLinkNumInfoById(key);
             jpegZipPreSum += MyPoolUtils.toPoolJpegCount(statusPre);
             originalZipPreSum += MyPoolUtils.toPoolOriginalCount(statusPre);
-            allZipPreSum += jpegZipPreSum + originalZipPreSum;
+            allZipPreSum += MyPoolUtils.toPoolJpegCount(statusPre) + MyPoolUtils.toPoolOriginalCount(statusPre);
         }
         MyLogUtils.warn("last time zips: ");
         MyLogUtils.warn("all: " + allZipPreSum + ", jpeg: " + jpegZipPreSum + ", original: " + originalZipPreSum);
