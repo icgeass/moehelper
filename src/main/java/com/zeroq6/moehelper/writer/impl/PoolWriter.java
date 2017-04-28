@@ -293,7 +293,6 @@ public class PoolWriter implements Writer {
         affectedZipNumJpg = 0;
         affectedZipNumPng = 0;
         MyLogUtils.info("-------------result-------------");
-        MyLogUtils.warn("zip num affected: jpeg packages " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumJpgSum) + " in all, original packages: " + MyStringUtils.insertBeforePlusOrMinus(affectedZipNumPngSum) + " in all");
         // -----------------------------------------------------
         int jpegZipPreSum = 0;
         int originalZipPreSum = 0;

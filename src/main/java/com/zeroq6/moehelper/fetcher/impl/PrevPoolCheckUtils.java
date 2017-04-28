@@ -176,7 +176,7 @@ public class PrevPoolCheckUtils {
                 if (PoolLog.POOL_STATUS_ALL_DELETED.equals(pageStatus)) {
                     numEmptyAndAllDeletedPool++;
                     Pool pool = page.getPools().get(0); // json数据中有多个pool时，不准确，没必要处理
-                    MyLogUtils.info("Pool # " + pool.getId() + " " + pool.getName() + " with all posts deleted.");
+                    MyLogUtils.info("Pool # " + pool.getId() + " " + pool.getName().replace("_", " ") + " with all posts deleted.");
                     continue;
                 }
                 Map<Integer, String> mapPostId2Md5 = new HashMap<Integer, String>();
