@@ -82,7 +82,15 @@ public class PostFetcher implements Fetcher {
 
 
     /**
-     * http://konachan.com/post/show/240519
+     * http://konachan.com/post/show/100262
+     *
+      <p>HTTP/1.1 418: I&#39;m a teapot</p>
+     */
+    private static Pattern pattern_kona_post_deleted1 = Pattern.compile("^.*HTTP/1[.]1\\s*418.*teapot.*$", Pattern.CASE_INSENSITIVE);
+
+
+    /**
+     * http://konachan.com/post/show/100262
      *
       This post is <span id="pool-seq-419">#3</span> in the <a href="/pool/show/419">Sugina Miki - Kasou</a> pool.
      */
@@ -107,11 +115,21 @@ public class PostFetcher implements Fetcher {
     }
 
     /**
-     * 忽略校验的特殊id
+     * 以下为忽略校验的特殊id
      */
 
+    /**
+     * 评论区评论内容
+     * This post was deleted.
+     * 导致误判
+     *
+     * 一般为图片被删除，后面恢复的情况，页面正常，能够获取json数据
+     * 忽略列表一般和IGNORE_DOC_DELETED_URL_MATCHED中的一致
+     */
     private final static List<Integer> IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST = new ArrayList<Integer>(){{
-        add(305487);
+        addIgnoreMoe(162059, this);
+        addIgnoreMoe(162584, this);
+        addIgnoreMoe(305487, this);
 
     }};
     private final static List<Integer> IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST = new ArrayList<Integer>(){{
@@ -124,27 +142,64 @@ public class PostFetcher implements Fetcher {
     }};
     private final static List<Integer> IGNORE_DOC_NOT_IN_POOL_JSON_IN_POOL_LIST = new ArrayList<Integer>(){{
 
-
-    }};
-
-    private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
-        add(294894);
-        add(294895);
-    }};
-
-    private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
-        add(305487);
     }};
 
     /**
-     * 页面太多，用debug处理
+     * 原本是 过滤类别 IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED 中的内容
+     * 但是评论区回复的原图，且和json数据中的不一致
+     *
+     * 可以限制url不能在评论区，这里采用加入忽略列表
+     */
+    private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
+        addIgnoreMoe(247822, this);
+        addIgnoreMoe(282278, this);
+        addIgnoreMoe(294278, this);
+        addIgnoreMoe(294894, this);
+        addIgnoreMoe(294895, this);
+
+    }};
+
+    /**
+     * 评论区评论内容
+     * This post was deleted.
+     * 导致误判
+     *
+     * 一般为图片被删除，后面恢复的情况
+     */
+    private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
+        addIgnoreMoe(162059, this);
+        addIgnoreMoe(162584, this);
+        addIgnoreMoe(305487, this);
+    }};
+
+    /**
+     * 一般表现为未登录状态显示sample图，登陆后显示image图
+     * 如：https://yande.re/post/show/19059
+     * 页面太多，弃用，用debug处理
      */
     @Deprecated
     private final static List<Integer> IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED = new ArrayList<Integer>(){{
-        add(304104);
-        add(294894);
-        add(294895);
+
     }};
+
+
+
+    private final static List<Integer> IGNORE_DOC_FLAG_DELETION_TAG_CHECK_PARSE_URL = new ArrayList<Integer>(){{
+        addIgnoreMoe(292218, this);
+    }};
+
+
+    private static void addIgnoreMoe(Integer id, List<Integer> list){
+        if(Configuration.HOST_MOE.equals(Configuration.getHost())){
+            list.add(id);
+        }
+    }
+
+    private static void addIgnoreKona(Integer id, List<Integer> list){
+        if(Configuration.HOST_KONA.equals(Configuration.getHost())){
+            list.add(id);
+        }
+    }
 
 
 
@@ -191,7 +246,7 @@ public class PostFetcher implements Fetcher {
                     break;
                 }
                 String currLine = line[i];
-                if (pattern_moe_post_deleted.matcher(currLine).matches() || pattern_kona_post_deleted0.matcher(currLine).matches()) {
+                if (pattern_moe_post_deleted.matcher(currLine).matches() || pattern_kona_post_deleted0.matcher(currLine).matches() || pattern_kona_post_deleted1.matcher(currLine).matches() ) {
                     isDeletedByDoc = true;
                 } else if (pattern_moe_post_in_pool.matcher(currLine).matches() || pattern_kona_post_in_pool.matcher(currLine).matches()) {
                     isInPoolByDoc = true;
@@ -245,8 +300,6 @@ public class PostFetcher implements Fetcher {
                     if (p.matcher(urlInHtml).matches()) {
                         // ---校验a标签中链接是否与page对象中的链接一致
                         if (!post.getFile_url().equals(urlInHtml)) {
-                            // yande.re 294894、294895原本未登录只显示/sample/，评论区有回复原图，所以匹配上了，但是该原图链接与json里的原图链接不完全相同
-                            // 可以限制url不能在评论区，这里采用加入忽略列表
                             if(!IGNORE_DOC_JSON_URL_NOT_EQUALS.contains(this.pageId)){
                                 MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + post.getFile_url() + ", while the url from html in tag a is " + urlInHtml);
                             }
@@ -265,7 +318,6 @@ public class PostFetcher implements Fetcher {
                             MyLogUtils.debug("Post #" + this.pageId + " match error. reason: this post was not deleted in html but not found the matched url in html in tag a.");
                         }
                     } else {
-                        // yande.re 305487, 1楼 评论: This post was deleted.
                         if(!IGNORE_DOC_DELETED_URL_MATCHED.contains(this.pageId)){
                             MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: this post was deleted in html but found the matched url in html in tag a.");
                         }
@@ -291,8 +343,10 @@ public class PostFetcher implements Fetcher {
                             tags = tags.substring(0, tags.lastIndexOf("."));
                             md5 = arr[arr.length - 2];
                             // 校验
-                            if(StringUtils.containsIgnoreCase(tags,"yande.re") || StringUtils.containsIgnoreCase(tags, "konachan.com")){
-                                MyLogUtils.fatal("Post #" + this.pageId + " read by html, error tag format in url " + file_url + ", may be parse error.");
+                            if(!IGNORE_DOC_FLAG_DELETION_TAG_CHECK_PARSE_URL.contains(this.pageId)){
+                                if(StringUtils.containsIgnoreCase(tags,"yande.re") || StringUtils.containsIgnoreCase(tags, "konachan.com")){
+                                    MyLogUtils.fatal("Post #" + this.pageId + " read by html, error tag format in url " + file_url + ", may be parse error.");
+                                }
                             }
                             if(!pattern_md5.matcher(md5).matches()){
                                 MyLogUtils.fatal("Post #" + this.pageId + " read by html, error md5 format in url " + file_url + ", may be parse error.");
@@ -315,6 +369,10 @@ public class PostFetcher implements Fetcher {
                             break lab;
                         }
                     }
+
+                }
+                if(null == page){
+                    MyLogUtils.warn("Post #" + this.pageId + " read by html tag failed, no matched url was found");
                 }
             }
             // ---------------判断page是否为空----------------------
@@ -374,7 +432,11 @@ public class PostFetcher implements Fetcher {
 
     // 当页面图片被删除时, 得到图片被删除的原因
     private String getReasonForDeleted(Document doc) {
-        return doc.getElementById("post-view").getElementsByClass("status-notice").get(0).text();
+        try{
+            return doc.getElementById("post-view").getElementsByClass("status-notice").get(0).text();
+        }catch (Exception e){
+            return  "HTTP/1.1 418: I'm a teapot?";
+        }
     }
 
     // 当页面图片被删除时, 如果存在设置Post对应Pool的name和id, 只会设置最后一个Pool信息(Pool有多个情况下)

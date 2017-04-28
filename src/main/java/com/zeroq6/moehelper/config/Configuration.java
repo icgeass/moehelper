@@ -125,8 +125,8 @@ public class Configuration {
         File f = new File(Writer.W_FULL_PATH_PREFIX + "_stderr.txt");
         FileUtils.write(f, "", "utf-8", false);
         System.setErr(new PrintStream(new FileOutputStream(f), true, "utf-8"));
-        f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
         // 标准重定向
+        f = new File(Writer.W_FULL_PATH_PREFIX + "_stdout.txt");
         FileUtils.write(f, "", "utf-8", false);
         System.setOut(new PrintStream(new FileOutputStream(f), true, "utf-8"));
         //

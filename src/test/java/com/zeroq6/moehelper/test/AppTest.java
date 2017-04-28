@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
+import com.zeroq6.moehelper.app.App;
 import com.zeroq6.moehelper.bean.Page;
 import com.zeroq6.moehelper.bean.Post;
 import com.zeroq6.moehelper.fetcher.impl.PoolFetcher;
@@ -22,8 +23,8 @@ public class AppTest {
 
     @Test
     public void testApp() {
-        String[] args = new String[]{"1", "10"};
-        //App.main(args);
+        String[] args = new String[]{"100664", "100664", "--Post", "--kona"};
+        App.main(args);
     }
 
 
