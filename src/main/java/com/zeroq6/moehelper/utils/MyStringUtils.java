@@ -41,17 +41,17 @@ public class MyStringUtils {
     }
 
 
-    public static String decodeUTF8(String fileName) {
+    public static String decodeUTF8(String string) {
         try {
-            return URLDecoder.decode(fileName, "utf-8");
+            return URLDecoder.decode(string, "utf-8");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static String encodeUTF8(String fileName) {
+    public static String encodeUTF8(String string) {
         try {
-            return URLEncoder.encode(fileName, "utf-8").replace("+", "%20");
+            return URLEncoder.encode(string, "utf-8").replace("+", "%20");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
