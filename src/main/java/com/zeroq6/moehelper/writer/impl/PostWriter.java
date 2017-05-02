@@ -108,15 +108,17 @@ public class PostWriter implements Writer {
             } else {
                 liJsonOkPost.add(ResourcesHolder.getMapIdJson().get(post.getId()));
             }
-            liMd5All.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
-            liLinkAll.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
+            String fileNameDecode = MyStringUtils.replaceIllegalCharInFilename(MyStringUtils.decodeUTF8(suffix.replace("/", "_")));
+            String fileNameEncode = MyStringUtils.encodeUTF8(fileNameDecode);
+            liMd5All.add(post.getMd5() + " *" + fileNameDecode);
+            liLinkAll.add(prefix + fileNameEncode);
             if (page.getPools().size() == 0 || post.getCreated_at() == Configuration.DELETED_POST_CREATED_AT) {
                 // 被删除的Post, 不管是否在Pool内, 均归类在NoPool内
-                liMd5NoPool.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
-                liLinkNoPool.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
+                liMd5NoPool.add(post.getMd5() + " *" + fileNameDecode);
+                liLinkNoPool.add(prefix + fileNameEncode);
             } else {
-                liMd5InPool.add(post.getMd5() + " *" + MyStringUtils.formatFileName(suffix));
-                liLinkInPool.add(MyStringUtils.formatUrlLink(prefix + suffix.replace("/", "_")));
+                liMd5InPool.add(post.getMd5() + " *" + fileNameDecode);
+                liLinkInPool.add(prefix + fileNameEncode);
             }
         }
     }

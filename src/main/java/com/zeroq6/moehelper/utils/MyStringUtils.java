@@ -28,25 +28,6 @@ public class MyStringUtils {
         return String.format("%.2f", fileSize) + byteUtils[i];
     }
 
-    /**
-     * 替换URL连接中最后一个/之后的非法字符为_
-     *
-     * 
-     * @param url
-     * @return String
-     */
-    public static String formatUrlLink(String url) {
-        String suffix = null;
-        String prefix = url.substring(0, url.lastIndexOf("/") + 1);
-        try {
-            suffix = URLDecoder.decode(url.substring(url.lastIndexOf("/") + 1), "utf-8");
-            suffix = replaceIllegalCharInFilename(suffix);
-            suffix = URLEncoder.encode(suffix, "utf-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return prefix + suffix.replace("+", "%20");// 由于此时的re已经是URL编码,所以原有的"+"不会被替换掉
-    }
 
     public static String replaceIllegalCharInFilename(String filename){
         if(null == filename){
@@ -59,21 +40,21 @@ public class MyStringUtils {
         return filename;
     }
 
-    /**
-     * 替换文件名字符串中的非法字符为_
-     * 
-     * @param fileName
-     * @return String
-     */
-    public static String formatFileName(String fileName) {
-        String re = null;
+
+    public static String decodeUTF8(String fileName) {
         try {
-            re = URLDecoder.decode(fileName, "utf-8");
-            re = replaceIllegalCharInFilename(re);
+            return URLDecoder.decode(fileName, "utf-8");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return re;
+    }
+
+    public static String encodeUTF8(String fileName) {
+        try {
+            return URLEncoder.encode(fileName, "utf-8").replace("+", "%20");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String insertBeforePlusOrMinus(Integer number) {
