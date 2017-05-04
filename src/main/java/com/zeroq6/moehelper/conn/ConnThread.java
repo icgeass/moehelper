@@ -22,6 +22,9 @@ import org.jsoup.nodes.Document;
  */
 public class ConnThread extends Thread {
 
+    private final static int HTTP_STATUS_404 = 404;
+
+    private final static int HTTP_STATUS_200 = 200;
 
     // 每个CloseableHttpClient默认只允许两个连接, 需要设置cm
     private static PoolingHttpClientConnectionManager cm = null;
@@ -70,16 +73,17 @@ public class ConnThread extends Thread {
             resp = httpClient.execute(target, req);
             connectUrl = this.protocol + "://" + this.host + "/" + this.linkType + "/show/" + this.pageId;
             statusCode = resp.getStatusLine().getStatusCode();
-            if (statusCode != 200 && statusCode != 404) {
+            if (statusCode != HTTP_STATUS_200 && statusCode != HTTP_STATUS_404) {
                 throw new RuntimeException(String.format("HTTP status {} when fetching url: {}", statusCode, connectUrl));
             }
             // 开始调用线程本地处理
-            isDocProcessing = true;
-            if (resp.getStatusLine().getStatusCode() == 404) {
+            if (resp.getStatusLine().getStatusCode() == HTTP_STATUS_404) {
+                isDocProcessing = true;
                 new Thread(Configuration.newFetcher(pageId, null)).start();
                 ConnManager.getInstance().readPageOK(this.pageId);
-            } else if (resp.getStatusLine().getStatusCode() == 200) {
+            } else if (resp.getStatusLine().getStatusCode() == HTTP_STATUS_200) {
                 Document doc = Jsoup.parse(resp.getEntity().getContent(), "utf-8", connectUrl);
+                isDocProcessing = true;
                 new Thread(Configuration.newFetcher(pageId, doc)).start();
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else {

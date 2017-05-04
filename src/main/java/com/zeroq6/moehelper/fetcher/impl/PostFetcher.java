@@ -130,6 +130,7 @@ public class PostFetcher implements Fetcher {
         addIgnoreMoe(162059, this);
         addIgnoreMoe(162584, this);
         addIgnoreMoe(305487, this);
+        addIgnoreKona(157802, this);
 
     }};
     private final static List<Integer> IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST = new ArrayList<Integer>(){{
@@ -170,6 +171,8 @@ public class PostFetcher implements Fetcher {
         addIgnoreMoe(162059, this);
         addIgnoreMoe(162584, this);
         addIgnoreMoe(305487, this);
+        addIgnoreKona(157802, this);
+
     }};
 
     /**
@@ -186,6 +189,11 @@ public class PostFetcher implements Fetcher {
 
     private final static List<Integer> IGNORE_DOC_FLAG_DELETION_TAG_CHECK_PARSE_URL = new ArrayList<Integer>(){{
         addIgnoreMoe(292218, this);
+        addIgnoreKona(76536, this);
+        addIgnoreKona(165705, this);
+        addIgnoreKona(165707, this);
+        addIgnoreKona(228880, this);
+
     }};
 
 

@@ -12,6 +12,9 @@
 2. 校验图片MD5使用RapidCRC Unicode并设置UTF-8编码
 3. jar文件与生成的文件（夹）的相对位置不能修改，抓取pool链接时会读取上一次抓取的pool信息，判断之前的pool中是否有图片更新
 4. 由于更新pool需要判断前面的pool是否有更新，所以pool id一律从1开始
+5. 为pool添加id前缀用于区分。使用downThemAll的文件名掩码```[*qstring*]*name*.*ext*```，下载到本地后用ReNamer替换下载好后的文件名的```jpeg=1&```和```pid=```为空字符串即可得到带id文件名。
+    1. ```[jpeg=1&pid=4474]電撃 おとなの萌王 Vol.06 (JPG).zip => [4474]電撃 おとなの萌王 Vol.06 (JPG).zip```
+    2. ```[pid=4474]電撃 おとなの萌王 Vol.06.zip => [pid=4474]電撃 おとなの萌王 Vol.06.zip ```
 
 ### 常见问题
  

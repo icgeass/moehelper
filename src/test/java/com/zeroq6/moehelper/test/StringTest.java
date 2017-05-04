@@ -15,6 +15,7 @@ public class StringTest
     public void test() throws Exception{
         String source = "https://yande.re/jpeg/eced93c44306c8f95bda9e47cfc0d5ef/yande.re%20268050%20bikini%20cleavage%20fukahire_sanba%20ruinon%20swimsuits.jpg";
         String charString = "/";
+        int a= 100;
 
         int index = MyStringUtils.getInnerStrIndex(source, charString, 5);
         System.out.println(URLDecoder.decode(source.substring(index + 1), "utf-8"));
