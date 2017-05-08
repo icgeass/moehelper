@@ -138,24 +138,24 @@ public class PostWriter implements Writer {
         int json_post_in_pool = post_pool_info_count[1];
         int doc_post_no_pool = post_pool_info_count[2];
         int doc_post_in_pool = post_pool_info_count[3];
-        boolean isValidateOk = true;
-        isValidateOk = isValidateOk && (allPosts == (successPosts + failedPosts));
-        isValidateOk = isValidateOk && (allPosts == liLog.size());
-        isValidateOk = isValidateOk && (successPosts == ok_json + ok_doc);
-        isValidateOk = isValidateOk && (failedPosts == post_404 + post_exception + post_no_url);
+        boolean validateOk = true;
+        validateOk = validateOk && (allPosts == (successPosts + failedPosts));
+        validateOk = validateOk && (allPosts == liLog.size());
+        validateOk = validateOk && (successPosts == ok_json + ok_doc);
+        validateOk = validateOk && (failedPosts == post_404 + post_exception + post_no_url);
         // post/show
-        isValidateOk = isValidateOk && (ok_json == liJsonOkPost.size());
-        isValidateOk = isValidateOk && (ok_doc == liJsonDeletedPost.size());
-        isValidateOk = isValidateOk && (allPosts == ok_json + ok_doc + post_404 + post_exception + post_no_url);
-        isValidateOk = isValidateOk && (ok_json == json_post_in_pool + json_post_no_pool);
-        isValidateOk = isValidateOk && (ok_doc == doc_post_in_pool + doc_post_no_pool);
-        isValidateOk = isValidateOk && (liLinkAll.size() == liMd5All.size());
-        isValidateOk = isValidateOk && (liLinkInPool.size() == liMd5InPool.size());
-        isValidateOk = isValidateOk && (liLinkNoPool.size() == liMd5NoPool.size());
-        isValidateOk = isValidateOk && (liLinkAll.size() == successPosts);
-        isValidateOk = isValidateOk && (liLinkInPool.size() == json_post_in_pool);
-        isValidateOk = isValidateOk && (liLinkNoPool.size() == doc_post_in_pool + doc_post_no_pool + json_post_no_pool);
-        if (!isValidateOk) {
+        validateOk = validateOk && (ok_json == liJsonOkPost.size());
+        validateOk = validateOk && (ok_doc == liJsonDeletedPost.size());
+        validateOk = validateOk && (allPosts == ok_json + ok_doc + post_404 + post_exception + post_no_url);
+        validateOk = validateOk && (ok_json == json_post_in_pool + json_post_no_pool);
+        validateOk = validateOk && (ok_doc == doc_post_in_pool + doc_post_no_pool);
+        validateOk = validateOk && (liLinkAll.size() == liMd5All.size());
+        validateOk = validateOk && (liLinkInPool.size() == liMd5InPool.size());
+        validateOk = validateOk && (liLinkNoPool.size() == liMd5NoPool.size());
+        validateOk = validateOk && (liLinkAll.size() == successPosts);
+        validateOk = validateOk && (liLinkInPool.size() == json_post_in_pool);
+        validateOk = validateOk && (liLinkNoPool.size() == doc_post_in_pool + doc_post_no_pool + json_post_no_pool);
+        if (!validateOk) {
             MyLogUtils.fatal("数据验证失败");
         }
     }

@@ -225,14 +225,14 @@ public class PrevPoolCheckUtils {
             return PoolLog.POOL_STATUS_EMPTY;
         }
         {
-            boolean isAllPostsDeleted = true;
+            boolean allPostsDeleted = true;
             for (Post post : page.getPosts()) {
                 if (post.getFile_url() != null) {
-                    isAllPostsDeleted = false;
+                    allPostsDeleted = false;
                     break;
                 }
             }
-            if (isAllPostsDeleted) {
+            if (allPostsDeleted) {
                 return PoolLog.POOL_STATUS_ALL_DELETED;
             }
         }

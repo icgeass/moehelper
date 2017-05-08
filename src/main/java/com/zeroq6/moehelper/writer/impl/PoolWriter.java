@@ -105,15 +105,15 @@ public class PoolWriter implements Writer {
     }
 
     private void validate() {
-        boolean isValidateOk = true;
-        isValidateOk = isValidateOk && ResourcesHolder.getMapIdJson().keySet().equals(PoolLog.getMapPageId2PoolDescription().keySet());
-        isValidateOk = isValidateOk && liPoolIdToZipNumCount.size() == PoolLog.getMapPageId2ZipLinkPoolAll().size();
-        isValidateOk = isValidateOk && liPoolLogUpdated.size() == PoolLog.getMapPageId2ZipLinkPoolUpdated().size();
-        isValidateOk = isValidateOk && liPoolLogAll.size() == Configuration.getToPage() - Configuration.getFromPage() + 1;
+        boolean validateOk = true;
+        validateOk = validateOk && ResourcesHolder.getMapIdJson().keySet().equals(PoolLog.getMapPageId2PoolDescription().keySet());
+        validateOk = validateOk && liPoolIdToZipNumCount.size() == PoolLog.getMapPageId2ZipLinkPoolAll().size();
+        validateOk = validateOk && liPoolLogUpdated.size() == PoolLog.getMapPageId2ZipLinkPoolUpdated().size();
+        validateOk = validateOk && liPoolLogAll.size() == Configuration.getToPage() - Configuration.getFromPage() + 1;
         int allPageNum = Configuration.getToPage() - Configuration.getFromPage() + 1;
         int logAllPageNumByPageStatus = PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NULL) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_EMPTY) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_ALL_DELETED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NEW) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_MODIFIED) + PoolLog.getPageCountByPageStatus(PoolLog.POOL_STATUS_NO_CHANGE);
-        isValidateOk = isValidateOk && (allPageNum == logAllPageNumByPageStatus);
-        if (!isValidateOk) {
+        validateOk = validateOk && (allPageNum == logAllPageNumByPageStatus);
+        if (!validateOk) {
             MyLogUtils.fatal("数据验证失败");
         }
     }

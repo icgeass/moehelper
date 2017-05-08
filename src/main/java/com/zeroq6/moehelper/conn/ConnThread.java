@@ -56,7 +56,7 @@ public class ConnThread extends Thread {
         HttpGet req = null;
         CloseableHttpResponse resp = null;
         String connectUrl = null;
-        boolean isDocProcessing = false;
+        boolean docParseThreadStarted = false;
         int statusCode = -1;
         try {
             HttpHost target = new HttpHost(this.host, this.port, this.protocol);
@@ -78,19 +78,19 @@ public class ConnThread extends Thread {
             }
             // 开始调用线程本地处理
             if (resp.getStatusLine().getStatusCode() == HTTP_STATUS_404) {
-                isDocProcessing = true;
+                docParseThreadStarted = true;
                 new Thread(Configuration.newFetcher(pageId, null)).start();
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else if (resp.getStatusLine().getStatusCode() == HTTP_STATUS_200) {
                 Document doc = Jsoup.parse(resp.getEntity().getContent(), "utf-8", connectUrl);
-                isDocProcessing = true;
+                docParseThreadStarted = true;
                 new Thread(Configuration.newFetcher(pageId, doc)).start();
                 ConnManager.getInstance().readPageOK(this.pageId);
             } else {
                 MyLogUtils.fatal("Unreachable Code");
             }
         } catch (Exception e) {
-            if (!isDocProcessing) {
+            if (!docParseThreadStarted) {
                 // 在调用子线程之前出现的异常均可忽略重新处理
                 ConnManager.getInstance().unlockCurrentPage(this.pageId);
                 MyLogUtils.info("Page #" + this.pageId + " " + e.getMessage() + ", try later");

@@ -266,22 +266,22 @@ public class PostFetcher implements Fetcher {
             }
             // ----------------通过HTML校验得到的Page信息是否准确----------------
             // 与上面循环分开以便代码结构清晰
-            boolean isDeletedByDoc = false;
-            boolean isInPoolByDoc = false;
+            boolean deletedByDoc = false;
+            boolean inPoolByDoc = false;
             for (int i = 0; i < line.length; i++) {
-                if (isDeletedByDoc && isInPoolByDoc) {
+                if (deletedByDoc && inPoolByDoc) {
                     break;
                 }
                 String currLine = line[i];
                 if (pattern_moe_post_deleted.matcher(currLine).matches() || pattern_kona_post_deleted0.matcher(currLine).matches() || pattern_kona_post_deleted1.matcher(currLine).matches() ) {
-                    isDeletedByDoc = true;
+                    deletedByDoc = true;
                 } else if (pattern_moe_post_in_pool.matcher(currLine).matches() || pattern_kona_post_in_pool.matcher(currLine).matches()) {
-                    isInPoolByDoc = true;
+                    inPoolByDoc = true;
                 }
             }
             // -------------------校验信息---------------------------
             if (page == null) {
-                if (!isDeletedByDoc) {
+                if (!deletedByDoc) {
                     // ###############=========>>>重要校验<<<=========####################
                     // ---Post是否删除校验1
                     if(!IGNORE_DOC_NOT_DELETE_JSON_DELETE_LIST.contains(this.pageId)){
@@ -289,20 +289,20 @@ public class PostFetcher implements Fetcher {
                     }
                 }
             } else {
-                if (isDeletedByDoc) {
+                if (deletedByDoc) {
                     // ---Post是否删除校验2
                     if(!IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST.contains(this.pageId)){
                         MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was deleted in html but found json data");
                     }
                 }
-                if ((page.getPools().size() == 0 && isInPoolByDoc)) {
+                if ((page.getPools().size() == 0 && inPoolByDoc)) {
                     // ###############=========>>>重要校验<<<=========####################
                     // ---Post是否在Pool校验1
                     if(!IGNORE_DOC_IN_POOL_JSON_NOT_IN_POOL_LIST.contains(this.pageId)){
                         MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was in pool in html but pools.size() = 0 in json data");
                     }
                 }
-                if (page.getPools().size() != 0 && !isInPoolByDoc) {
+                if (page.getPools().size() != 0 && !inPoolByDoc) {
                     // ---Post是否在Pool校验2
                     if(!IGNORE_DOC_NOT_IN_POOL_JSON_IN_POOL_LIST.contains(this.pageId)){
                         MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post was not in pool in html but pools.size() != 0 in json date");
@@ -318,7 +318,7 @@ public class PostFetcher implements Fetcher {
                 if (!(fileUrl.startsWith("http") && fileUrl.contains("/image/"))) {
                     MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: post url was not correct in json, url should be start with \"http\" and contains \"/image/\"");
                 }
-                boolean isPostUrlMatched = false;
+                boolean postUrlMatched = false;
                 for (Element element : doc.getElementsByTag("a")) {
                     // 当图片被标记为删除时通过a标签不会获取到连接, 需要通过link meta标签
                     Pattern p = Configuration.HOST_MOE.equals(Configuration.getHost()) ? pattern_moe_post_url_exist : pattern_kona_post_url_exist;
@@ -331,14 +331,14 @@ public class PostFetcher implements Fetcher {
                                 MyLogUtils.fatal("Post #" + this.pageId + " match error. reason: different url was found. The url from json is " + post.getFile_url() + ", while the url from html in tag a is " + urlInHtml);
                             }
                         }
-                        isPostUrlMatched = true;
+                        postUrlMatched = true;
                         // 防止有多个不匹配链接被找到而造成的重复打印
                         break;
                     }
                 }
                 // ---校验图片被删除, 则能不能找到匹配链接, 否则能找到匹配链接，校验html内的信息没有涉及json数据，实际可以忽略
-                if (isDeletedByDoc == isPostUrlMatched) {
-                    if (!isDeletedByDoc) {
+                if (deletedByDoc == postUrlMatched) {
+                    if (!deletedByDoc) {
                         // yande.re 304104等, 未登陆只显示 /sample/ 不显示 /image/ 导致在a标签中找不到原图链接
                         // 不影响url抓取准确性，且页面太多（页面1-20000中有55个，20170427），使用debug处理
                         if(!IGNORE_DOC_NOT_DELETED_URL_NOT_MATCHED.contains(this.pageId)){
@@ -387,7 +387,7 @@ public class PostFetcher implements Fetcher {
                             page.getPosts().add(post);
                             PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_READ_BY_DOCUMENT);
                             // 设置是否在pool中属性
-                            if (isInPoolByDoc) {
+                            if (inPoolByDoc) {
                                 page.getPools().add(new Pool());
                                 setPoolInfo(page, doc);
                                 MyLogUtils.info("Post #" + this.pageId + " in the Pool #" + page.getPools().get(0).getId() + "  " + page.getPools().get(0).getName() + "  was deleted");
