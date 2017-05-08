@@ -106,6 +106,9 @@ public class PostFetcher implements Fetcher {
     private static Pattern pattern_kona_post_url_exist = Pattern.compile("^.*//(.*[.])?konachan[.]com/image/[0-9a-f]{32}/Konachan[.]com.*[.][pngjgifswe]{3,4}.*$", Pattern.CASE_INSENSITIVE);
 
 
+
+    private static Pattern pattern_url_tag_replace = Pattern.compile("(\\s*yande[.]re\\s*\\d{1,10}\\s*)|(\\s*konachan[.]com\\s*-\\s*\\d{1,10}\\s*(-)?\\s*)", Pattern.CASE_INSENSITIVE);
+
     // 当图片被删除时用于查找文件url的标签属性对
     private static Map<String, String> mapTag2Prop = new HashMap<String, String>();
 
@@ -125,6 +128,8 @@ public class PostFetcher implements Fetcher {
      *
      * 一般为图片被删除，后面恢复的情况，页面正常，能够获取json数据
      * 忽略列表一般和IGNORE_DOC_DELETED_URL_MATCHED中的一致
+     *
+     * 20170508 doc去除了评论区
      */
     private final static List<Integer> IGNORE_DOC_DELETE_JSON_NOT_DELETE_LIST = new ArrayList<Integer>(){{
         addIgnoreMoe(162059, this);
@@ -150,6 +155,8 @@ public class PostFetcher implements Fetcher {
      * 但是评论区回复的原图，且和json数据中的不一致
      *
      * 可以限制url不能在评论区，这里采用加入忽略列表
+     *
+     * 20170508 doc去除了评论区
      */
     private final static List<Integer> IGNORE_DOC_JSON_URL_NOT_EQUALS = new ArrayList<Integer>(){{
         addIgnoreMoe(247822, this);
@@ -166,6 +173,8 @@ public class PostFetcher implements Fetcher {
      * 导致误判
      *
      * 一般为图片被删除，后面恢复的情况
+     *
+     * 20170508 doc去除了评论区
      */
     private final static List<Integer> IGNORE_DOC_DELETED_URL_MATCHED = new ArrayList<Integer>(){{
         addIgnoreMoe(162059, this);
@@ -186,7 +195,12 @@ public class PostFetcher implements Fetcher {
     }};
 
 
-
+    /**
+     * 从html页面获取url，解析tags后，tags仍然含有host
+     * 一般是tags中本来就含有host标签
+     *
+     * 20170508 改用正则替换，不会出现该问题
+     */
     private final static List<Integer> IGNORE_DOC_FLAG_DELETION_TAG_CHECK_PARSE_URL = new ArrayList<Integer>(){{
         addIgnoreMoe(292218, this);
         addIgnoreKona(76536, this);
@@ -230,6 +244,11 @@ public class PostFetcher implements Fetcher {
                 PostLog.logPageCountByPageStatus(PostLog.POST_STATUS_404);
                 MyLogUtils.error("Post #" + this.pageId + " read page failed. reason: 404, page not found");
                 return;
+            }
+            // 移除doc中的comments区，排除干扰
+            Element commentsArea = doc.getElementById("comments");
+            if(null != commentsArea){
+                commentsArea.remove();
             }
             PostLog log = new PostLog(this.pageId);
             ResourcesHolder.getMapIdLog().put(this.pageId, log);
@@ -347,12 +366,13 @@ public class PostFetcher implements Fetcher {
                             file_url = element.absUrl(mapTag2Prop.get(key));
                             // 分割成的字符串数组最大长度6
                             String[] arr = file_url.split("/", 6);
-                            tags = URLDecoder.decode(arr[arr.length - 1], "utf-8").replace("yande.re " + pageId + " ", "").replace("Konachan.com - " + pageId + " - ", "").replace("Konachan.com - " + pageId + " ", "").trim();
+                            tags = URLDecoder.decode(arr[arr.length - 1], "utf-8").trim();
+                            tags = pattern_url_tag_replace.matcher(tags).replaceAll("");
                             tags = tags.substring(0, tags.lastIndexOf("."));
                             md5 = arr[arr.length - 2];
                             // 校验
                             if(!IGNORE_DOC_FLAG_DELETION_TAG_CHECK_PARSE_URL.contains(this.pageId)){
-                                if(StringUtils.containsIgnoreCase(tags,"yande.re") || StringUtils.containsIgnoreCase(tags, "konachan.com")){
+                                if(StringUtils.containsIgnoreCase(tags,Configuration.HOST_MOE) || StringUtils.containsIgnoreCase(tags, Configuration.HOST_KONA)){
                                     MyLogUtils.fatal("Post #" + this.pageId + " read by html, error tag format in url " + file_url + ", may be parse error.");
                                 }
                             }
