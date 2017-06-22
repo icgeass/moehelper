@@ -16,6 +16,7 @@ public class PoolSyncTest {
 
 
     /**
+     * 同步pool
      * 删除的手动处理
      * @throws Exception
      */
@@ -23,6 +24,7 @@ public class PoolSyncTest {
     public void sync() throws Exception{
         File fromDir = new File("D:\\1");
         File toDir = new File("D:\\Pool_Packages");
+        ///////////
         String[] suffix = new String[]{"zip"};
         final String toDirName = "Pool_Packages";
         if (!fromDir.isDirectory()) {
@@ -42,17 +44,17 @@ public class PoolSyncTest {
             List<File> to = toMap.get(item.getKey());
             if (null == to) {
                 for(File f : item.getValue()){
-                    FileUtils.moveFileToDirectory(f, genToDirById(Integer.valueOf(item.getKey()), toDir), true);
+                    FileUtils.moveFileToDirectory(f, genMoveToDirById(Integer.valueOf(item.getKey()), toDir), true);
                     System.out.println("new新增: " + f.getAbsolutePath());
                 }
             } else {
                 for(File f : item.getValue()){
                     System.out.println("update新增: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, genToDirById(Integer.valueOf(item.getKey()), toDir), true);
+                    FileUtils.moveFileToDirectory(f, genMoveToDirById(Integer.valueOf(item.getKey()), toDir), true);
                 }
                 for(File f : to){
                     System.out.println("update移除: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, new File(genRootDir(toDir) + time + ".updated"), true);
+                    FileUtils.moveFileToDirectory(f, new File(toDir.getCanonicalPath() + File.pathSeparator + time + ".updated"), true);
                 }
             }
         }
@@ -60,16 +62,7 @@ public class PoolSyncTest {
 
     }
 
-    private String genRootDir(File dir) throws Exception{
-        String path = dir.getCanonicalPath();
-        int index = path.indexOf(":\\");
-        if(index < 0){
-            throw new RuntimeException("windows only");
-        }
-        return path.substring(0, path.indexOf(":\\")  + 2);
-    }
-
-    private File genToDirById(int id, File toDir) throws Exception{
+    private File genMoveToDirById(int id, File toDir) throws Exception{
         if (id < 1) {
             throw new RuntimeException("id非法, " + id);
         }
