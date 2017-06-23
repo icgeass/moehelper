@@ -173,8 +173,8 @@ public class Configuration {
                         return false;
                     }
                     Configuration.host = HOST_KONA;
-                    Configuration.protocol = "http";
-                    Configuration.port = 80;
+                    Configuration.protocol = "https";
+                    Configuration.port = 443;
                 } else if (!"--moe".equalsIgnoreCase(args[3])) {
                     return false;
                 }

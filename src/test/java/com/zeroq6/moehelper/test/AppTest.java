@@ -10,7 +10,7 @@ public class AppTest {
 
     @Test
     public void testApp() {
-        String[] args = new String[]{"100664", "100664", "--Post", "--kona"};
+        String[] args = new String[]{"100600", "100664", "--Post", "--kona"};
         App.main(args);
     }
 
