@@ -22,8 +22,8 @@ public class PoolSyncTest {
      */
     @Test
     public void sync() throws Exception{
-        File fromDir = new File("D:\\1");
-        File toDir = new File("D:\\Pool_Packages");
+        File fromDir = new File("F:\\图\\yande.re.pool");
+        File toDir = new File("F:\\yande.re\\Pool_Packages");
         ///////////
         String[] suffix = new String[]{"zip"};
         final String toDirName = "Pool_Packages";
@@ -48,13 +48,13 @@ public class PoolSyncTest {
                     System.out.println("new新增: " + f.getAbsolutePath());
                 }
             } else {
+                for(File f : to){
+                    System.out.println("update移除: " + f.getAbsolutePath());
+                    FileUtils.moveFileToDirectory(f, new File(toDir.getCanonicalPath() + File.separator + time + ".updated"), true);
+                }
                 for(File f : item.getValue()){
                     System.out.println("update新增: " + f.getAbsolutePath());
                     FileUtils.moveFileToDirectory(f, genMoveToDirById(Integer.valueOf(item.getKey()), toDir), true);
-                }
-                for(File f : to){
-                    System.out.println("update移除: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, new File(toDir.getCanonicalPath() + File.pathSeparator + time + ".updated"), true);
                 }
             }
         }
