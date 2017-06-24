@@ -20,10 +20,10 @@ public class CalcInfoTest {
 
     @Test
     public void calcInfoTest() throws IOException {
-        String logFilesDir = "";
+        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\!work\\konachan.com\\Post";
         // ------------------------------------
-        Integer to = null;
-        String pathToWrite = "./all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt";
+        Integer to = 180000; // 最大id，null表示所有
+        String pathToWrite = "./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt";
         File dir = new File(logFilesDir);
         List<String> liLines = new ArrayList<String>();
         List<String> liFileNameReadFrom = new ArrayList<String>();
@@ -36,9 +36,15 @@ public class CalcInfoTest {
         int[] poolInfo = new int[4];
         int[] writeInfo = new int[4];
         for (File file : dir.listFiles()) {
-            if (file.getName().endsWith("_post.log")){
+            if (file.getName().endsWith("_post.log")) {
                 Integer maxId = Integer.valueOf(file.getName().split("_")[5]);
-                to = null == to ? maxId : (to < maxId ? maxId : to);
+                if (null == to) {
+                    to = null == to ? maxId : (to < maxId ? maxId : to);
+                } else {
+                    if (maxId > to) {
+                        continue;
+                    }
+                }
                 liFileNameReadFrom.add(file.getName());
                 List<String> liTmpLines = FileUtils.readLines(file, "utf-8");
                 for (int i = 0; i < liTmpLines.size(); i++) {

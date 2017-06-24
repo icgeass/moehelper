@@ -22,7 +22,7 @@ public class PoolSyncTest {
      */
     @Test
     public void sync() throws Exception{
-        File fromDir = new File("F:\\图\\yande.re.pool");
+        File fromDir = new File("F:\\yande.re.pool2");
         File toDir = new File("F:\\yande.re\\Pool_Packages");
         ///////////
         String[] suffix = new String[]{"zip"};
@@ -48,9 +48,10 @@ public class PoolSyncTest {
                     System.out.println("new新增: " + f.getAbsolutePath());
                 }
             } else {
+                // 先移除, 后新增, 避免文件名同步无法新增或错误覆盖
                 for(File f : to){
                     System.out.println("update移除: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, new File(toDir.getCanonicalPath() + File.separator + time + ".updated"), true);
+                    FileUtils.moveFileToDirectory(f, new File(toDir.getParentFile().getCanonicalPath() + File.separator + time + ".updated"), true);
                 }
                 for(File f : item.getValue()){
                     System.out.println("update新增: " + f.getAbsolutePath());
