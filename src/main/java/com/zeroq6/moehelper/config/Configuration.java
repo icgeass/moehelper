@@ -117,6 +117,7 @@ public class Configuration {
             System.exit(-1);
         }
         System.setProperty("line.separator", "\r\n");
+        System.setProperty("file.encoding", "UTF-8");
         Configuration.inputParams = args;
         Configuration.fromPage = Integer.valueOf(args[0]);
         Configuration.toPage = Integer.valueOf(args[1]);
