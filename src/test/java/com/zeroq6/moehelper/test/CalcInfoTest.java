@@ -20,9 +20,9 @@ public class CalcInfoTest {
 
     @Test
     public void calcInfoTest() throws IOException {
-        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\!work\\konachan.com\\Post";
+        String logFilesDir = "E:\\BaiduNetdiskDownload\\!work\\konachan.com\\Post";
         // ------------------------------------
-        Integer to = 180000; // 最大id，null表示所有
+        Integer to = null; // 最大id，null表示所有
         String pathToWrite = "./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt";
         File dir = new File(logFilesDir);
         List<String> liLines = new ArrayList<String>();
@@ -35,15 +35,19 @@ public class CalcInfoTest {
         int[] countDetailsInfo = new int[5];
         int[] poolInfo = new int[4];
         int[] writeInfo = new int[4];
+        Integer maxPostId = null;
         for (File file : dir.listFiles()) {
             if (file.getName().endsWith("_post.log")) {
-                Integer maxId = Integer.valueOf(file.getName().split("_")[5]);
-                if (null == to) {
-                    to = null == to ? maxId : (to < maxId ? maxId : to);
-                } else {
-                    if (maxId > to) {
-                        continue;
-                    }
+                Integer lastId = Integer.valueOf(file.getName().split("_")[5]);
+                maxPostId = null == maxPostId ? lastId : (maxPostId < lastId ? lastId : maxPostId);
+            }
+        }
+        Integer toPostId = null == to ? maxPostId : to;
+        for (File file : dir.listFiles()) {
+            if (file.getName().endsWith("_post.log")) {
+                Integer lastId = Integer.valueOf(file.getName().split("_")[5]);
+                if(lastId > toPostId){
+                    continue;
                 }
                 liFileNameReadFrom.add(file.getName());
                 List<String> liTmpLines = FileUtils.readLines(file, "utf-8");
@@ -104,7 +108,7 @@ public class CalcInfoTest {
         liResult.add(MyDateUtils.formatCurrentTime());
         liResult.add("统计: ");
         liResult.add("");
-        liResult.add("Id 范围: 1 - " + to);
+        liResult.add("Id 范围: 1 - " + toPostId);
         liResult.add("页面总数: " + allPageNum);
         liResult.add("读取成功: " + readOkPageNum);
         liResult.add("读取失败: " + readFailedPageNum);
