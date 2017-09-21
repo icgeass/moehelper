@@ -24,7 +24,7 @@ public class PoolSyncTest {
     public void sync() throws Exception{
         // 最近更新的pool
         File newDir = new File("E:\\bak\\yande.re_-_Pool_20170921");
-        // 以前更新的pool
+        // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
         File oldDir = new File("E:\\bak\\yande.re_-_Pool_20170723");
 
         // 最终移动到Pool_Packages时设置为true
