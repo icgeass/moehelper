@@ -22,40 +22,45 @@ public class PoolSyncTest {
      */
     @Test
     public void sync() throws Exception{
-        File fromDir = new File("F:\\yande.re.pool2");
-        File toDir = new File("F:\\yande.re\\Pool_Packages");
+        // 最近更新的pool
+        File newDir = new File("E:\\bak\\yande.re_-_Pool_20170921");
+        // 以前更新的pool
+        File oldDir = new File("E:\\bak\\yande.re_-_Pool_20170723");
+
+        // 最终移动到Pool_Packages时设置为true
+        boolean genIdDir = false;
         ///////////
         String[] suffix = new String[]{"zip"};
         final String toDirName = "Pool_Packages";
-        if (!fromDir.isDirectory()) {
+        if (!newDir.isDirectory()) {
             throw new RuntimeException("来源非法");
         }
-        if (!toDir.getName().equals(toDirName) || !toDir.isDirectory()) {
+        if ((!oldDir.getName().equals(toDirName) && genIdDir) || !oldDir.isDirectory()) {
             throw new RuntimeException("目标非法");
         }
-        if(FileUtils.sizeOfDirectory(fromDir) >= toDir.getFreeSpace() + FileUtils.ONE_GB){
+        if(FileUtils.sizeOfDirectory(newDir) >= oldDir.getFreeSpace() - (FileUtils.ONE_GB * 10)){
             throw new RuntimeException("目标空间不足");
         }
-        Map<String, List<File>> fromMap = transferIdFileMap(FileUtils.listFiles(fromDir, suffix, true));
-        Map<String, List<File>> toMap = transferIdFileMap(FileUtils.listFiles(toDir, suffix, true));
+        Map<String, List<File>> newMap = transferIdFileMap(FileUtils.listFiles(newDir, suffix, true));
+        Map<String, List<File>> oldMap = transferIdFileMap(FileUtils.listFiles(oldDir, suffix, true));
         String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         // 更新和新增
-        for (Map.Entry<String, List<File>> item : fromMap.entrySet()) {
-            List<File> to = toMap.get(item.getKey());
-            if (null == to) {
+        for (Map.Entry<String, List<File>> item : newMap.entrySet()) {
+            List<File> old = oldMap.get(item.getKey());
+            if (null == old) {
                 for(File f : item.getValue()){
-                    FileUtils.moveFileToDirectory(f, genMoveToDirById(Integer.valueOf(item.getKey()), toDir), true);
+                    FileUtils.moveFileToDirectory(f, genIdDir ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
                     System.out.println("new新增: " + f.getAbsolutePath());
                 }
             } else {
                 // 先移除, 后新增, 避免文件名同步无法新增或错误覆盖
-                for(File f : to){
+                for(File f : old){
                     System.out.println("update移除: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, new File(toDir.getParentFile().getCanonicalPath() + File.separator + time + ".updated"), true);
+                    FileUtils.moveFileToDirectory(f, new File(oldDir.getParentFile().getCanonicalPath() + File.separator + time + ".updated"), true);
                 }
                 for(File f : item.getValue()){
                     System.out.println("update新增: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, genMoveToDirById(Integer.valueOf(item.getKey()), toDir), true);
+                    FileUtils.moveFileToDirectory(f, genIdDir ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
                 }
             }
         }
