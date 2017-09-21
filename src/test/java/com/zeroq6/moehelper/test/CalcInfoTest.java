@@ -22,7 +22,7 @@ public class CalcInfoTest {
     public void calcInfoTest() throws IOException {
         String logFilesDir = "E:\\BaiduNetdiskDownload\\!work\\konachan.com\\Post";
         // ------------------------------------
-        Integer to = 180000; // 最大id，null表示所有
+        Integer to = null; // 最大id，null表示所有
         String pathToWrite = "./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt";
         File dir = new File(logFilesDir);
         List<String> liLines = new ArrayList<String>();
