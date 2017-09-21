@@ -277,7 +277,7 @@ public class PoolWriter implements Writer {
                 affectedPoolNum++;
                 affectedZipNumJpg += MyPoolUtils.toPoolJpegCount(statusNow) - MyPoolUtils.toPoolJpegCount(statusPre);
                 affectedZipNumPng += MyPoolUtils.toPoolOriginalCount(statusNow) -  MyPoolUtils.toPoolOriginalCount(statusPre);
-                MyLogUtils.info("Pool #" + poolLog.getId() + " was modified, status previous = " + Integer.toBinaryString(statusNow) + ", status now = " + Integer.toBinaryString(statusPre));
+                MyLogUtils.info("Pool #" + poolLog.getId() + " was modified, status now = " + Integer.toBinaryString(statusNow) + ", status previous = " + Integer.toBinaryString(statusPre));
                 if (!statusNow.equals(statusPre)) {
                     int jpegAffected = MyPoolUtils.toPoolJpegCount(statusNow) - MyPoolUtils.toPoolJpegCount(statusPre);
                     int pngAffected = MyPoolUtils.toPoolOriginalCount(statusNow) -  MyPoolUtils.toPoolOriginalCount(statusPre);
