@@ -114,7 +114,7 @@ public class Configuration {
         }
         if (!checkParams(args)) {
             System.out.println("Usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
-            System.out.println("System properties(optional): -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080 -Dfile.encoding=UTF-8");
+            System.out.println("System properties(optional): \r\n\t-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080 -Dfile.encoding=UTF-8");
             System.exit(-1);
         }
         System.setProperty("line.separator", "\r\n");
