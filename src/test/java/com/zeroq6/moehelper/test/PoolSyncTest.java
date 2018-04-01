@@ -23,12 +23,12 @@ public class PoolSyncTest {
     @Test
     public void sync() throws Exception{
         // 最近更新的pool
-        File newDir = new File("E:\\bak\\yande.re_-_Pool_20170921");
+        File newDir = new File("G:\\pool_updating\\yande.re_-_Pool_20170723");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
-        File oldDir = new File("E:\\bak\\yande.re_-_Pool_20170723");
+        File oldDir = new File("G:\\yande.re\\Pool_Packages");
 
         // 最终移动到Pool_Packages时设置为true
-        boolean genIdDir = false;
+        boolean genIdDir = true;
         ///////////
         String[] suffix = new String[]{"zip"};
         final String toDirName = "Pool_Packages";
