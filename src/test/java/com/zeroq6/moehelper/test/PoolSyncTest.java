@@ -23,21 +23,36 @@ public class PoolSyncTest {
     @Test
     public void sync() throws Exception{
         // 最近更新的pool
-        File newDir = new File("G:\\pool_updating\\yande.re_-_Pool_20170723");
+        File newDir = new File("F:\\downloads\\图片\\yande.re_-_Pool_20180401");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
-        File oldDir = new File("G:\\yande.re\\Pool_Packages");
+        File oldDir = new File("F:\\downloads\\图片\\yande.re_-_Pool_20180210");
 
         // 最终移动到Pool_Packages时设置为true
-        boolean genIdDir = true;
+        boolean genIdDir = false;
         ///////////
         String[] suffix = new String[]{"zip"};
-        final String toDirName = "Pool_Packages";
-        if (!newDir.isDirectory()) {
-            throw new RuntimeException("来源非法");
+        if (!oldDir.isDirectory() || !newDir.isDirectory()) {
+            throw new RuntimeException("新旧文件都必须为目录");
         }
-        if ((!oldDir.getName().equals(toDirName) && genIdDir) || !oldDir.isDirectory()) {
-            throw new RuntimeException("目标非法");
+        // 校验文件名
+        String reg = "yande[.]re_[-]_Pool_\\d{8}";
+        if(!Pattern.matches(reg, newDir.getName())){
+            throw new RuntimeException("新目录名必须满足正则" + reg);
         }
+        if(genIdDir){
+            String poolPackages = "Pool_Packages";
+            if(!oldDir.getName().equals(poolPackages)){
+                throw new RuntimeException("旧目录名必须为" + poolPackages);
+            }
+        }else{
+            if(!Pattern.matches(reg, oldDir.getName())){
+                throw new RuntimeException("旧目录名必须满足正则" + reg);
+            }
+            if(newDir.getName().compareTo(oldDir.getName()) <= 0){
+                throw new RuntimeException("新目录比较必须大于旧目录");
+            }
+        }
+        // 校验空间
         if(FileUtils.sizeOfDirectory(newDir) >= oldDir.getFreeSpace() - (FileUtils.ONE_GB * 10)){
             throw new RuntimeException("目标空间不足");
         }
