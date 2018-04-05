@@ -20,7 +20,7 @@ public class CalcInfoTest {
 
     @Test
     public void calcInfoTest() throws IOException {
-        String logFilesDir = "E:\\BaiduNetdiskDownload\\!work\\konachan.com\\Post";
+        String logFilesDir = "F:\\downloads\\!work\\yande.re\\Post";
         // ------------------------------------
         Integer to = null; // 最大id，null表示所有
         String pathToWrite = "./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt";
