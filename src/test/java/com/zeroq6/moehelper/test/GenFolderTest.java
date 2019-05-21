@@ -8,12 +8,21 @@ import java.io.File;
 public class GenFolderTest {
 
 
+    /**
+     * 在parentDir下生成生成类似
+     * yande.re_-_Pack_049_480001_490000(In_Pool)
+     * yande.re_-_Pack_049_480001_490000(Not_In_Pool)
+     * Konachan.com_-_Pack_028_270001_280000
+     * 的文件夹
+     *
+     * @throws Exception
+     */
     @Test
     public void genFolder() throws Exception {
         String parentDir = "F:\\moe_post";
-        int from = 49;
-        int to = 54;
-        boolean typeMoe = true;
+        int from = 28;
+        int to = 28;
+        boolean typeMoe = false;
         for (int i = from; i <= to; i++) {
             if (typeMoe) {
                 File f1 = new File(parentDir, getFolderName(typeMoe, i, EndStringType.MOE_IN_POOL));

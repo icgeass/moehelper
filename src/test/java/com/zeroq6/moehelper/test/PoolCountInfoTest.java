@@ -9,22 +9,21 @@ import java.util.*;
 
 /**
  * Created by yuuki asuna on 2018/4/2.
- *
+ * <p>
  * 校验文件的压缩包zip和txt记录文件中是否一致
  * 包含总original和jpeg包数量，每个id对应的original和jpeg包数量
  */
-public class PoolCountInfoTest
-{
+public class PoolCountInfoTest {
 
     @Test
-    public void test() throws Exception{
-        String packDir = "F:\\yande.re\\Pool_Packages";
-        String txtFile = "D:\\yande.re_-_pool_180331222103_1_4953_info.txt";
+    public void test() throws Exception {
+        String packDir = "H:\\yande.re\\Pool_Packages";
+        String txtFile = "C:\\Users\\yuuki asuna\\Desktop\\!work\\yande.re\\pool\\yande.re_-_pool_190517065816_1_6301_info.txt";
 
         // 读取zip文件名
         Collection<File> list = FileUtils.listFiles(new File(packDir), null, true);
         List<String> nameList = new ArrayList<String>();
-        for(File f : list){
+        for (File f : list) {
             nameList.add(f.getName());
         }
         Collections.sort(nameList);
@@ -36,17 +35,17 @@ public class PoolCountInfoTest
         });
         int jpegAll = 0;
         int originalAll = 0;
-        for(int i = 0; i<nameList.size();i++){
+        for (int i = 0; i < nameList.size(); i++) {
             String name = nameList.get(i);
             String id = Integer.valueOf(name.substring(1, 5)) + "";
-            if(!itemMapPackFile.containsKey(id)){
+            if (!itemMapPackFile.containsKey(id)) {
                 itemMapPackFile.put(id, new Item());
             }
             Item item = itemMapPackFile.get(id);
-            if(name.contains("(JPG)")){
-                jpegAll ++;
+            if (name.contains("(JPG)")) {
+                jpegAll++;
                 item.setJpeg(item.getJpeg() + 1);
-            }else{
+            } else {
                 originalAll++;
                 item.setOriginal(item.getOriginal() + 1);
             }
@@ -63,23 +62,22 @@ public class PoolCountInfoTest
             }
         });
         Item last = null;
-        for(int i = 0; i< lineList.size(); i++){
+        for (int i = 0; i < lineList.size(); i++) {
             String line = lineList.get(i);
-            if(!line.contains("To #")){
+            if (!line.contains("To #")) {
                 continue;
             }
             String id = Integer.valueOf(line.substring(line.indexOf("#") + 1, line.indexOf(":"))) + "";
-            if(!itemMapTxtFile.containsKey(id)){
+            if (!itemMapTxtFile.containsKey(id)) {
                 itemMapTxtFile.put(id, new Item());
             }
             Item item = itemMapTxtFile.get(id);
-            int originalAllTxt = Integer.valueOf(line.substring(line.indexOf("and ") + 4, line.indexOf(" ori")));
+            int originalAllTxt = Integer.valueOf(line.substring(line.indexOf("and ") + 4, line.indexOf(" original")));
             int jpegAllTxt = Integer.valueOf(line.substring(line.indexOf("all, ") + 5, line.indexOf(" jpeg")));
-            int allTxt = Integer.valueOf(line.substring(line.indexOf(": ") + 2, line.indexOf(" in ")));
-            if(null == last){
+            if (null == last) {
                 item.setOriginal(originalAllTxt);
                 item.setJpeg(jpegAllTxt);
-            }else{
+            } else {
                 item.setOriginal(originalAllTxt - last.getOriginalAll());
                 item.setJpeg(jpegAllTxt - last.getJpegAll());
             }
@@ -90,20 +88,19 @@ public class PoolCountInfoTest
         }
 
 
-
         StringBuffer stringBuffer = new StringBuffer();
         // 校验
-        for(Map.Entry<String, Item> entry : itemMapPackFile.entrySet()){
+        for (Map.Entry<String, Item> entry : itemMapPackFile.entrySet()) {
             Item item = itemMapTxtFile.get(entry.getKey());
-            if(null == item){
-               System.out.println("zip文件含有，txt记录不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
-            }else{
-               if(!item.equals(entry.getValue())){
-                   stringBuffer.append("zip文件和txt记录不相同，" + entry.getKey() + "，zip文件：" + JSON.toJSONString(entry.getValue()) + ", txt记录：" + JSON.toJSONString(item));
-                   stringBuffer.append("\r\n");
-               }
-               itemMapTxtFile.remove(entry.getKey());
-           }
+            if (null == item) {
+                System.out.println("zip文件含有，txt记录不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
+            } else {
+                if (!item.equals(entry.getValue())) {
+                    stringBuffer.append("zip文件和txt记录不相同，" + entry.getKey() + "，zip文件：" + JSON.toJSONString(entry.getValue()) + ", txt记录：" + JSON.toJSONString(item));
+                    stringBuffer.append("\r\n");
+                }
+                itemMapTxtFile.remove(entry.getKey());
+            }
 
         }
 
@@ -115,12 +112,12 @@ public class PoolCountInfoTest
         System.out.println("================================================");
         System.out.print(stringBuffer.toString());
         System.out.println("================================================");
-        System.out.println("校验完成");
+        System.out.println("校验完成：" + (stringBuffer.length() == 0 ? "全部通过" : "有未通过校验的数据"));
 
 
     }
 
-    class Item{
+    class Item {
 
         private int jpeg = 0;
         private int original = 0;

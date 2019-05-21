@@ -17,18 +17,18 @@ public class PoolSyncTest {
 
     /**
      * 同步pool
-     * 删除的手动处理
+     * oldDir中被替换回来的，会放置在oldDir同级目录下的，yyyyMMddHHmmss.old.replaced.to_delete_manual，确认无误，手动删除即可
      * @throws Exception
      */
     @Test
     public void sync() throws Exception{
         // 最近更新的pool
-        File newDir = new File("F:\\yande.re\\yande.re_-_Pool_20180210");
+        File newDir = new File("H:\\yande.re\\yande.re_-_Pool_20190521");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
-        File oldDir = new File("F:\\yande.re\\Pool_Packages");
+        File oldDir = new File("H:\\yande.re\\Pool_Packages");
 
         // 最终移动到Pool_Packages时设置为true
-        boolean genIdDir = true;
+        boolean finalToPoolPackages = true;
         ///////////
         String[] suffix = new String[]{"zip"};
         if (!oldDir.isDirectory() || !newDir.isDirectory()) {
@@ -39,7 +39,7 @@ public class PoolSyncTest {
         if(!Pattern.matches(reg, newDir.getName())){
             throw new RuntimeException("新目录名必须满足正则" + reg);
         }
-        if(genIdDir){
+        if(finalToPoolPackages){
             String poolPackages = "Pool_Packages";
             if(!oldDir.getName().equals(poolPackages)){
                 throw new RuntimeException("旧目录名必须为" + poolPackages);
@@ -64,18 +64,18 @@ public class PoolSyncTest {
             List<File> old = oldMap.get(item.getKey());
             if (null == old) {
                 for(File f : item.getValue()){
-                    FileUtils.moveFileToDirectory(f, genIdDir ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
+                    FileUtils.moveFileToDirectory(f, finalToPoolPackages ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
                     System.out.println("new新增: " + f.getAbsolutePath());
                 }
             } else {
                 // 先移除, 后新增, 避免文件名同步无法新增或错误覆盖
                 for(File f : old){
                     System.out.println("update移除: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, new File(oldDir.getParentFile().getCanonicalPath() + File.separator + time + ".updated"), true);
+                    FileUtils.moveFileToDirectory(f, new File(oldDir.getParentFile().getCanonicalPath() + File.separator + time + ".old.replaced.to_delete_manual"), true);
                 }
                 for(File f : item.getValue()){
                     System.out.println("update新增: " + f.getAbsolutePath());
-                    FileUtils.moveFileToDirectory(f, genIdDir ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
+                    FileUtils.moveFileToDirectory(f, finalToPoolPackages ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
                 }
             }
         }
