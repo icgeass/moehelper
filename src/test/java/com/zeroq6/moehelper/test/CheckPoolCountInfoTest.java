@@ -13,7 +13,7 @@ import java.util.*;
  * 校验文件的压缩包zip和txt记录文件中是否一致
  * 包含总original和jpeg包数量，每个id对应的original和jpeg包数量
  */
-public class PoolCountInfoTest {
+public class CheckPoolCountInfoTest {
 
     @Test
     public void test() throws Exception {
