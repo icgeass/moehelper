@@ -103,16 +103,12 @@ public class PoolCountInfoTest {
             }
 
         }
-
-        System.out.println("================================================");
         for (Map.Entry<String, Item> entry : itemMapTxtFile.entrySet()) {
             System.out.println("txt记录含有，zip文件不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
 
         }
-        System.out.println("================================================");
         System.out.print(stringBuffer.toString());
-        System.out.println("================================================");
-        System.out.println("校验完成：" + (stringBuffer.length() == 0 ? "全部通过" : "有未通过校验的数据"));
+        System.out.println("校验完成：" + (stringBuffer.length() == 0 ? "全部通过" : "未通过"));
 
 
     }
