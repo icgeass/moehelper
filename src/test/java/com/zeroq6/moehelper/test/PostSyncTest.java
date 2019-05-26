@@ -18,7 +18,7 @@ public class PostSyncTest {
     @Test
     public void test() throws Exception {
         String srcWorkPostDir = "C:\\Users\\yuuki asuna\\Desktop\\!work";
-        String targetStorePostDir = "F:\\moe_post";
+        String targetStorePostDir = "P:\\BaiduDownload";
         FileFilter fileFilter = new FileFilter(srcWorkPostDir);
 
         for (File item : new File(targetStorePostDir).listFiles()) {
@@ -54,6 +54,9 @@ public class PostSyncTest {
                     && file.getName().contains("_" + start + "_" + end)
                     && file.getName().endsWith(endStringType.getEndStringInMd5File()), 1);
             FileUtils.copyFileToDirectory(md5File.get(0), item);
+            System.out.println("MD5文件复制完成：" + md5File.get(0).getCanonicalPath());
+
+
 
             // 打包关联work文件
             List<File> workFileList = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
@@ -61,8 +64,9 @@ public class PostSyncTest {
             if (workFileList.size() != 11 && workFileList.size() != 12) {
                 throw new RuntimeException("workFileList != 11 and workFileList != 12");
             }
-            ZipUtils.zipFileFolders(new File(item, item.getName() + "_data.zip"), workFileList, item.getName() + "_data");
-
+            File zipFile = new File(item, item.getName() + "_data.zip");
+            ZipUtils.zipFileFolders(zipFile, workFileList, item.getName() + "_data");
+            System.out.println("打包成功: " + zipFile.getCanonicalPath());
 
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
@@ -83,7 +87,9 @@ public class PostSyncTest {
 
 
             if (endStringType == EndStringType.KONA_All || endStringType == EndStringType.MOE_NOT_IN_POOL){
-                List<File> file404List = fileFilter.filter(file -> file.getName().contains("_404_") && file.getName().contains("_" + start + "_" + end));
+                List<File> file404List = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
+                        && file.getName().contains("_404_")
+                        && file.getName().contains("_" + start + "_" + end));
                 if (file404List.size() == 1) {
                     String file404Name = file404List.get(0).getName();
                     imageCountInLogFile -= Integer.valueOf(file404Name.substring(file404Name.lastIndexOf("_") + 1, file404Name.lastIndexOf(".")));
@@ -92,12 +98,11 @@ public class PostSyncTest {
             if (imageFileList.size() != imageCountInLogFile) {
                 throw new RuntimeException("imageFile in disk = " + imageFileList.size() + ", in log file = " + imageCountInLogFile);
             }
+            System.out.println("同步验证通过，" + name);
 
 
         }
-
-
-        System.out.println();
+        System.out.println("---------------------END---------------------");
     }
 
 
