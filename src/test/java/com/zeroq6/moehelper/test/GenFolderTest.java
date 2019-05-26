@@ -26,16 +26,16 @@ public class GenFolderTest {
         boolean typeMoe = false;
         for (int i = from; i <= to; i++) {
             if (typeMoe) {
-                File f1 = new File(parentDir, ArrangeHelper.getFolderName(typeMoe, i, EndStringType.MOE_IN_POOL));
+                File f1 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.MOE_IN_POOL));
                 f1.mkdirs();
 
-                File f2 = new File(parentDir, ArrangeHelper.getFolderName(typeMoe, i, EndStringType.MOE_NOT_IN_POOL));
+                File f2 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.MOE_NOT_IN_POOL));
                 f2.mkdirs();
 
                 System.out.println(f1.getCanonicalPath());
                 System.out.println(f2.getCanonicalPath());
             } else {
-                File f3 = new File(parentDir, ArrangeHelper.getFolderName(typeMoe, i, EndStringType.KONA_EMPTY));
+                File f3 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.KONA_EMPTY));
                 f3.mkdirs();
 
                 System.out.println(f3.getCanonicalPath());
