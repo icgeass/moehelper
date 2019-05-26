@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author
@@ -98,6 +99,12 @@ public class ZipUtils {
         }
 
     }
+
+    public static void zipFileFolders(File zipFile, List<File> folders, String parentDirectoryInZipFile) throws Exception {
+        zipFolders(zipFile,  folders.stream().map(File::getAbsolutePath).collect(Collectors.toList()), parentDirectoryInZipFile);
+    }
+
+
 
 
 }

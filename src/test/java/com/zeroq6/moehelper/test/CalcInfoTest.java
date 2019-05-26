@@ -25,6 +25,7 @@ public class CalcInfoTest {
         // ------------------------------------
 
         PostStatistics postStatistics = new PostStatistics(logFilesDir, 50001, 60000);
+        postStatistics.writeToFile(new File("./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt"));
         System.out.println(postStatistics.toString());
     }
 }

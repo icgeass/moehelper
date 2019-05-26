@@ -35,7 +35,7 @@ public class GenFolderTest {
                 System.out.println(f1.getCanonicalPath());
                 System.out.println(f2.getCanonicalPath());
             } else {
-                File f3 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.KONA_EMPTY));
+                File f3 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.KONA_All));
                 f3.mkdirs();
 
                 System.out.println(f3.getCanonicalPath());

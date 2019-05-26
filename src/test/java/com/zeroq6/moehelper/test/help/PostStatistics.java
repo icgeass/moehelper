@@ -12,10 +12,10 @@ import java.util.List;
 
 public class PostStatistics {
 
-    private Integer allPageNum = 0;
-    private Integer readSuccessPageNum = 0;
-    private Integer readFailedPageNum = 0;
-    private Integer jsonDataItemNum = 0;
+    private int allPageNum = 0;
+    private int readSuccessPageNum = 0;
+    private int readFailedPageNum = 0;
+    private int jsonDataItemNum = 0;
 
 
     private int[] detailAllCount = new int[5];
@@ -24,23 +24,23 @@ public class PostStatistics {
 
 
     // 
-    private Integer detailAllCountSuccessJson;
-    private Integer detailAllCountSuccessDocPostDeleted;
-    private Integer detailAllCountFailed404;
-    private Integer detailAllCountFailedException;
-    private Integer detailAllCountFailedNoUrl;
+    private int detailAllCountSuccessJson;
+    private int detailAllCountSuccessDocPostDeleted;
+    private int detailAllCountFailed404;
+    private int detailAllCountFailedException;
+    private int detailAllCountFailedNoUrl;
 
 
-    private Integer poolCountSuccessJsonInPool;
-    private Integer poolCountSuccessJsonNotInPool;
-    private Integer poolCountSuccessDocPostDeletedInPool;
-    private Integer poolCountSuccessDocPostDeletedNotInPool;
+    private int poolCountSuccessJsonInPool;
+    private int poolCountSuccessJsonNotInPool;
+    private int poolCountSuccessDocPostDeletedInPool;
+    private int poolCountSuccessDocPostDeletedNotInPool;
 
 
-    private Integer writeCountJson;
-    private Integer writeCountUrl;
-    private Integer writeCountMd5;
-    private Integer writeCountLog;
+    private int writeCountJson;
+    private int writeCountUrl;
+    private int writeCountMd5;
+    private int writeCountLog;
 
 
     //
@@ -156,10 +156,10 @@ public class PostStatistics {
             detailAllCountFailedNoUrl = detailAllCount[4];
 
 
-            poolCountSuccessJsonInPool = poolCount[0];
-            poolCountSuccessJsonNotInPool = poolCount[1];
-            poolCountSuccessDocPostDeletedInPool = poolCount[2];
-            poolCountSuccessDocPostDeletedNotInPool = poolCount[3];
+            poolCountSuccessJsonNotInPool = poolCount[0];
+            poolCountSuccessJsonInPool = poolCount[1];
+            poolCountSuccessDocPostDeletedNotInPool = poolCount[2];
+            poolCountSuccessDocPostDeletedInPool = poolCount[3];
 
 
             writeCountJson = writeCount[0];
@@ -185,87 +185,87 @@ public class PostStatistics {
     }
 
 
-    public Integer getAllPageNum() {
+    public int getAllPageNum() {
         return allPageNum;
     }
 
-    public Integer getReadSuccessPageNum() {
+    public int getReadSuccessPageNum() {
         return readSuccessPageNum;
     }
 
-    public Integer getReadFailedPageNum() {
+    public int getReadFailedPageNum() {
         return readFailedPageNum;
     }
 
-    public Integer getJsonDataItemNum() {
+    public int getJsonDataItemNum() {
         return jsonDataItemNum;
     }
 
-    public Integer getDetailAllCountSuccessJson() {
+    public int getDetailAllCountSuccessJson() {
         return detailAllCountSuccessJson;
     }
 
-    public Integer getDetailAllCountSuccessDocPostDeleted() {
+    public int getDetailAllCountSuccessDocPostDeleted() {
         return detailAllCountSuccessDocPostDeleted;
     }
 
-    public Integer getDetailAllCountFailed404() {
+    public int getDetailAllCountFailed404() {
         return detailAllCountFailed404;
     }
 
-    public Integer getDetailAllCountFailedException() {
+    public int getDetailAllCountFailedException() {
         return detailAllCountFailedException;
     }
 
-    public Integer getDetailAllCountFailedNoUrl() {
+    public int getDetailAllCountFailedNoUrl() {
         return detailAllCountFailedNoUrl;
     }
 
-    public Integer getPoolCountSuccessJsonInPool() {
+    public int getPoolCountSuccessJsonInPool() {
         return poolCountSuccessJsonInPool;
     }
 
-    public Integer getPoolCountSuccessJsonNotInPool() {
+    public int getPoolCountSuccessJsonNotInPool() {
         return poolCountSuccessJsonNotInPool;
     }
 
-    public Integer getPoolCountSuccessDocPostDeletedInPool() {
+    public int getPoolCountSuccessDocPostDeletedInPool() {
         return poolCountSuccessDocPostDeletedInPool;
     }
 
-    public Integer getPoolCountSuccessDocPostDeletedNotInPool() {
+    public int getPoolCountSuccessDocPostDeletedNotInPool() {
         return poolCountSuccessDocPostDeletedNotInPool;
     }
 
-    public Integer getWriteCountJson() {
+    public int getWriteCountJson() {
         return writeCountJson;
     }
 
-    public Integer getWriteCountUrl() {
+    public int getWriteCountUrl() {
         return writeCountUrl;
     }
 
-    public Integer getWriteCountMd5() {
+    public int getWriteCountMd5() {
         return writeCountMd5;
     }
 
-    public Integer getWriteCountLog() {
+    public int getWriteCountLog() {
         return writeCountLog;
     }
 
-    public Integer getMinPostId() {
+    public int getMinPostId() {
         return minPostId;
     }
 
-    public Integer getMaxPostId() {
+    public int getMaxPostId() {
         return maxPostId;
     }
 
-    public Integer getFromPostId() {
+    public int getFromPostId() {
         return fromPostId;
     }
 
-    public Integer getToPostId() {
+    public int getToPostId() {
         return toPostId;
     }
 
