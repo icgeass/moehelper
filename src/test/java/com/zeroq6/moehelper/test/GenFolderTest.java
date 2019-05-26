@@ -2,6 +2,7 @@ package com.zeroq6.moehelper.test;
 
 import com.zeroq6.moehelper.test.help.ArrangeHelper;
 import com.zeroq6.moehelper.test.help.EndStringType;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -32,13 +33,13 @@ public class GenFolderTest {
                 File f2 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.MOE_NOT_IN_POOL));
                 f2.mkdirs();
 
-                System.out.println(f1.getCanonicalPath());
-                System.out.println(f2.getCanonicalPath());
+                MyLogUtils.stdOut(f1.getCanonicalPath());
+                MyLogUtils.stdOut(f2.getCanonicalPath());
             } else {
                 File f3 = new File(parentDir, ArrangeHelper.getFolderName(i, EndStringType.KONA_All));
                 f3.mkdirs();
 
-                System.out.println(f3.getCanonicalPath());
+                MyLogUtils.stdOut(f3.getCanonicalPath());
             }
         }
 

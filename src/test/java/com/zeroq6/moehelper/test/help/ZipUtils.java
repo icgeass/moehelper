@@ -2,6 +2,7 @@ package com.zeroq6.moehelper.test.help;
 
 
 import com.alibaba.fastjson.JSON;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -50,7 +51,7 @@ public class ZipUtils {
                     throw new RuntimeException("非法路径: " + f.getAbsolutePath());
                 }
             }
-            System.out.println("当前备份文件列表：" + JSON.toJSONString(absPathList));
+            MyLogUtils.stdOut("当前备份文件列表：" + JSON.toJSONString(absPathList));
             OutputStream out = null;
             ArchiveOutputStream os = null;
             InputStream is = null;

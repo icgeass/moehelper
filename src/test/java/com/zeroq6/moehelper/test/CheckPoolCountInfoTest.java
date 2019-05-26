@@ -1,6 +1,7 @@
 package com.zeroq6.moehelper.test;
 
 import com.alibaba.fastjson.JSON;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -93,7 +94,7 @@ public class CheckPoolCountInfoTest {
         for (Map.Entry<String, Item> entry : itemMapPackFile.entrySet()) {
             Item item = itemMapTxtFile.get(entry.getKey());
             if (null == item) {
-                System.out.println("zip文件含有，txt记录不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
+                MyLogUtils.stdOut("zip文件含有，txt记录不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
             } else {
                 if (!item.equals(entry.getValue())) {
                     stringBuffer.append("zip文件和txt记录不相同，" + entry.getKey() + "，zip文件：" + JSON.toJSONString(entry.getValue()) + ", txt记录：" + JSON.toJSONString(item));
@@ -104,11 +105,11 @@ public class CheckPoolCountInfoTest {
 
         }
         for (Map.Entry<String, Item> entry : itemMapTxtFile.entrySet()) {
-            System.out.println("txt记录含有，zip文件不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
+            MyLogUtils.stdOut("txt记录含有，zip文件不含有：" + entry.getKey() + "，" + JSON.toJSONString(entry.getValue()));
 
         }
-        System.out.print(stringBuffer.toString());
-        System.out.println("校验完成：" + (stringBuffer.length() == 0 ? "全部通过" : "未通过"));
+        MyLogUtils.stdOut(stringBuffer.toString());
+        MyLogUtils.stdOut("校验完成：" + (stringBuffer.length() == 0 ? "全部通过" : "未通过"));
 
 
     }

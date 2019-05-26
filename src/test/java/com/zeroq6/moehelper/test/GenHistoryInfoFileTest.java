@@ -86,12 +86,12 @@ public class GenHistoryInfoFileTest {
             if (!stringList.isEmpty()) {
                 String newName = list.get(key).replace("_post.log", "") + ".deleted_post.json";
                 FileUtils.writeLines(new File("E:\\new111" + File.separator + newName), "utf-8", stringList, false);
-                System.out.println(key + "--->" + stringList.size());
+                MyLogUtils.stdOut(key + "--->" + stringList.size());
                 all += stringList.size();
             }
         }
 
-        System.out.println(all);
+        MyLogUtils.stdOut(all);
 
     }
 
@@ -134,7 +134,7 @@ public class GenHistoryInfoFileTest {
                     productId = Integer.valueOf(decode.split(" ", 4)[2]);
                 }
                 postId2String.put(productId + "", string);
-                // System.out.println(productId + "------------" + string);
+                // MyLogUtils.stdOut(productId + "------------" + string);
             }
             int index = Integer.valueOf(id);
             int from = (index - 1) * 10000 + 1;
@@ -150,7 +150,7 @@ public class GenHistoryInfoFileTest {
             if (!stringList.isEmpty()) {
                 String newName = baseId2FileName.get(id).replace("no_pool", "all");
                 FileUtils.writeLines(new File("E:\\new" + File.separator + newName), "utf-8", stringList, false);
-                System.out.println(id + "--->" + stringList.size());
+                MyLogUtils.stdOut(id + "--->" + stringList.size());
             }
 
         }
@@ -231,11 +231,11 @@ public class GenHistoryInfoFileTest {
             if (!stringList.isEmpty()) {
                 FileUtils.writeLines(new File("E:\\" + newName), "utf-8", stringList, false);
                 size += stringList.size();
-                System.out.println(newName);
+                MyLogUtils.stdOut(newName);
             }
         }
-        System.out.println(size);
-        System.out.println();
+        MyLogUtils.stdOut(size);
+        MyLogUtils.stdOut();
     }
 
 

@@ -1,5 +1,6 @@
 package com.zeroq6.moehelper.test;
 
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
@@ -66,16 +67,16 @@ public class PoolSyncTest {
             if (null == old) {
                 for (File f : item.getValue()) {
                     FileUtils.moveFileToDirectory(f, finalToPoolPackages ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
-                    System.out.println("new新增: " + f.getAbsolutePath());
+                    MyLogUtils.stdOut("new新增: " + f.getAbsolutePath());
                 }
             } else {
                 // 先移除, 后新增, 避免文件名同步无法新增或错误覆盖
                 for (File f : old) {
-                    System.out.println("update移除: " + f.getAbsolutePath());
+                    MyLogUtils.stdOut("update移除: " + f.getAbsolutePath());
                     FileUtils.moveFileToDirectory(f, new File(oldDir.getParentFile().getCanonicalPath() + File.separator + oldDir.getName() + "_" + time + "_to_delete"), true);
                 }
                 for (File f : item.getValue()) {
-                    System.out.println("update新增: " + f.getAbsolutePath());
+                    MyLogUtils.stdOut("update新增: " + f.getAbsolutePath());
                     FileUtils.moveFileToDirectory(f, finalToPoolPackages ? genMoveToDirById(Integer.valueOf(item.getKey()), oldDir) : oldDir, true);
                 }
             }

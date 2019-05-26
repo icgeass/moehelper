@@ -29,32 +29,37 @@ public class MyLogUtils {
     }
 
     // 用于stderr.txt
-    private static void formattedLog(String msg, String level) {
-        System.err.println(sdf.format(new Date()) + " - " + level + " - " + msg);
+    private static void formattedLog(Object msg, String level) {
+        System.err.println(sdf.format(new Date()) + " - " + level + " - " + String.valueOf(msg));
     }
 
     // 用于stdout.txt
-    public static void stdOut(String message) {
-        System.out.println(sdf.format(new Date()) + " " + message);
+    public static void stdOut(Object message) {
+        System.out.println(sdf.format(new Date()) + " " + String.valueOf(message));
     }
 
-    public static void debug(String message) {
+    public static void stdOut() {
+        System.out.println(sdf.format(new Date()));
+    }
+
+
+    public static void debug(Object message) {
         formattedLog(message, LOG_LEVEL_DEBUG);
     }
 
-    public static void info(String message) {
+    public static void info(Object message) {
         formattedLog(message, LOG_LEVEL_INFO);
     }
 
-    public static void warn(String message) {
+    public static void warn(Object message) {
         formattedLog(message, LOG_LEVEL_WARN);
     }
 
-    public static void error(String message) {
+    public static void error(Object message) {
         formattedLog(message, LOG_LEVEL_ERROR);
     }
 
-    public static synchronized void fatal(String message, Exception... exceptions) {
+    public static synchronized void fatal(Object message, Exception... exceptions) {
         try {
             StackTraceElement[] stacks = Thread.currentThread().getStackTrace();
             String msg = message + " in class " + stacks[2].getClassName() + "." + stacks[2].getMethodName() + " at line " + stacks[2].getLineNumber();

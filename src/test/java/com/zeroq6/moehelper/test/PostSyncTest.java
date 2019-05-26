@@ -5,6 +5,7 @@ import com.zeroq6.moehelper.test.help.EndStringType;
 import com.zeroq6.moehelper.test.help.FileFilter;
 import com.zeroq6.moehelper.test.help.PostStatistics;
 import com.zeroq6.moehelper.test.help.ZipUtils;
+import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -18,7 +19,15 @@ public class PostSyncTest {
     @Test
     public void test() throws Exception {
         String srcWorkPostDir = "C:\\Users\\yuuki asuna\\Desktop\\!work";
-        String targetStorePostDir = "P:\\BaiduDownload";
+        String[] targetStorePostDirArray = new String[]{"F:\\OK", "F:\\moe_post", "P:\\BaiduDownload"};
+        for (String item : targetStorePostDirArray) {
+            syncAndCheck(srcWorkPostDir, item);
+        }
+    }
+
+
+    public static void syncAndCheck(String srcWorkPostDir, String targetStorePostDir) throws Exception {
+
         FileFilter fileFilter = new FileFilter(srcWorkPostDir);
 
         for (File item : new File(targetStorePostDir).listFiles()) {
@@ -54,19 +63,18 @@ public class PostSyncTest {
                     && file.getName().contains("_" + start + "_" + end)
                     && file.getName().endsWith(endStringType.getEndStringInMd5File()), 1);
             FileUtils.copyFileToDirectory(md5File.get(0), item);
-            System.out.println("MD5文件复制完成：" + md5File.get(0).getCanonicalPath());
-
+            MyLogUtils.stdOut("MD5文件复制完成：" + md5File.get(0).getCanonicalPath());
 
 
             // 打包关联work文件
             List<File> workFileList = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
                     && file.getName().contains("_" + start + "_" + end));
-            if (workFileList.size() != 11 && workFileList.size() != 12) {
-                throw new RuntimeException("workFileList != 11 and workFileList != 12");
+            if (workFileList.size() != 11 && workFileList.size() != 12 && workFileList.size() != 13) {
+                throw new RuntimeException("workFileList.size() != 11 && workFileList.size() != 12 && workFileList.size() != 13");
             }
             File zipFile = new File(item, item.getName() + "_data.zip");
             ZipUtils.zipFileFolders(zipFile, workFileList, item.getName() + "_data");
-            System.out.println("打包成功: " + zipFile.getCanonicalPath());
+            MyLogUtils.stdOut("打包成功: " + zipFile.getCanonicalPath());
 
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
@@ -86,7 +94,7 @@ public class PostSyncTest {
             }
 
 
-            if (endStringType == EndStringType.KONA_All || endStringType == EndStringType.MOE_NOT_IN_POOL){
+            if (endStringType == EndStringType.KONA_All || endStringType == EndStringType.MOE_NOT_IN_POOL) {
                 List<File> file404List = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
                         && file.getName().contains("_404_")
                         && file.getName().contains("_" + start + "_" + end));
@@ -98,11 +106,11 @@ public class PostSyncTest {
             if (imageFileList.size() != imageCountInLogFile) {
                 throw new RuntimeException("imageFile in disk = " + imageFileList.size() + ", in log file = " + imageCountInLogFile);
             }
-            System.out.println("同步验证通过，" + name);
+            MyLogUtils.stdOut("同步验证通过，" + name);
 
 
         }
-        System.out.println("---------------------END---------------------");
+        MyLogUtils.stdOut("---------------------END---------------------");
     }
 
 
