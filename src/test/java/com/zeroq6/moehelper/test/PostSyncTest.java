@@ -30,6 +30,10 @@ public class PostSyncTest {
 
         FileFilter fileFilter = new FileFilter(srcWorkPostDir);
 
+        File[] files = new File(targetStorePostDir).listFiles();
+        if (null == files || files.length == 0) {
+            return;
+        }
         for (File item : new File(targetStorePostDir).listFiles()) {
             String name = item.getName();
             final EndStringType endStringType;
