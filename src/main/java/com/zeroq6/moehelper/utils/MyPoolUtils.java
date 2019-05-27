@@ -1,7 +1,7 @@
 package com.zeroq6.moehelper.utils;
 
 /**
- * Created by zengshengxin on 2017/4/26.
+ * Created by icgeass on 2017/4/26.
  */
 public class MyPoolUtils
 {

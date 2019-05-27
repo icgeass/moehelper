@@ -370,7 +370,7 @@ public class PoolWriter implements Writer {
         }
         String pageIdString = splitStrArr[splitStrArr.length - 1];
         pageIdString = pageIdString.substring(0, pageIdString.indexOf("?") == -1 ? pageIdString.length() : pageIdString.indexOf("?"));
-        pageIdString = StringUtils.leftPad(pageIdString, 4, "0");
+        pageIdString = StringUtils.leftPad(pageIdString, 5, "0");
         if(!StringUtils.isNumeric(pageIdString)){
             MyLogUtils.fatal("pageId获取失败, " + pageIdString);
         }

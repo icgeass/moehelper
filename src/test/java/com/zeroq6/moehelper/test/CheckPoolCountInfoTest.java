@@ -38,7 +38,7 @@ public class CheckPoolCountInfoTest {
         int originalAll = 0;
         for (int i = 0; i < nameList.size(); i++) {
             String name = nameList.get(i);
-            String id = Integer.valueOf(name.substring(1, 5)) + "";
+            String id = Integer.valueOf(name.substring(name.indexOf("[") + 1, name.indexOf("]"))) + "";
             if (!itemMapPackFile.containsKey(id)) {
                 itemMapPackFile.put(id, new Item());
             }

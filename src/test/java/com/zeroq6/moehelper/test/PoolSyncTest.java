@@ -99,7 +99,7 @@ public class PoolSyncTest {
 
     private Map<String, List<File>> transferIdFileMap(Collection<File> fileCollection) {
         Iterator<File> iterator = fileCollection.iterator();
-        Pattern pattern = Pattern.compile("\\[[0-9]{4}\\].*[.]zip");
+        Pattern pattern = Pattern.compile("\\[[0-9]{4,5}\\].*[.]zip");
         Map<String, List<File>> result = new HashMap<String, List<File>>();
         while (iterator.hasNext()) {
             File file = iterator.next();
@@ -107,7 +107,7 @@ public class PoolSyncTest {
             if (!pattern.matcher(name).matches()) {
                 throw new RuntimeException("非法文件名, " + name);
             }
-            String id = Integer.valueOf(name.substring(1, 5)) + "";
+            String id = Integer.valueOf(name.substring(name.indexOf("[") + 1, name.indexOf("]"))) + "";
             if (null == result.get(id)) {
                 result.put(id, new ArrayList<File>());
             }
