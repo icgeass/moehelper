@@ -1,5 +1,6 @@
 package com.zeroq6.moehelper.test;
 
+import com.zeroq6.moehelper.test.help.ArrangeHelper;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -85,13 +86,26 @@ public class PoolSyncTest {
 
     }
 
+
+    @Test
+    public void arrangeDirTest() throws Exception{
+        File parentDir = new File("I:\\yande.re\\Pool_Packages");
+        for(File item : FileUtils.listFiles(parentDir, null, true)){
+            String id = ArrangeHelper.getPoolId(item.getName());
+            File toDir = genMoveToDirById(Integer.valueOf(id), parentDir);
+            FileUtils.moveFileToDirectory(item, toDir, true);
+        }
+
+    }
+
     private File genMoveToDirById(int id, File toDir) throws Exception {
         if (id < 1) {
             throw new RuntimeException("id非法, " + id);
         }
-        int index = id % 600 == 0 ? id / 600 : id / 600 + 1;
-        int a = (index - 1) * 600 + 1;
-        int b = index * 600;
+        int numSliptDir = 500;
+        int index = id % numSliptDir == 0 ? id / numSliptDir : id / numSliptDir + 1;
+        int a = (index - 1) * numSliptDir + 1;
+        int b = index * numSliptDir;
         String name = String.format("Pool_Packages-%s(id=%s-%s)", StringUtils.leftPad(index + "", 2, "0"), a + "", b + "");
         return new File(toDir.getCanonicalPath() + File.separator + name);
 
@@ -99,15 +113,11 @@ public class PoolSyncTest {
 
     private Map<String, List<File>> transferIdFileMap(Collection<File> fileCollection) {
         Iterator<File> iterator = fileCollection.iterator();
-        Pattern pattern = Pattern.compile("\\[[0-9]{4,5}\\].*[.]zip");
         Map<String, List<File>> result = new HashMap<String, List<File>>();
         while (iterator.hasNext()) {
             File file = iterator.next();
             String name = file.getName();
-            if (!pattern.matcher(name).matches()) {
-                throw new RuntimeException("非法文件名, " + name);
-            }
-            String id = Integer.valueOf(name.substring(name.indexOf("[") + 1, name.indexOf("]"))) + "";
+            String id = ArrangeHelper.getPoolId(name);
             if (null == result.get(id)) {
                 result.put(id, new ArrayList<File>());
             }

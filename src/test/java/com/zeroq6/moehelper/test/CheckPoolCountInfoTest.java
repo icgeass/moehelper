@@ -1,6 +1,7 @@
 package com.zeroq6.moehelper.test;
 
 import com.alibaba.fastjson.JSON;
+import com.zeroq6.moehelper.test.help.ArrangeHelper;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class CheckPoolCountInfoTest {
         int originalAll = 0;
         for (int i = 0; i < nameList.size(); i++) {
             String name = nameList.get(i);
-            String id = Integer.valueOf(name.substring(name.indexOf("[") + 1, name.indexOf("]"))) + "";
+            String id = ArrangeHelper.getPoolId(name);
             if (!itemMapPackFile.containsKey(id)) {
                 itemMapPackFile.put(id, new Item());
             }
