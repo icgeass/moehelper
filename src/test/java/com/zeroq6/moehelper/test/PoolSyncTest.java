@@ -88,9 +88,9 @@ public class PoolSyncTest {
 
 
     @Test
-    public void arrangeDirTest() throws Exception{
+    public void arrangeDirTest() throws Exception {
         File parentDir = new File("I:\\yande.re\\Pool_Packages");
-        for(File item : FileUtils.listFiles(parentDir, null, true)){
+        for (File item : FileUtils.listFiles(parentDir, null, true)) {
             String id = ArrangeHelper.getPoolId(item.getName());
             File toDir = genMoveToDirById(Integer.valueOf(id), parentDir);
             FileUtils.moveFileToDirectory(item, toDir, true);
