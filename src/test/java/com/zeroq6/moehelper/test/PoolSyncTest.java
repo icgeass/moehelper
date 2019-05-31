@@ -26,9 +26,9 @@ public class PoolSyncTest {
     @Test
     public void sync() throws Exception {
         // 最近更新的pool
-        File newDir = new File("H:\\yande.re\\yande.re_-_Pool_20190521");
+        File newDir = new File("I:\\yande.re\\yande.re_-_Pool_20190000");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
-        File oldDir = new File("H:\\yande.re\\Pool_Packages");
+        File oldDir = new File("I:\\yande.re\\Pool_Packages");
 
         // 最终移动到Pool_Packages时设置为true
         boolean finalToPoolPackages = true;
@@ -106,7 +106,7 @@ public class PoolSyncTest {
         int index = id % numSliptDir == 0 ? id / numSliptDir : id / numSliptDir + 1;
         int a = (index - 1) * numSliptDir + 1;
         int b = index * numSliptDir;
-        String name = String.format("Pool_Packages-%s(id=%s-%s)", StringUtils.leftPad(index + "", 2, "0"), a + "", b + "");
+        String name = String.format("Pool_Packages-%s(id=%s-%s)", StringUtils.leftPad(index + "", 3, "0"), a + "", b + "");
         return new File(toDir.getCanonicalPath() + File.separator + name);
 
     }

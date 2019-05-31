@@ -18,8 +18,8 @@ public class PostSyncTest {
 
     @Test
     public void test() throws Exception {
-        String srcWorkPostDir = "C:\\Users\\yuuki asuna\\Desktop\\!work";
-        String[] targetStorePostDirArray = new String[]{"F:\\OK", "F:\\moe_post", "P:\\BaiduDownload"};
+        String srcWorkPostDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace";
+        String[] targetStorePostDirArray = new String[]{"P:\\BaiduDownload"};
         for (String item : targetStorePostDirArray) {
             syncAndCheck(srcWorkPostDir, item);
         }
@@ -29,6 +29,19 @@ public class PostSyncTest {
     public static void syncAndCheck(String srcWorkPostDir, String targetStorePostDir) throws Exception {
 
         FileFilter fileFilter = new FileFilter(srcWorkPostDir);
+
+        // 增加所有文件只读
+        fileFilter.filter(null).stream().forEach(file -> file.setReadOnly());
+
+        // 校验post,pool文件数量
+        if(fileFilter.filter(file -> file.getParentFile().getName().equals(Configuration.POST)).size() % 11 != 0){
+            throw new RuntimeException(Configuration.POST + "记录文件数量不能被11整除");
+        }
+        if(fileFilter.filter(file -> file.getParentFile().getName().equals(Configuration.POOL)).size() % 9 != 0){
+            throw new RuntimeException(Configuration.POOL + "记录文件数量不能被9整除");
+        }
+
+        // 校验文件
 
         File[] files = new File(targetStorePostDir).listFiles();
         if (null == files || files.length == 0) {

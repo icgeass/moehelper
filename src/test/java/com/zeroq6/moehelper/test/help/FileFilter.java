@@ -25,7 +25,7 @@ public class FileFilter {
     public List<File> filter(Predicate<File> p, Integer acceptNum) {
         List<File> fileList = new ArrayList<>();
         for (File f : fileCollection) {
-            if (p.test(f)) {
+            if (null == p || p.test(f)) {
                 fileList.add(f);
             }
         }
