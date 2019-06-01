@@ -12,14 +12,18 @@ public class FileFilter {
 
     private Collection<File> fileCollection = null;
 
+    private File rootDir = null;
+
 
     public FileFilter(String dir, String[] extensions, boolean recursive) {
-        fileCollection = FileUtils.listFiles(new File(dir), extensions, recursive);
+        rootDir = new File(dir);
+        fileCollection = FileUtils.listFiles(rootDir, extensions, recursive);
     }
 
 
     public FileFilter(String dir) {
-        fileCollection = FileUtils.listFiles(new File(dir), null, true);
+        rootDir = new File(dir);
+        fileCollection = FileUtils.listFiles(rootDir, null, true);
     }
 
     public List<File> filter(Predicate<File> p, Integer acceptNum) {
@@ -41,4 +45,8 @@ public class FileFilter {
         return filter(p, null);
     }
 
+
+    public File getRootDir() {
+        return rootDir;
+    }
 }

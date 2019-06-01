@@ -1,10 +1,7 @@
 package com.zeroq6.moehelper.test;
 
 import com.zeroq6.moehelper.config.Configuration;
-import com.zeroq6.moehelper.test.help.EndStringType;
-import com.zeroq6.moehelper.test.help.FileFilter;
-import com.zeroq6.moehelper.test.help.PostStatistics;
-import com.zeroq6.moehelper.test.help.ZipUtils;
+import com.zeroq6.moehelper.test.help.*;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -13,40 +10,34 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+
 public class PostSyncTest {
 
 
     @Test
     public void test() throws Exception {
-        String srcWorkPostDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace";
+        String srcWorkSpaceDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace";
         String[] targetStorePostDirArray = new String[]{"P:\\BaiduDownload"};
         for (String item : targetStorePostDirArray) {
-            syncAndCheck(srcWorkPostDir, item);
+            syncAndCheck(srcWorkSpaceDir, item);
         }
     }
 
 
-    public static void syncAndCheck(String srcWorkPostDir, String targetStorePostDir) throws Exception {
+    public static void syncAndCheck(String srcWorkSpaceDir, String targetStorePostDir) throws Exception {
 
-        FileFilter fileFilter = new FileFilter(srcWorkPostDir);
+        FileFilter fileFilter = new FileFilter(srcWorkSpaceDir);
 
-        // 增加所有文件只读
-        fileFilter.filter(null).stream().forEach(file -> file.setReadOnly());
-
-        // 校验post,pool文件数量
-        if(fileFilter.filter(file -> file.getParentFile().getName().equals(Configuration.POST)).size() % 11 != 0){
-            throw new RuntimeException(Configuration.POST + "记录文件数量不能被11整除");
-        }
-        if(fileFilter.filter(file -> file.getParentFile().getName().equals(Configuration.POOL)).size() % 9 != 0){
-            throw new RuntimeException(Configuration.POOL + "记录文件数量不能被9整除");
-        }
 
         // 校验文件
+        WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir(srcWorkSpaceDir);
+        MyLogUtils.stdOut(srcWorkSpaceDir + "\t校验成功");
 
         File[] files = new File(targetStorePostDir).listFiles();
         if (null == files || files.length == 0) {
             return;
         }
+        MyLogUtils.stdOut("---------------------BEGIN---------------------");
         for (File item : new File(targetStorePostDir).listFiles()) {
             String name = item.getName();
             final EndStringType endStringType;
@@ -101,7 +92,7 @@ public class PostSyncTest {
             }
 
             // 校验文件数量是否与日志文件中一致
-            PostStatistics postStatistics = new PostStatistics(srcWorkPostDir + File.separator + endStringType.getHost() + File.separator + "post", start, end);
+            PostStatistics postStatistics = new PostStatistics(srcWorkSpaceDir + File.separator + endStringType.getHost() + File.separator + "post", start, end);
             // 排除链接中下载404的
             int imageCountInLogFile = postStatistics.getDetailAllCountSuccessJson() + postStatistics.getDetailAllCountSuccessDocPostDeleted();
             if (endStringType == EndStringType.MOE_IN_POOL) {

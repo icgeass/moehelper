@@ -26,6 +26,11 @@ public class MyLogUtils {
         long offset = TimeZone.getDefault().getRawOffset();
         String tzStr = "GMT" + String.format("%s%02d:%02d", offset >= 0 ? "+" : "-", offset / 3600000, (offset / 60000) % 60);
         info("use time zone " + tzStr);
+        try {
+            Thread.sleep(50);
+        }catch (Exception e){
+            // ignore
+        }
     }
 
     // 用于stderr.txt

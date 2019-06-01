@@ -1,6 +1,7 @@
 package com.zeroq6.moehelper.test;
 
 import com.zeroq6.moehelper.test.help.ArrangeHelper;
+import com.zeroq6.moehelper.test.help.PoolChecker;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +27,12 @@ public class PoolSyncTest {
     @Test
     public void sync() throws Exception {
         // 最近更新的pool
-        File newDir = new File("I:\\yande.re\\yande.re_-_Pool_20190000");
+        File newDir = new File("I:\\yande.re\\yande.re_-_Pool_20190521");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
         File oldDir = new File("I:\\yande.re\\Pool_Packages");
+
+        // 如果finalToPoolPackages = true;则必须设置
+        String txtFile = "C:\\Users\\yuuki asuna\\Desktop\\workspace\\yande.re\\pool\\yande.re_-_pool_190517065816_1_6301_info.txt";
 
         // 最终移动到Pool_Packages时设置为true
         boolean finalToPoolPackages = true;
@@ -43,10 +47,12 @@ public class PoolSyncTest {
             throw new RuntimeException("新目录名必须满足正则" + reg);
         }
         if (finalToPoolPackages) {
-            String poolPackages = "Pool_Packages";
+            String poolPackages = ArrangeHelper.packDirName;
             if (!oldDir.getName().equals(poolPackages)) {
                 throw new RuntimeException("旧目录名必须为" + poolPackages);
             }
+            // 事先校验
+            PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
         } else {
             if (!Pattern.matches(reg, oldDir.getName())) {
                 throw new RuntimeException("旧目录名必须满足正则" + reg);
@@ -82,12 +88,20 @@ public class PoolSyncTest {
                 }
             }
         }
+        // 事后校验
+        PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
 
 
     }
 
 
+    /**
+     * 将pool按照每600个分割转为按每500个分割
+     *
+     * @throws Exception
+     */
     @Test
+    @Deprecated
     public void arrangeDirTest() throws Exception {
         File parentDir = new File("I:\\yande.re\\Pool_Packages");
         for (File item : FileUtils.listFiles(parentDir, null, true)) {
@@ -111,17 +125,27 @@ public class PoolSyncTest {
 
     }
 
+    /**
+     * 会校验文件名，和每个id对应的文件数量必须为1或者2
+     *
+     * @param fileCollection
+     * @return
+     */
     private Map<String, List<File>> transferIdFileMap(Collection<File> fileCollection) {
         Iterator<File> iterator = fileCollection.iterator();
         Map<String, List<File>> result = new HashMap<String, List<File>>();
         while (iterator.hasNext()) {
             File file = iterator.next();
             String name = file.getName();
+            // 已经校验文件名
             String id = ArrangeHelper.getPoolId(name);
             if (null == result.get(id)) {
                 result.put(id, new ArrayList<File>());
             }
             result.get(id).add(file);
+            if (result.get(id).size() != 1 && result.get(id).size() != 2) {
+                throw new RuntimeException("每个pool id对应的文件数量必须为1或者2");
+            }
         }
         return result;
     }

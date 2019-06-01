@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 public class ArrangeHelper {
 
+    public final static String packDirName = "Pool_Packages";
+
     public static String getFolderName(int startInTenThousand, EndStringType endStringType) {
         String typeString = endStringType.getHost();
         String format = typeString + "_-_Pack_%s_%s_%s%s";
