@@ -38,7 +38,7 @@ public class PostSyncTest {
             return;
         }
         MyLogUtils.stdOut("---------------------BEGIN---------------------");
-        for (File item : new File(targetStorePostDir).listFiles()) {
+        for (File item : files) {
             String name = item.getName();
             final EndStringType endStringType;
             if (!name.contains("_-_Pack_")) {
@@ -87,6 +87,8 @@ public class PostSyncTest {
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
             Collection<File> imageFileWithMd5ZipList = FileUtils.listFiles(item, null, true);
+            // 设置文件只读
+            imageFileWithMd5ZipList.stream().forEach(file -> file.setReadOnly());
             if (imageFileList.size() != imageFileWithMd5ZipList.size() && imageFileList.size() + 2 != imageFileWithMd5ZipList.size()) {
                 throw new RuntimeException("imageFileList.size(or +2) != imageFileWithMd5ZipList.size");
             }

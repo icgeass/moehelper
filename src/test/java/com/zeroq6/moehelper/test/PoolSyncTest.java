@@ -65,8 +65,8 @@ public class PoolSyncTest {
         if (FileUtils.sizeOfDirectory(newDir) >= oldDir.getFreeSpace() - (FileUtils.ONE_GB * 10)) {
             throw new RuntimeException("目标空间不足");
         }
-        Map<String, List<File>> newMap = transferIdFileMap(FileUtils.listFiles(newDir, suffix, true));
-        Map<String, List<File>> oldMap = transferIdFileMap(FileUtils.listFiles(oldDir, suffix, true));
+        Map<String, List<File>> newMap = transferIdFileMapAndSetReadOnly(FileUtils.listFiles(newDir, suffix, true));
+        Map<String, List<File>> oldMap = transferIdFileMapAndSetReadOnly(FileUtils.listFiles(oldDir, suffix, true));
         String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         // 更新和新增
         for (Map.Entry<String, List<File>> item : newMap.entrySet()) {
@@ -131,7 +131,8 @@ public class PoolSyncTest {
      * @param fileCollection
      * @return
      */
-    private Map<String, List<File>> transferIdFileMap(Collection<File> fileCollection) {
+    private Map<String, List<File>> transferIdFileMapAndSetReadOnly(Collection<File> fileCollection) {
+        fileCollection.stream().forEach(file -> file.setReadOnly());
         Iterator<File> iterator = fileCollection.iterator();
         Map<String, List<File>> result = new HashMap<String, List<File>>();
         while (iterator.hasNext()) {
