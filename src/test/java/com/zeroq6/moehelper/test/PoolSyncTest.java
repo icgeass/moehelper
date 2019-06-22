@@ -2,6 +2,7 @@ package com.zeroq6.moehelper.test;
 
 import com.zeroq6.moehelper.test.help.ArrangeHelper;
 import com.zeroq6.moehelper.test.help.PoolChecker;
+import com.zeroq6.moehelper.test.help.WorkSpaceValidator;
 import com.zeroq6.moehelper.utils.MyLogUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -110,6 +111,11 @@ public class PoolSyncTest {
             FileUtils.moveFileToDirectory(item, toDir, true);
         }
 
+    }
+
+    @Test
+    public void checkWorkSpace() throws Exception{
+        WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir("C:\\Users\\yuuki asuna\\Desktop\\workspace");
     }
 
     private File genMoveToDirById(int id, File toDir) throws Exception {
