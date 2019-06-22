@@ -132,6 +132,7 @@ public class PoolSyncTest {
      * @return
      */
     private Map<String, List<File>> transferIdFileMapAndSetReadOnly(Collection<File> fileCollection) {
+        // 设置pool的zip包readOnly
         fileCollection.stream().forEach(file -> file.setReadOnly());
         Iterator<File> iterator = fileCollection.iterator();
         Map<String, List<File>> result = new HashMap<String, List<File>>();

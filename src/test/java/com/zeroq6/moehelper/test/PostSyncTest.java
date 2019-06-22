@@ -87,7 +87,7 @@ public class PostSyncTest {
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
             Collection<File> imageFileWithMd5ZipList = FileUtils.listFiles(item, null, true);
-            // 设置文件只读
+            // 设置所有文件包括MD5,图片文件,zip打包工作文件只读
             imageFileWithMd5ZipList.stream().forEach(file -> file.setReadOnly());
             if (imageFileList.size() != imageFileWithMd5ZipList.size() && imageFileList.size() + 2 != imageFileWithMd5ZipList.size()) {
                 throw new RuntimeException("imageFileList.size(or +2) != imageFileWithMd5ZipList.size");

@@ -23,8 +23,12 @@ public class WorkSpaceValidator {
 
         FileFilter fileFilter = new FileFilter(srcWorkSpaceDir);
 
-        // 增加所有文件只读
-        fileFilter.filter(null).stream().forEach(file -> file.setReadOnly());
+        // 设置workspace里面的文件只读
+        fileFilter.filter(null).stream().forEach(file -> {
+            if (!"NOTICE".equals(file.getName())) {
+                file.setReadOnly();
+            }
+        });
 
         // 校验post,pool文件数量
         if (fileFilter.filter(file -> file.getParentFile().getName().equals(Configuration.POST)).size() % 11 != 0) {
@@ -84,21 +88,20 @@ public class WorkSpaceValidator {
         FileFilter poolFilter = new FileFilter(fileFilter.getRootDir().getCanonicalPath() + File.separator + Configuration.HOST_MOE + File.separator + Configuration.POOL);
         int poolWorkFileTypeNum = 0;
         int times = -1;
-        for(String suffix : poolWorkFileNameSuffix){
+        for (String suffix : poolWorkFileNameSuffix) {
             List<File> fileList = poolFilter.filter(file -> file.getName().endsWith(suffix));
-            if(times == -1){
+            if (times == -1) {
                 times = fileList.size();
-            }else if(times != fileList.size()){
+            } else if (times != fileList.size()) {
                 throw new RuntimeException("pool同步更新文件数量不一致，times = " + times + ", fileList.size = " + fileList.size());
             }
-            if(fileList.size() != 0){
+            if (fileList.size() != 0) {
                 poolWorkFileTypeNum++;
             }
         }
         if (poolWorkFileTypeNum != poolWorkFileNameSuffix.length) {
             throw new RuntimeException("poolWorkFileTypeNum错误");
         }
-
 
 
     }
