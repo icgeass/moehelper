@@ -48,7 +48,7 @@ public class PoolSyncTest {
             throw new RuntimeException("新目录名必须满足正则" + reg);
         }
         if (finalToPoolPackages) {
-            String poolPackages = ArrangeHelper.packDirName;
+            String poolPackages = ArrangeHelper.POOL_PACKAGES_DIR_NAME;
             if (!oldDir.getName().equals(poolPackages)) {
                 throw new RuntimeException("旧目录名必须为" + poolPackages);
             }
@@ -91,7 +91,10 @@ public class PoolSyncTest {
         }
         // 事后校验
         PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
-
+        // 如果是最终目录，则将父目录下所有文件readOnly
+        if (finalToPoolPackages || ArrangeHelper.POOL_PACKAGES_DIR_NAME.equals(oldDir.getName())) {
+            FileUtils.listFiles(oldDir.getParentFile(), null, null).stream().forEach(file -> file.setReadOnly());
+        }
 
     }
 
@@ -114,7 +117,7 @@ public class PoolSyncTest {
     }
 
     @Test
-    public void checkWorkSpace() throws Exception{
+    public void checkWorkSpace() throws Exception {
         WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir("C:\\Users\\yuuki asuna\\Desktop\\workspace");
     }
 
@@ -138,8 +141,6 @@ public class PoolSyncTest {
      * @return
      */
     private Map<String, List<File>> transferIdFileMapAndSetReadOnly(Collection<File> fileCollection) {
-        // 设置pool的zip包readOnly
-        fileCollection.stream().forEach(file -> file.setReadOnly());
         Iterator<File> iterator = fileCollection.iterator();
         Map<String, List<File>> result = new HashMap<String, List<File>>();
         while (iterator.hasNext()) {

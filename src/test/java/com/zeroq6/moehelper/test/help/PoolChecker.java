@@ -18,8 +18,8 @@ public class PoolChecker {
         if (!packDirFile.exists() || !txtFile.exists() || !packDirFile.isDirectory() || !txtFile.isFile()) {
             throw new RuntimeException("packDir必须存在为目录，txtFile必须存在为文件");
         }
-        if (!packDirFile.getName().equals(ArrangeHelper.packDirName)) {
-            throw new RuntimeException("packDirFile文件名不为" + ArrangeHelper.packDirName);
+        if (!packDirFile.getName().equals(ArrangeHelper.POOL_PACKAGES_DIR_NAME)) {
+            throw new RuntimeException("packDirFile文件名不为" + ArrangeHelper.POOL_PACKAGES_DIR_NAME);
         }
         if (!Pattern.matches("yande[.]re_-_pool_\\d+_1_\\d+_info[.]txt", txtFile.getName())) {
             throw new RuntimeException("txtFile文件名格式错误" + txtFile.getName());
@@ -30,6 +30,9 @@ public class PoolChecker {
         if (null == list || list.isEmpty()) {
             throw new RuntimeException("packDirFile中没有文件");
         }
+        // 设置pool的zip包readOnly
+        list.stream().forEach(file -> file.setReadOnly());
+        //
         List<String> nameList = new ArrayList<String>();
         Pattern pattern = Pattern.compile("Pool_Packages-\\d{3}[(]id=\\d+-\\d+00[)]");
         for (File f : list) {

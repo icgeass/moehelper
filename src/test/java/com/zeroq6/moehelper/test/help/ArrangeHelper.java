@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class ArrangeHelper {
 
-    public final static String packDirName = "Pool_Packages";
+    public final static String POOL_PACKAGES_DIR_NAME = "Pool_Packages";
 
     public static String getFolderName(int startInTenThousand, EndStringType endStringType) {
         String typeString = endStringType.getHost();
