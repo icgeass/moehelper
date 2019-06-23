@@ -44,7 +44,7 @@ public class PostSyncTest {
             if (!name.contains("_-_Pack_")) {
                 continue;
             }
-            if (item.isFile() || item.isHidden()) {
+            if (item.isFile()) {
                 continue;
             }
             //
