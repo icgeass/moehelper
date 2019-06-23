@@ -50,7 +50,7 @@ public class Configuration {
     // 其他初始配置
     private static boolean init = false;
     private static String[] inputParams = null;
-    private static String beginTime = MyDateUtils.format(new Date(), "yyMMddHHmmss");
+    private static String beginTime = MyDateUtils.format(new Date(), "yyyyMMddHHmmss");
     private static int fromPage = -1;
     private static int toPage = -1;
 

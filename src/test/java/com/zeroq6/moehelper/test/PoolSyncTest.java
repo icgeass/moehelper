@@ -116,10 +116,6 @@ public class PoolSyncTest {
 
     }
 
-    @Test
-    public void checkWorkSpace() throws Exception {
-        WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir("C:\\Users\\yuuki asuna\\Desktop\\workspace");
-    }
 
     private File genMoveToDirById(int id, File toDir) throws Exception {
         if (id < 1) {

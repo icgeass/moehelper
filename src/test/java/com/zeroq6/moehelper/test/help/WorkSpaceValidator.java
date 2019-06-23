@@ -119,7 +119,7 @@ public class WorkSpaceValidator {
         }
 
 
-        // 校验404，md5_err文件夹yande.re_-_Pool_Packages_CRC32_ERROR.txt文件是否存在
+        // 校验其他文件是否一致
         Collection<File> fileCollectionToSha1 = FileUtils.listFiles(fileFilter.getRootDir(),
                 new IOFileFilter() {
                     @Override
@@ -139,6 +139,7 @@ public class WorkSpaceValidator {
             System.out.println("fileCollectionToSha1: " + JSON.toJSONString(fileCollectionToSha1));
             throw new RuntimeException(String.format("现有摘要值=%s与保存的摘要值=%s不相等", sha1Hex, SHA1_HEX_OTHER_FILES));
         }
+        System.out.println("验证成功：" + srcWorkSpaceDir);
 
 
     }

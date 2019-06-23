@@ -33,9 +33,9 @@ public class PrevPoolCheckUtils {
     private static int lastTimePageTo = -1;
     private static boolean init = false;
 
-    private static Pattern pattern_filename_json = Pattern.compile("^yande.re_-_pool_[0-9]{12}_[0-9]{1,}_[0-9]{1,}[.]json$");
+    private static Pattern pattern_filename_json = Pattern.compile("^yande.re_-_pool_[0-9]{12,14}_[0-9]{1,}_[0-9]{1,}[.]json$");
 
-    private static Pattern pattern_filename_packages_all_url = Pattern.compile("^yande.re_-_pool_[0-9]{12}_[0-9]{1,}_[0-9]{1,}_packages_url[.]lst$");
+    private static Pattern pattern_filename_packages_all_url = Pattern.compile("^yande.re_-_pool_[0-9]{12,14}_[0-9]{1,}_[0-9]{1,}_packages_url[.]lst$");
 
     private static Pattern pattern_md5 = Pattern.compile("^[0-9a-z]{32}$");
 
