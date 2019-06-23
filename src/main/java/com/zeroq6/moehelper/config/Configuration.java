@@ -113,7 +113,7 @@ public class Configuration {
             MyLogUtils.fatal("只能初始化一次");
         }
         if (!checkParams(args)) {
-            System.out.println("usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]");
+            System.out.println("usage: \r\n\tjava -jar <jarfile> <fromindex> <toindex> [<--post|--pool> [--moe|--kona]]");
             System.out.println("\r\n(optional): \r\n\t-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080 -Dfile.encoding=UTF-8");
             System.exit(-1);
         }
@@ -164,9 +164,9 @@ public class Configuration {
         }
         // 3, 4个参数
         if (args.length > 2) {
-            if ("--Pool".equalsIgnoreCase(args[2])) {
+            if ("--pool".equalsIgnoreCase(args[2])) {
                 Configuration.linkType = POOL;
-            } else if (!"--Post".equalsIgnoreCase(args[2])) {
+            } else if (!"--post".equalsIgnoreCase(args[2])) {
                 return false;
             }
             if (args.length == 4) {

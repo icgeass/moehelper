@@ -28,12 +28,12 @@ public class PoolSyncTest {
     @Test
     public void sync() throws Exception {
         // 最近更新的pool
-        File newDir = new File("I:\\yande.re\\yande.re_-_Pool_20190521");
+        File newDir = new File("H:\\yande.re\\yande.re_-_Pool_20190623");
         // 以前更新的pool，如果是最终移动到Pool_Packages，需要设定为Pool_Packages目录
-        File oldDir = new File("I:\\yande.re\\Pool_Packages");
+        File oldDir = new File("H:\\yande.re\\Pool_Packages");
 
         // 如果finalToPoolPackages = true;则必须设置
-        String txtFile = "C:\\Users\\yuuki asuna\\Desktop\\workspace\\yande.re\\pool\\yande.re_-_pool_190517065816_1_6301_info.txt";
+        String txtFile = "C:\\Users\\yuuki asuna\\Desktop\\新建文件夹\\workspace\\yande.re\\pool\\yande.re_-_pool_20190621003648_1_6388_info.txt";
 
         // 最终移动到Pool_Packages时设置为true
         boolean finalToPoolPackages = true;
@@ -52,8 +52,6 @@ public class PoolSyncTest {
             if (!oldDir.getName().equals(poolPackages)) {
                 throw new RuntimeException("旧目录名必须为" + poolPackages);
             }
-            // 事先校验
-            PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
         } else {
             if (!Pattern.matches(reg, oldDir.getName())) {
                 throw new RuntimeException("旧目录名必须满足正则" + reg);
@@ -89,11 +87,11 @@ public class PoolSyncTest {
                 }
             }
         }
-        // 事后校验
-        PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
-        // 如果是最终目录，则将父目录下所有文件readOnly
+        // 如果是最终目录，则将父目录下所有文件readOnly，并且校验
         if (finalToPoolPackages || ArrangeHelper.POOL_PACKAGES_DIR_NAME.equals(oldDir.getName())) {
-            FileUtils.listFiles(oldDir.getParentFile(), null, null).stream().forEach(file -> file.setReadOnly());
+            // 事后校验
+            PoolChecker.check(oldDir.getCanonicalPath(), txtFile);
+            FileUtils.listFiles(oldDir.getParentFile(), null, true).stream().forEach(file -> file.setReadOnly());
         }
 
     }

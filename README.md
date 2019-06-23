@@ -4,7 +4,7 @@
 
 ### 用法
 
-```java -jar <jarfile> <fromindex> <toindex> [<--Post|--Pool> [--moe|--kona]]```
+```java -jar <jarfile> <fromindex> <toindex> [<--post|--pool> [--moe|--kona]]```
 
 ### 注意
 
