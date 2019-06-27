@@ -13,6 +13,9 @@ import java.util.List;
 
 public class PostSyncTest {
 
+    private final static String WORK_FILE_CONTAINS_404 = "_404_";
+    private final static String WORK_FILE_CONTAINS_MD5_ERR = "_md5_err_";
+
 
     @Test
     public void test() throws Exception {
@@ -77,8 +80,18 @@ public class PostSyncTest {
             // 打包关联work文件
             List<File> workFileList = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
                     && file.getName().contains("_" + start + "_" + end));
-            if (workFileList.size() != 11 && workFileList.size() != 12 && workFileList.size() != 13) {
-                throw new RuntimeException("workFileList.size() != 11 && workFileList.size() != 12 && workFileList.size() != 13");
+            // 校验打包文件数目
+            int predictCount = 11;
+            for (File f : workFileList) {
+                String fileName = f.getName();
+                if (fileName.contains(WORK_FILE_CONTAINS_404)) {
+                    predictCount++;
+                } else if (fileName.contains(WORK_FILE_CONTAINS_MD5_ERR)) {
+                    predictCount++;
+                }
+            }
+            if (workFileList.size() != predictCount) {
+                throw new RuntimeException(String.format("workFileList.size(%s) != predictCount(%s)", workFileList.size(), predictCount));
             }
             File zipFile = new File(item, item.getName() + "_data.zip");
             ZipUtils.zipFileFolders(zipFile, workFileList, item.getName() + "_data");
@@ -87,11 +100,12 @@ public class PostSyncTest {
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
             Collection<File> imageFileWithMd5ZipList = FileUtils.listFiles(item, null, true);
+            if (imageFileList.size() + 2 != imageFileWithMd5ZipList.size()) {
+                throw new RuntimeException("imageFileList.size + 2 != imageFileWithMd5ZipList.size");
+            }
+
             // 设置所有文件包括MD5,图片文件,zip打包工作文件只读
             imageFileWithMd5ZipList.stream().forEach(file -> file.setReadOnly());
-            if (imageFileList.size() != imageFileWithMd5ZipList.size() && imageFileList.size() + 2 != imageFileWithMd5ZipList.size()) {
-                throw new RuntimeException("imageFileList.size(or +2) != imageFileWithMd5ZipList.size");
-            }
 
             // 校验文件数量是否与日志文件中一致
             PostStatistics postStatistics = new PostStatistics(srcWorkSpaceDir + File.separator + endStringType.getHost() + File.separator + "post", start, end);
@@ -106,16 +120,19 @@ public class PostSyncTest {
 
             if (endStringType == EndStringType.KONA_All || endStringType == EndStringType.MOE_NOT_IN_POOL) {
                 List<File> file404List = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
-                        && file.getName().contains("_404_")
+                        && file.getName().contains(WORK_FILE_CONTAINS_404)
                         && file.getName().contains("_" + start + "_" + end));
                 if (file404List.size() == 1) {
                     String file404Name = file404List.get(0).getName();
                     imageCountInLogFile -= Integer.valueOf(file404Name.substring(file404Name.lastIndexOf("_") + 1, file404Name.lastIndexOf(".")));
+                } else if (file404List.size() != 0) {
+                    throw new RuntimeException("file404List.size() != 0 and != 1");
                 }
             }
             if (imageFileList.size() != imageCountInLogFile) {
                 throw new RuntimeException("imageFile in disk = " + imageFileList.size() + ", in log file = " + imageCountInLogFile);
             }
+            MyLogUtils.stdOut("硬盘图片数目(" + imageFileList.size() + ") = 日志文件记录文件数目(" + imageCountInLogFile + ")");
             MyLogUtils.stdOut("同步验证通过，" + name);
 
 

@@ -22,10 +22,10 @@ public class CalcInfoTest {
 
     @Test
     public void calcInfoTest() throws IOException {
-        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\!work\\konachan.com\\post";
+        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace\\yande.re\\post";
         // ------------------------------------
 
-        PostStatistics postStatistics = new PostStatistics(logFilesDir, 50001, 60000);
+        PostStatistics postStatistics = new PostStatistics(logFilesDir, null, null);
         postStatistics.writeToFile(new File("./tmp/all_post_info_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".txt"));
         MyLogUtils.stdOut(postStatistics.toString());
     }

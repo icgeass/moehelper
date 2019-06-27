@@ -51,6 +51,8 @@ public class PostStatistics {
     private Integer toPostId;
     //
     private List<String> fileNameReadFrom = null;
+    //
+    private String host;
 
     public PostStatistics(String logFileFolder) {
         this(logFileFolder, null, null);
@@ -73,9 +75,16 @@ public class PostStatistics {
             writeCount = new int[4];
             maxPostId = null;
             minPostId = null;
+            host = null;
             for (File file : dir.listFiles()) {
                 if (file.getName().endsWith(logFileSuffix)) {
                     String[] splitArray = file.getName().split("_");
+                    String newHost = splitArray[0];
+                    if (null == host) {
+                        host = newHost;
+                    } else if (!host.equals(newHost)) {
+                        throw new RuntimeException(String.format("文件中host必须一致，old=%s, new=%s", host, newHost));
+                    }
                     Integer recentMaxPostId = Integer.valueOf(splitArray[5]);
                     Integer recentMinPostId = Integer.valueOf(splitArray[4]);
                     maxPostId = null == maxPostId ? recentMaxPostId : (maxPostId < recentMaxPostId ? recentMaxPostId : maxPostId);
@@ -277,6 +286,7 @@ public class PostStatistics {
     public String toString() {
         List<String> liResult = new ArrayList<String>();
         liResult.add(MyDateUtils.formatCurrentTime());
+        liResult.add("HOST: " + host);
         liResult.add("统计: ");
         liResult.add("");
         liResult.add("Id 范围: " + fromPostId + " - " + toPostId);
