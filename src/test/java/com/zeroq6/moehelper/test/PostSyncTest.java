@@ -77,8 +77,10 @@ public class PostSyncTest {
                 throw new RuntimeException("md5File.size() != 1, " + item.getName());
             }
             File md5File = md5FileList.get(0);
-            if (md5File.exists()) {
-                md5File.setReadable(true);
+            File md5FileInPackDir = new File(item, md5File.getName());
+            if (md5FileInPackDir.exists()) {
+                md5FileInPackDir.setWritable(true);
+                MyLogUtils.stdOut(md5FileInPackDir.getCanonicalPath() + "--->setWritable(true) to be replaced");
             }
             FileUtils.copyFileToDirectory(md5File, item);
             MyLogUtils.stdOut("MD5文件复制完成：" + md5FileList.get(0).getCanonicalPath());
@@ -102,7 +104,8 @@ public class PostSyncTest {
             }
             File zipFile = new File(item, item.getName() + "_data.zip");
             if (zipFile.exists()) {
-                zipFile.setReadable(true);
+                zipFile.setWritable(true);
+                MyLogUtils.stdOut(zipFile.getCanonicalPath() + "--->setWritable(true) to be replaced");
             }
             ZipUtils.zipFileFolders(zipFile, workFileList, item.getName() + "_data");
             MyLogUtils.stdOut("打包成功(" + workFileList.size() + "): " + zipFile.getCanonicalPath());
@@ -114,7 +117,7 @@ public class PostSyncTest {
                 throw new RuntimeException("imageFileList.size + 2 != imageFileWithMd5ZipList.size");
             }
 
-            // 设置所有文件包括MD5,图片文件,zip打包工作文件只读
+            // 【重要】设置所有文件包括MD5,图片文件,zip打包工作文件只读
             imageFileWithMd5ZipList.stream().forEach(file -> file.setReadOnly());
 
             // 校验文件数量是否与日志文件中一致
@@ -143,7 +146,7 @@ public class PostSyncTest {
                 throw new RuntimeException("imageFile in disk = " + imageFileList.size() + ", in log file = " + imageCountInLogFile);
             }
             MyLogUtils.stdOut("硬盘图片数目(" + imageFileList.size() + ") = 日志文件记录文件数目(" + imageCountInLogFile + ")");
-            MyLogUtils.stdOut("同步验证通过，" + name);
+            MyLogUtils.stdOut("-------------同步验证通过，" + name + "-------------");
 
 
         }
