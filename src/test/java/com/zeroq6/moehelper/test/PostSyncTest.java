@@ -20,7 +20,7 @@ public class PostSyncTest {
     @Test
     public void test() throws Exception {
         String srcWorkSpaceDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace";
-        String[] targetStorePostDirArray = new String[]{"P:\\BaiduDownload"};
+        String[] targetStorePostDirArray = new String[]{"H:\\post"};
         for (String item : targetStorePostDirArray) {
             syncAndCheck(srcWorkSpaceDir, item);
         }
@@ -70,11 +70,18 @@ public class PostSyncTest {
 
 
             // 复制md5文件
-            List<File> md5File = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
+            List<File> md5FileList = fileFilter.filter(file -> file.getName().startsWith(endStringType.getHost())
                     && file.getName().contains("_" + start + "_" + end)
                     && file.getName().endsWith(endStringType.getEndStringInMd5File()), 1);
-            FileUtils.copyFileToDirectory(md5File.get(0), item);
-            MyLogUtils.stdOut("MD5文件复制完成：" + md5File.get(0).getCanonicalPath());
+            if (md5FileList.size() != 1) {
+                throw new RuntimeException("md5File.size() != 1, " + item.getName());
+            }
+            File md5File = md5FileList.get(0);
+            if (md5File.exists()) {
+                md5File.setReadable(true);
+            }
+            FileUtils.copyFileToDirectory(md5File, item);
+            MyLogUtils.stdOut("MD5文件复制完成：" + md5FileList.get(0).getCanonicalPath());
 
 
             // 打包关联work文件
@@ -94,8 +101,11 @@ public class PostSyncTest {
                 throw new RuntimeException(String.format("workFileList.size(%s) != predictCount(%s)", workFileList.size(), predictCount));
             }
             File zipFile = new File(item, item.getName() + "_data.zip");
+            if (zipFile.exists()) {
+                zipFile.setReadable(true);
+            }
             ZipUtils.zipFileFolders(zipFile, workFileList, item.getName() + "_data");
-            MyLogUtils.stdOut("打包成功: " + zipFile.getCanonicalPath());
+            MyLogUtils.stdOut("打包成功(" + workFileList.size() + "): " + zipFile.getCanonicalPath());
 
             // 校验是否存在多余文件
             Collection<File> imageFileList = FileUtils.listFiles(item, new String[]{"jpg", "jpeg", "gif", "png", "swf"}, false);
