@@ -22,7 +22,7 @@ public class CalcInfoTest {
 
     @Test
     public void calcInfoTest() throws IOException {
-        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace\\yande.re\\post";
+        String logFilesDir = "C:\\Users\\yuuki asuna\\Desktop\\workspace\\konachan.com\\post";
         // ------------------------------------
 
         PostStatistics postStatistics = new PostStatistics(logFilesDir, null, null);

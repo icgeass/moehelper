@@ -8,7 +8,7 @@ public class WorkSpaceCheckTest {
 
     @Test
     public void checkWorkSpace() throws Exception {
-        WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir("C:\\Users\\yuuki asuna\\Desktop\\新建文件夹\\workspace");
+        WorkSpaceValidator.checkAndSetReadOnlyWorkSpaceDir("C:\\Users\\yuuki asuna\\Desktop\\workspace");
     }
 
 }

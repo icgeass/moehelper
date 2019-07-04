@@ -21,7 +21,7 @@ public class WorkSpaceValidator {
     private static String[] poolWorkFileNameSuffix = new String[]{".json", ".log", "_info.txt", "_info_details.txt",
             "_info_updated.txt", "_packages_updated_url.lst", "_packages_url.lst", "_stderr.txt", "_stdout.txt"};
 
-    private final static String SHA1_HEX_OTHER_FILES = "81e7d3310bb5066e3cb1966bd3b6d4e4fb8a9757";
+    private final static String SHA1_HEX_OTHER_FILES = "7709d9971cb7ca38ebce522660600782fe76c0b7";
 
     private final static String WORKSPACE_DIR_NAME = "workspace";
 
